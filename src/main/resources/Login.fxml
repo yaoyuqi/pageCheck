@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="300.0" prefWidth="400.0"
+            xmlns="http://javafx.com/javafx/8.0.121" fx:controller="Ywk.UserInterface.Controller.LoginController">
+    <children>
+        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="30.0" AnchorPane.bottomAnchor="10.0"
+              AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+            <children>
+                <Label text="万词霸屏">
+                    <padding>
+                        <Insets left="50.0" right="50.0"/>
+                    </padding>
+                    <font>
+                        <Font size="36.0"/>
+                    </font>
+                </Label>
+                <GridPane>
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="253.0" minWidth="70.0" prefWidth="99.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="304.0" minWidth="10.0" prefWidth="261.0"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                    <opaqueInsets>
+                        <Insets/>
+                    </opaqueInsets>
+                    <children>
+                        <Label text="用户名"/>
+                        <Label text="密码" GridPane.rowIndex="1"/>
+                        <TextField GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                        <TextField GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    </children>
+                    <padding>
+                        <Insets left="30.0" right="30.0"/>
+                    </padding>
+                </GridPane>
+                <Button mnemonicParsing="false" text="登录" onAction="#login">
+                    <opaqueInsets>
+                        <Insets/>
+                    </opaqueInsets>
+                    <padding>
+                        <Insets left="50.0" right="50.0"/>
+                    </padding>
+                    <font>
+                        <Font size="24.0"/>
+                    </font>
+                </Button>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>
