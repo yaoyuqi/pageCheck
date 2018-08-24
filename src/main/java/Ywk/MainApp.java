@@ -1,5 +1,6 @@
 package Ywk;
 
+import Ywk.UserInterface.Controller.HomeController;
 import Ywk.UserInterface.Controller.LoginController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -34,7 +35,7 @@ public class MainApp extends Application {
         loginController.setApp(this);
 
         Scene scene = new Scene(root, 400, 300);
-        primaryStage.setTitle("海量推万词霸屏系统");
+        primaryStage.setTitle("海量推万词霸屏");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -58,6 +59,8 @@ public class MainApp extends Application {
 //            primaryStage.setHeight(bounds.getHeight());
 
             Scene scene = new Scene(pane, SCREEN_WIDTH, SCREEN_HEIGHT);
+            HomeController controller = loader.getController();
+            controller.setApp(this);
             primaryStage.setScene(scene);
         } catch (IOException e) {
             e.printStackTrace();

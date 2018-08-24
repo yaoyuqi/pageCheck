@@ -17,15 +17,21 @@ public class BaiduCapture {
         capture.setIdleCallback(handler);
     }
 
+    public static String makeUrl(int type, String keyword) {
+        if (type == Info.TYPE_PC) {
+            return PC_URL + keyword;
+
+        } else {
+            return MOBILE_URL + keyword;
+        }
+    }
+
     public void run(String keyword, int type) {
         if (type == Info.TYPE_PC) {
-            String hostPc = PC_URL + keyword;
-            capture.pc(hostPc, keyword);
-
+            capture.pc(makeUrl(type, keyword), keyword);
         }
         else {
-            String hostMobile = MOBILE_URL + keyword;
-            capture.mobile(hostMobile, keyword);
+            capture.mobile(makeUrl(type, keyword), keyword);
         }
     }
 

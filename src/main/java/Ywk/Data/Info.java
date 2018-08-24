@@ -1,5 +1,6 @@
 package Ywk.Data;
 
+
 public class Info {
     public static int TYPE_PC = 1;
     public static int TYPE_MOBILE = 2;
@@ -56,4 +57,5 @@ public class Info {
     public int getTotal() {
         return total;
     }
+
 }
