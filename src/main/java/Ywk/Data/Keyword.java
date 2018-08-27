@@ -80,4 +80,12 @@ public class Keyword {
         }
         return words;
     }
+
+    public int getTotal() {
+        if (prefix.length == 0 && main.length == 0 && suffix.length == 0) {
+            return 0;
+        }
+        return (prefix.length + 1) * (main.length + 1) * (suffix.length + 1) - 1;
+    }
+
 }

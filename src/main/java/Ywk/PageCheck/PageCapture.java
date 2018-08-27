@@ -10,13 +10,19 @@ public class PageCapture {
 
     private BaiduChecker checker;
 
+    private RunningUpdateListener listener;
+
     public PageCapture(int maxPerHost, int maxRequest) {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        Dispatcher dispatcher = new Dispatcher();
+
+        client = builder.build();
+        Dispatcher dispatcher = client.dispatcher();
         dispatcher.setMaxRequests(maxRequest);
         dispatcher.setMaxRequestsPerHost(maxPerHost);
-        builder.dispatcher(dispatcher);
-        client = builder.build();
+    }
+
+    public void setListener(RunningUpdateListener listener) {
+        this.listener = listener;
     }
 
     public void setIdleCallback(Runnable callback) {
@@ -40,12 +46,15 @@ public class PageCapture {
 
             @Override
             public void onFailure(Call call, IOException e) {
+                listener.updateRunningInfo();
                 checker.checkPcFail(keyword);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 checker.checkPC(response.body().string(), keyword);
+                listener.updateRunningInfo();
+
             }
         });
 
@@ -73,11 +82,15 @@ public class PageCapture {
             @Override
             public void onFailure(Call call, IOException e) {
                 checker.checkMobileFail(keyword);
+                listener.updateRunningInfo();
+
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 checker.checkMobile(response.body().string(), keyword);
+                listener.updateRunningInfo();
+
             }
         });
 //        try (Response response = client.newCall(request).execute()) {
@@ -88,6 +101,10 @@ public class PageCapture {
 //        catch (IOException e) {
 //            e.printStackTrace();
 //        }
+    }
+
+    public interface RunningUpdateListener {
+        public void updateRunningInfo();
     }
 
 

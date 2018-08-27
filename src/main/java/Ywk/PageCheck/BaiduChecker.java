@@ -16,9 +16,15 @@ public class BaiduChecker {
 
     private XMLWriter writer;
 
+    private CheckResult resultListener;
+
     public BaiduChecker(String identity, XMLWriter writer) {
         this.identity = identity;
         this.writer = writer;
+    }
+
+    public void setResultListener(CheckResult resultListener) {
+        this.resultListener = resultListener;
     }
 
     public void checkPC(String content, String keyword) {
@@ -28,7 +34,7 @@ public class BaiduChecker {
             ArrayList<String> list = new ArrayList<>();
 
             Elements results = doc.select("div.result.c-container");
-            for (Element result: results) {
+            for (Element result : results) {
                 String data = result.text();
                 if (data.contains(identity)) {
                     String index = result.id();
@@ -40,13 +46,20 @@ public class BaiduChecker {
             }
             if (!list.isEmpty()) {
                 SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                writer.add(keyword, Info.TYPE_PC, list.toArray(new String[list.size()]), ft.format(new Date()));
-                System.out.println(keyword + " check in pc ok" );
+//                writer.add(keyword, Info.TYPE_PC, list.toArray(new String[list.size()]), ft.format(new Date()));
+                System.out.println(keyword + " check in pc ok");
+
+                Info info = new Info();
+                info.setKeyword(keyword);
+                info.setType(Info.TYPE_PC);
+                info.setTime(ft.format(new Date()));
+                info.setLoc(list.toArray(new String[list.size()]));
+                writer.add(info);
+                resultListener.found(info);
 
             }
 
-        }
-        else {
+        } else {
             System.out.println(keyword + " check in pc no results");
         }
 
@@ -75,8 +88,7 @@ public class BaiduChecker {
             ArrayList<String> list = new ArrayList<>();
 
 
-
-            for (Element result: results) {
+            for (Element result : results) {
                 String data = result.text();
                 if (data.contains(identity)) {
                     String index = result.attr("order");
@@ -99,19 +111,30 @@ public class BaiduChecker {
             }
 
             if (!list.isEmpty()) {
-                System.out.println(keyword + " check in mobile ok" );
+                System.out.println(keyword + " check in mobile ok");
 
                 SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-                writer.add(keyword, Info.TYPE_MOBILE, list.toArray(new String[list.size()]), ft.format(new Date()));
+//                writer.add(keyword, Info.TYPE_MOBILE, list.toArray(new String[list.size()]), ft.format(new Date()));
+                Info info = new Info();
+                info.setKeyword(keyword);
+                info.setType(Info.TYPE_MOBILE);
+                info.setTime(ft.format(new Date()));
+                info.setLoc(list.toArray(new String[list.size()]));
+                writer.add(info);
+                resultListener.found(info);
             }
 
 
-
-        }
-        else {
+        } else {
             System.out.println(keyword + " check in mobile no results");
 
         }
     }
+
+    public interface CheckResult {
+        public void found(Info info);
+    }
+
+
 }

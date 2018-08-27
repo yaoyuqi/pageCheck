@@ -4,15 +4,16 @@ package Ywk.Data;
 public class Info {
     public static int TYPE_PC = 1;
     public static int TYPE_MOBILE = 2;
+    public static int TYPE_BOTH = 3;
 
     private String keyword;
     private int type;
 
     private int total = 0;
 
-//    private String url;
+    //    private String url;
     private String[] loc;
-//    private String searchUrl;
+    //    private String searchUrl;
     private String time;
 
 

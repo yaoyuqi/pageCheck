@@ -13,10 +13,6 @@ public class BaiduCapture {
         capture.setChecker(check);
     }
 
-    public void setIdleHandler(Runnable handler) {
-        capture.setIdleCallback(handler);
-    }
-
     public static String makeUrl(int type, String keyword) {
         if (type == Info.TYPE_PC) {
             return PC_URL + keyword;
@@ -26,12 +22,22 @@ public class BaiduCapture {
         }
     }
 
+    public PageCapture getCapture() {
+        return capture;
+    }
+
+    public void setIdleHandler(Runnable handler) {
+        capture.setIdleCallback(handler);
+    }
+
     public void run(String keyword, int type) {
         if (type == Info.TYPE_PC) {
             capture.pc(makeUrl(type, keyword), keyword);
-        }
-        else {
+        } else if (type == Info.TYPE_MOBILE) {
             capture.mobile(makeUrl(type, keyword), keyword);
+        } else {
+            capture.pc(makeUrl(Info.TYPE_PC, keyword), keyword);
+            capture.mobile(makeUrl(Info.TYPE_MOBILE, keyword), keyword);
         }
     }
 

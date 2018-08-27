@@ -40,8 +40,8 @@
                         </GridPane>
                         <HBox spacing="10.0">
                             <children>
-                                <CheckBox fx:id="checkMobileCb" mnemonicParsing="false" text="PC端"/>
-                                <CheckBox fx:id="checkPcCb" mnemonicParsing="false" text="手机端"/>
+                                <CheckBox fx:id="checkPcCb" mnemonicParsing="false" selected="true" text="PC端"/>
+                                <CheckBox fx:id="checkMobileCb" mnemonicParsing="false" text="手机端"/>
                             </children>
                             <padding>
                                 <Insets left="10.0"/>
@@ -58,7 +58,7 @@
                         </HBox>
                         <HBox spacing="10.0">
                             <children>
-                                <Button fx:id="startBtn" mnemonicParsing="false" text="开始"/>
+                                <Button fx:id="startBtn" mnemonicParsing="false" onAction="#HandleStart" text="开始"/>
                                 <Button fx:id="resumeBtn" disable="true" mnemonicParsing="false" text="继续"/>
                                 <Button fx:id="stopBtn" mnemonicParsing="false" text="停止"/>
                             </children>

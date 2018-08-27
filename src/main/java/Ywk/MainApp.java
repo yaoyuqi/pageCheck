@@ -22,6 +22,10 @@ public class MainApp extends Application {
     public MainApp() {
     }
 
+    public static void main(String[] args) {
+        launch(args);
+    }
+
     public void start(Stage primaryStage) throws Exception {
 
 
@@ -40,12 +44,9 @@ public class MainApp extends Application {
         primaryStage.show();
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
-
     public void gotoMain() {
         try {
+            String identity = "xcWj2";
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainApp.class.getResource("/Main.fxml"));
             AnchorPane pane = loader.load();
@@ -60,7 +61,7 @@ public class MainApp extends Application {
 
             Scene scene = new Scene(pane, SCREEN_WIDTH, SCREEN_HEIGHT);
             HomeController controller = loader.getController();
-            controller.setApp(this);
+            controller.setApp(this, identity);
             primaryStage.setScene(scene);
         } catch (IOException e) {
             e.printStackTrace();
