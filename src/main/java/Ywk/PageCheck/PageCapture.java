@@ -21,6 +21,10 @@ public class PageCapture {
         dispatcher.setMaxRequestsPerHost(maxPerHost);
     }
 
+    public PageCapture(OkHttpClient client) {
+        this.client = client;
+    }
+
     public void setListener(RunningUpdateListener listener) {
         this.listener = listener;
     }
@@ -103,9 +107,20 @@ public class PageCapture {
 //        }
     }
 
+
+    public void stopAll() {
+        Dispatcher dispatcher = client.dispatcher();
+        dispatcher.cancelAll();
+    }
+
     public interface RunningUpdateListener {
         public void updateRunningInfo();
     }
 
+    public void setSpeed(int speed) {
+        Dispatcher dispatcher = client.dispatcher();
+        dispatcher.setMaxRequestsPerHost(speed);
+        dispatcher.setMaxRequests(speed);
+    }
 
 }

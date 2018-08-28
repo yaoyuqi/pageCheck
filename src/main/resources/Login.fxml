@@ -33,8 +33,8 @@
                     <children>
                         <Label text="用户名"/>
                         <Label text="密码" GridPane.rowIndex="1"/>
-                        <TextField GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                        <TextField GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        <TextField fx:id="account" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                        <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                     </children>
                     <padding>
                         <Insets left="30.0" right="30.0"/>

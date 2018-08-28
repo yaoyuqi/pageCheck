@@ -1,5 +1,6 @@
 package Ywk;
 
+import Ywk.Api.HltApi;
 import Ywk.UserInterface.Controller.HomeController;
 import Ywk.UserInterface.Controller.LoginController;
 import javafx.application.Application;
@@ -9,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import okhttp3.OkHttpClient;
 
 import java.io.IOException;
 
@@ -19,6 +21,8 @@ public class MainApp extends Application {
 
     private Stage primaryStage;
 
+    private OkHttpClient client;
+
     public MainApp() {
     }
 
@@ -27,7 +31,9 @@ public class MainApp extends Application {
     }
 
     public void start(Stage primaryStage) throws Exception {
+        client = (new OkHttpClient.Builder()).build();
 
+        HltApi.getInstance(client);
 
         this.primaryStage = primaryStage;
 
@@ -61,10 +67,15 @@ public class MainApp extends Application {
 
             Scene scene = new Scene(pane, SCREEN_WIDTH, SCREEN_HEIGHT);
             HomeController controller = loader.getController();
-            controller.setApp(this, identity);
+            controller.setClient(client);
+            controller.setApp(this);
             primaryStage.setScene(scene);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public Stage getPrimaryStage() {
+        return primaryStage;
     }
 }

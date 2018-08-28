@@ -2,7 +2,7 @@ package Ywk.Data;
 
 public class Keyword {
 
-    private static final int CHUNK_NUMBER = 100;
+    private static final int CHUNK_NUMBER = 10;
     private final String[] prefix;
     private final String[] main;
     private final String[] suffix;

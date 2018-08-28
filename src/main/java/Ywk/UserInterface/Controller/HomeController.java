@@ -1,5 +1,6 @@
 package Ywk.UserInterface.Controller;
 
+import Ywk.Api.HltApi;
 import Ywk.Data.Info;
 import Ywk.MainApp;
 import Ywk.PageCheck.BaiduCapture;
@@ -15,9 +16,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import okhttp3.OkHttpClient;
 
 public class HomeController {
 
@@ -93,23 +92,71 @@ public class HomeController {
     @FXML
     private TableColumn<InfoModel, String> mobileOpenCl;
 
+    @FXML
+    private CheckBox autoUploadCb;
+
+    @FXML
+    private Button uploadBtn;
+
 
     private TaskManage manage;
+
+    private OkHttpClient client;
 
     public HomeController() {
     }
 
-    public void setApp(MainApp app, String identity) {
+    public void setApp(MainApp app) {
         this.app = app;
-        manage = new TaskManage(identity);
+//        manage = new TaskManage(identity);
+        manage = new TaskManage();
         manage.setController(this);
+
+
+//        for (int i = 0; i < 100000; i++) {
+//            Info info = new Info();
+//            info.setType(1);
+//            info.setLoc(new String[]{"1", "2", "3"});
+//            info.setTime("2018-12-1 1:1:1");
+//            info.setKeyword("肯尼亚CICC" + i);
+//            listPc.add(new InfoModel(info));
+//        }
+//
+//        for (int i = 0; i < 100000; i++) {
+//            Info info = new Info();
+//            info.setType(2);
+//            info.setLoc(new String[]{"1", "2", "3"});
+//            info.setTime("2018-12-1 1:1:1");
+//            info.setKeyword("肯尼亚CICC" + i);
+//            listMobile.add(new InfoModel(info));
+//        }
+    }
+
+    public OkHttpClient getClient() {
+        return client;
+    }
+
+    public void setClient(OkHttpClient client) {
+        this.client = client;
+    }
+
+    public void setIdentity(String identity) {
+        manage.setIdentity(identity);
+        System.out.println("identity=" + identity);
     }
 
     @FXML
     private void initialize() {
         listPcTv.setItems(listPc);
         listMobileTv.setItems(listMobile);
-//        updateTaskStatus();
+
+        uploadBtn.setDisable(true);
+        autoUploadCb.setSelected(true);
+
+        speedSlider.setValue(50.0);
+
+        HltApi api = HltApi.getInstance();
+        api.identity(this);
 
         pcKeywordsCl.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>>() {
             @Override
@@ -167,18 +214,8 @@ public class HomeController {
 //                            }
 //                        }
                         if (model != null) {
-
-                            try {
-                                String url = model.getKeyword();
-                                url = URLEncoder.encode(url, "UTF-8");
-                                url = BaiduCapture.makeUrl(Info.TYPE_PC, url);
-                                System.out.println(url);
-                                app.getHostServices().showDocument(url);
-                            } catch (UnsupportedEncodingException e) {
-                                e.printStackTrace();
-                            }
-//                            String url = model.getTime();
-//                            app.getHostServices().showDocument("http://www.baidu.com?wd=" + url);
+                            String url = BaiduCapture.makeUrl(Info.TYPE_PC, model.getKeyword());
+                            app.getHostServices().showDocument(url);
                         }
 
 //
@@ -234,15 +271,9 @@ public class HomeController {
                         TableCell<InfoModel, String> cell = (TableCell<InfoModel, String>) event.getSource();
 
                         InfoModel model = listMobile.get(cell.getIndex());
-                        try {
-                            String url = model.getKeyword();
-                            url = URLEncoder.encode(url, "UTF-8");
-                            url = BaiduCapture.makeUrl(Info.TYPE_MOBILE, url);
-                            System.out.println(url);
-                            app.getHostServices().showDocument(url);
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        }
+                        String url = BaiduCapture.makeUrl(Info.TYPE_MOBILE, model.getKeyword());
+                        app.getHostServices().showDocument(url);
+
                     }
                 });
                 return cell;
@@ -269,6 +300,7 @@ public class HomeController {
 
         manage.setType(type);
 
+
         int runSpeed = ((Double) speedSlider.getValue()).intValue() % 10;
         if (runSpeed == 0) {
             runSpeed = 1;
@@ -276,12 +308,56 @@ public class HomeController {
 
         manage.setSpeed(runSpeed);
 
-        startBtn.setDisable(true);
-        stopBtn.setDisable(false);
+
+        manage.setTaskStatus(TaskManage.TASK_STATUS_NEW);
+
+        //new设置， 放在子线程里更新不上
+
 
         Thread thread = new Thread(manage);
         thread.start();
 
+
+    }
+
+    @FXML
+    private void handleStop() {
+        manage.stopAll();
+        manage.setTaskStatus(TaskManage.TASK_STATUS_STOPPED);
+
+    }
+
+    @FXML
+    private void handleResume() {
+
+        boolean pcSelected = checkPcCb.isSelected();
+        boolean mobileSelected = checkMobileCb.isSelected();
+        int type = 0;
+        if (pcSelected && mobileSelected) {
+            type = Info.TYPE_BOTH;
+        } else if (pcSelected) {
+            type = Info.TYPE_PC;
+        } else if (mobileSelected) {
+            type = Info.TYPE_MOBILE;
+        } else {
+            //TODO error
+        }
+
+        manage.setType(type);
+
+        int runSpeed = ((Double) speedSlider.getValue()).intValue() % 10;
+        if (runSpeed == 0) {
+            runSpeed = 1;
+        }
+
+        manage.setSpeed(runSpeed);
+
+
+        manage.setTaskStatus(TaskManage.TASK_STATUS_RESUME);
+
+
+        Thread thread = new Thread(manage);
+        thread.start();
 
     }
 
@@ -317,45 +393,98 @@ public class HomeController {
     }
 
     public void updateTaskStatus() {
-        try {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (manage.getTaskStatus() == TaskManage.TASK_STATUS_NEW) {
-                        startBtn.setDisable(false);
-                        stopBtn.setDisable(true);
-                        resumeBtn.setDisable(true);
-                        checkPcCb.setDisable(false);
-                        checkMobileCb.setDisable(false);
-                    } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_RUNNING) {
-                        startBtn.setDisable(true);
-                        stopBtn.setDisable(false);
-                        resumeBtn.setDisable(false);
-                        resumeBtn.setText("暂停");
 
-                        checkPcCb.setDisable(true);
-                        checkMobileCb.setDisable(true);
-                    } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_FINISHED) {
-                        startBtn.setDisable(false);
-                        startBtn.setText("重新开始");
-                        stopBtn.setDisable(true);
-                        resumeBtn.setDisable(true);
-                        checkPcCb.setDisable(false);
-                        checkMobileCb.setDisable(false);
+        if (manage.getTaskStatus() == TaskManage.TASK_STATUS_RUNNING
+                || manage.getTaskStatus() == TaskManage.TASK_STATUS_FINISHED
+                ) {
+            try {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (manage.getTaskStatus() == TaskManage.TASK_STATUS_RUNNING) {
+                            startBtn.setDisable(true);
+                            stopBtn.setDisable(false);
+                            resumeBtn.setDisable(true);
+                            checkPcCb.setDisable(true);
+                            checkMobileCb.setDisable(true);
+                            autoUploadCb.setDisable(true);
+                            uploadBtn.setDisable(true);
+                        } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_FINISHED) {
+                            startBtn.setDisable(false);
+                            startBtn.setText("开始");
+                            stopBtn.setDisable(true);
+                            resumeBtn.setDisable(true);
+                            checkPcCb.setDisable(false);
+                            checkMobileCb.setDisable(false);
+                            autoUploadCb.setDisable(true);
+                            uploadBtn.setDisable(false);
+                        }
                     }
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_NEW) {
+            checkedLabel.setText("0");
+            manage.setRunned(0);
+
+            manage.setMobileBingo(0);
+            showedPcLabel.setText("0");
+            manage.setPcBingo(0);
+            showedMobileLabel.setText("0");
+
+            startBtn.setDisable(false);
+            stopBtn.setDisable(true);
+            resumeBtn.setDisable(true);
+            checkPcCb.setDisable(false);
+            checkMobileCb.setDisable(false);
+            autoUploadCb.setDisable(false);
+            uploadBtn.setDisable(false);
+
+            listPc.clear();
+            listMobile.clear();
+        } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_STOPPED) {
+            startBtn.setDisable(false);
+            startBtn.setText("重新开始");
+            stopBtn.setDisable(true);
+            resumeBtn.setDisable(false);
+            checkPcCb.setDisable(false);
+            checkMobileCb.setDisable(false);
+
+            autoUploadCb.setDisable(true);
+            uploadBtn.setDisable(false);
+
+        } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_RESUME) {
+            //new设置， 放在子线程里更新不上
+            startBtn.setDisable(false);
+            stopBtn.setDisable(true);
+            resumeBtn.setDisable(true);
+            checkPcCb.setDisable(false);
+            checkMobileCb.setDisable(false);
+            autoUploadCb.setDisable(true);
+            uploadBtn.setDisable(false);
+
         }
     }
 
-    public void addResult(Info info) {
+    public synchronized void addResult(Info info) {
         if (info.getType() == Info.TYPE_PC) {
 
             listPc.add(new InfoModel(info));
         } else {
             listMobile.add(new InfoModel(info));
+        }
+
+        try {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    showedMobileLabel.setText(manage.getMobileBingo() + "");
+                    showedPcLabel.setText(manage.getPcBingo() + "");
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

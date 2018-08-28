@@ -5,7 +5,7 @@ import Ywk.Data.Keyword;
 import Ywk.Data.XMLWriter;
 
 public class CheckManage implements Runnable {
-    private final int type;
+    private int type;
     private Keyword keyword;
     private BaiduCapture baiduCapture;
     private XMLWriter writer;
@@ -27,6 +27,9 @@ public class CheckManage implements Runnable {
 
     @Override
     public void run() {
+        if (listener.isStopped()) {
+            return;
+        }
 
         String[] next = keyword.nextChunk();
         if (next != null) {
@@ -58,7 +61,13 @@ public class CheckManage implements Runnable {
         return finished;
     }
 
+    public void setType(int type) {
+        this.type = type;
+    }
+
     public interface TaskFinishListener {
         public void finish();
+
+        public boolean isStopped();
     }
 }

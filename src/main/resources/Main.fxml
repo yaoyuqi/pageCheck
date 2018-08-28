@@ -31,9 +31,9 @@
                                 <Label fx:id="totalLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
                                 <Label text="已检索" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                                 <Label fx:id="checkedLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                                <Label text="上屏数" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                                <Label text="PC上屏" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
                                 <Label fx:id="showedPcLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                                <Label text="上屏数" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                                <Label text="手机上屏" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
                                 <Label fx:id="showedMobileLabel" text="0" GridPane.columnIndex="1"
                                        GridPane.rowIndex="3"/>
                             </children>
@@ -56,11 +56,18 @@
                                 <Insets left="10.0" top="10.0"/>
                             </padding>
                         </HBox>
+                        <CheckBox fx:id="autoUploadCb" mnemonicParsing="false" text="完成后自动上传结果">
+                            <VBox.margin>
+                                <Insets bottom="10.0" left="10.0" top="10.0"/>
+                            </VBox.margin>
+                        </CheckBox>
                         <HBox spacing="10.0">
                             <children>
                                 <Button fx:id="startBtn" mnemonicParsing="false" onAction="#HandleStart" text="开始"/>
-                                <Button fx:id="resumeBtn" disable="true" mnemonicParsing="false" text="继续"/>
-                                <Button fx:id="stopBtn" mnemonicParsing="false" text="停止"/>
+                                <Button fx:id="resumeBtn" disable="true" mnemonicParsing="false"
+                                        onAction="#handleResume" text="继续"/>
+                                <Button fx:id="stopBtn" disable="true" mnemonicParsing="false" onAction="#handleStop"
+                                        text="停止"/>
                             </children>
                             <VBox.margin>
                                 <Insets/>
@@ -69,36 +76,42 @@
                                 <Insets left="10.0" top="10.0"/>
                             </padding>
                         </HBox>
-                        <GridPane>
-                            <columnConstraints>
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="86.0" minWidth="10.0" prefWidth="66.0"/>
-                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="115.0" minWidth="10.0"
-                                                   prefWidth="114.0"/>
-                            </columnConstraints>
-                            <rowConstraints>
-                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                            </rowConstraints>
+                        <Button fx:id="uploadBtn" mnemonicParsing="false" text="上传结果">
                             <VBox.margin>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                <Insets bottom="10.0" left="10.0" top="10.0"/>
                             </VBox.margin>
-                            <children>
-                                <Label text="已运行" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                                <Label fx:id="runnedLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                                <Label text="剩余时间" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                                <Label fx:id="estimateLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                            </children>
-                        </GridPane>
-                        <ProgressBar fx:id="progressBar" prefWidth="200.0" progress="0.0">
-                            <VBox.margin>
-                                <Insets left="10.0" right="10.0" top="10.0"/>
-                            </VBox.margin>
-                        </ProgressBar>
-                        <ListView fx:id="infoLv" prefHeight="200.0" prefWidth="200.0">
-                            <VBox.margin>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
-                            </VBox.margin>
-                        </ListView>
+                        </Button>
+
+                        <!--<GridPane>-->
+                        <!--<columnConstraints>-->
+                        <!--<ColumnConstraints hgrow="SOMETIMES" maxWidth="86.0" minWidth="10.0" prefWidth="66.0"/>-->
+                        <!--<ColumnConstraints hgrow="SOMETIMES" maxWidth="115.0" minWidth="10.0"-->
+                        <!--prefWidth="114.0"/>-->
+                        <!--</columnConstraints>-->
+                        <!--<rowConstraints>-->
+                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
+                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
+                        <!--</rowConstraints>-->
+                        <!--<VBox.margin>-->
+                        <!--<Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>-->
+                        <!--</VBox.margin>-->
+                        <!--&lt;!&ndash;<children>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<Label text="已运行" GridPane.columnIndex="0" GridPane.rowIndex="0"/>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<Label fx:id="runnedLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="0"/>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<Label text="剩余时间" GridPane.columnIndex="0" GridPane.rowIndex="1"/>&ndash;&gt;-->
+                        <!--&lt;!&ndash;<Label fx:id="estimateLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</children>&ndash;&gt;-->
+                        <!--</GridPane>-->
+                        <!--<ProgressBar fx:id="progressBar" prefWidth="200.0" progress="0.0">-->
+                        <!--<VBox.margin>-->
+                        <!--<Insets left="10.0" right="10.0" top="10.0"/>-->
+                        <!--</VBox.margin>-->
+                        <!--</ProgressBar>-->
+                        <!--<ListView fx:id="infoLv" prefHeight="200.0" prefWidth="200.0">-->
+                        <!--<VBox.margin>-->
+                        <!--<Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>-->
+                        <!--</VBox.margin>-->
+                        <!--</ListView>-->
 
 
                     </children>

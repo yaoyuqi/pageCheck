@@ -57,6 +57,7 @@ public class BaiduChecker {
                 writer.add(info);
                 resultListener.found(info);
 
+
             }
 
         } else {
