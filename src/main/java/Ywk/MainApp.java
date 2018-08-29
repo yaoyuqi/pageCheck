@@ -4,12 +4,14 @@ import Ywk.Api.HltApi;
 import Ywk.UserInterface.Controller.HomeController;
 import Ywk.UserInterface.Controller.LoginController;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import okhttp3.OkHttpClient;
 
 import java.io.IOException;
@@ -36,6 +38,10 @@ public class MainApp extends Application {
         HltApi.getInstance(client);
 
         this.primaryStage = primaryStage;
+        primaryStage.setOnCloseRequest((WindowEvent event) -> {
+            Platform.exit();
+            System.exit(0);
+        });
 
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(MainApp.class.getResource("/Login.fxml"));
