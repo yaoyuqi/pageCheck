@@ -116,15 +116,16 @@ public class HomeController {
 
     public HomeController() {
         manage = new TaskManage();
+
+
     }
 
     public void setApp(MainApp app) {
         this.app = app;
         manage = new TaskManage();
         manage.setController(this);
-
         manage.setTaskStatus(TaskManage.TASK_STATUS_NEW);
-
+        manage.prepareKeyword();
 
 //        for (int i = 0; i < 100000; i++) {
 //            Info info = new Info();
@@ -155,6 +156,7 @@ public class HomeController {
 
     public void setIdentity(String identity) {
         manage.setIdentity(identity);
+//        manage.setIdentity("xcWj2");
         System.out.println("identity=" + identity);
     }
 
@@ -181,11 +183,6 @@ public class HomeController {
         pcCheckTimeCl.setSortable(false);
         pcLocCl.setSortable(false);
 
-//        pcKeywordsCl.setMaxWidth(150);
-//        pcPageCl.setMaxWidth(50);
-//        pcCheckTimeCl.setMaxWidth(150);
-//        pcLocCl.setMaxWidth(100);
-//        pcOpenCl.setMaxWidth(50);
         pcCheckTimeCl.setMinWidth(80);
         pcKeywordsCl.setMinWidth(150);
 
@@ -340,7 +337,7 @@ public class HomeController {
 
 
     @FXML
-    private void HandleStart() {
+    private void handleStart() {
         manage.setTaskStatus(TaskManage.TASK_STATUS_NEW);
         boolean pcSelected = checkPcCb.isSelected();
         boolean mobileSelected = checkMobileCb.isSelected();
@@ -369,12 +366,14 @@ public class HomeController {
 
         manage.setTaskStatus(TaskManage.TASK_STATUS_NEW_RUNNING);
 
+        manage.setAutoUpdate(autoUploadCb.isSelected());
+
 
         //new设置， 放在子线程里更新不上
 
 
         Thread thread = new Thread(manage);
-        thread.setDaemon(true);
+//        thread.setDaemon(true);
         thread.start();
     }
 
@@ -382,12 +381,11 @@ public class HomeController {
     private void handleStop() {
         manage.stopAll();
         manage.setTaskStatus(TaskManage.TASK_STATUS_STOPPED);
-
+        showAlert(Alert.AlertType.INFORMATION, "已停止 \n");
     }
 
     @FXML
     private void handleResume() {
-
         boolean pcSelected = checkPcCb.isSelected();
         boolean mobileSelected = checkMobileCb.isSelected();
         int type = 0;
@@ -411,14 +409,19 @@ public class HomeController {
         manage.setPageDepth(pageChoiceBox.getValue());
         manage.setSpeed(runSpeed);
         manage.setTaskStatus(TaskManage.TASK_STATUS_RESUME_RUNNING);
-
+        manage.setAutoUpdate(autoUploadCb.isSelected());
 
         Thread thread = new Thread(manage);
-        thread.setDaemon(true);
+//        thread.setDaemon(true);
         thread.start();
 
     }
 
+    /**
+     * 更新总数量
+     *
+     * @param total
+     */
     public void setTotal(final int total) {
         try {
             Platform.runLater(new Runnable() {
@@ -438,6 +441,10 @@ public class HomeController {
 
     }
 
+    /**
+     * 更新已检索数量
+     * @param runned
+     */
     public void updateRunned(int runned) {
         try {
             Platform.runLater(new Runnable() {
@@ -461,6 +468,9 @@ public class HomeController {
 
     }
 
+    /**
+     * 更新状态
+     */
     public void updateTaskStatus() {
         if (!Platform.isFxApplicationThread()) {
             try {
@@ -534,7 +544,6 @@ public class HomeController {
         pageChoiceBox.setDisable(false); //检索深度 可用
         uploadBtn.setDisable(false); //上传按钮 可用
 
-        showAlert(Alert.AlertType.INFORMATION, "上传成功");
     }
 
 
@@ -565,7 +574,6 @@ public class HomeController {
         autoUploadCb.setDisable(false); //自动上传 可用
         pageChoiceBox.setDisable(false); //检索深度 可用
         uploadBtn.setDisable(false); //上传按钮 可用
-        showAlert(Alert.AlertType.INFORMATION, "已暂停 \n");
     }
 
 
@@ -594,6 +602,11 @@ public class HomeController {
     }
 
 
+    /**
+     * 回调， 将爬取结果放回列表显示
+     * 同时更新页面命中数
+     * @param info
+     */
     public synchronized void addResult(Info info) {
         if (info.getType() == Info.TYPE_PC) {
             listPc.add(0, new InfoModel(info));
@@ -623,6 +636,87 @@ public class HomeController {
         alert.setContentText(message);
         alert.setHeaderText(null);
         alert.show();
+    }
+
+    /**
+     * 显示网络异常alert
+     */
+    public void alertNetError() {
+        if (!Platform.isFxApplicationThread()) {
+            try {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        showAlert(Alert.AlertType.ERROR, "网络错误，请检查网络并上后重试");
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            showAlert(Alert.AlertType.ERROR, "网络错误，请检查网络并上后重试");
+        }
+
+
+    }
+
+    public void alertVital() {
+        if (!Platform.isFxApplicationThread()) {
+            try {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        showAlert(Alert.AlertType.ERROR, "初始化失败，请重启软件");
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            showAlert(Alert.AlertType.ERROR, "初始化失败，请重启软件");
+        }
+    }
+
+    /**
+     * 显示上传成功alert
+     */
+    public void uploadSuccess() {
+        if (!Platform.isFxApplicationThread()) {
+            try {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        showAlert(Alert.AlertType.INFORMATION, "上传成功");
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            showAlert(Alert.AlertType.INFORMATION, "上传成功");
+        }
+    }
+
+    /**
+     * 显示上传失败alert
+     */
+    public void alertUploadError() {
+        if (!Platform.isFxApplicationThread()) {
+            try {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        showAlert(Alert.AlertType.ERROR, "结果上传出错，请稍后重试");
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            showAlert(Alert.AlertType.ERROR, "结果上传出错，请稍后重试");
+        }
+
+
     }
 
 

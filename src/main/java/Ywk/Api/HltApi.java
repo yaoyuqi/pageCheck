@@ -1,6 +1,7 @@
 package Ywk.Api;
 
 import Ywk.Data.ApiWriter;
+import Ywk.PageCheck.TaskManage;
 import Ywk.UserInterface.Controller.HomeController;
 import Ywk.UserInterface.Controller.LoginController;
 import com.google.gson.Gson;
@@ -68,16 +69,6 @@ public class HltApi {
             }
         });
 
-//        try (Response response = client.newCall(request).execute()) {
-//            if (response.isSuccessful()) {
-//                LoginData loginOut = new Gson().fromJson(response.body().string(), LoginData.class);
-//
-//                LoginHeader.getInstance(loginOut.getToken_type() + " " + loginOut.getAccess_token());
-//            }
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
     public void login(String identity, LoginController controller) {
@@ -138,12 +129,16 @@ public class HltApi {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-
+                controller.alertNetError();
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 IdentityData identityData = new Gson().fromJson(response.body().string(), IdentityData.class);
+                if (identityData.getStatus() != 200) {
+                    response.close();
+                    throw new ApiErrorException();
+                }
                 header.setIdentity(identityData.getData().getIdentity());
                 controller.setIdentity(header.getIdentity());
                 response.close();
@@ -162,7 +157,7 @@ public class HltApi {
     }
 
 
-    public WordData words() {
+    public void words(TaskManage manage) throws ApiErrorException {
         String url = host + "api/hltapp/words";
 
         LoginHeader header = LoginHeader.getInstance();
@@ -173,20 +168,40 @@ public class HltApi {
                 .addHeader(header.getHeaderMark(), header.getAccessToken())
                 .build();
 
-        try (Response response = client.newCall(request).execute()) {
-            if (response.isSuccessful()) {
-//                System.out.println(response.body().string());
-                WordData wordData = new Gson().fromJson(response.body().string(), WordData.class);
-
-                return wordData;
-//                header.setIdentity(identityData.getData().getIdentity());
+//        try (Response response = client.newCall(request).execute()) {
+//            if (response.isSuccessful()) {
+////                System.out.println(response.body().string());
+//                WordData wordData = new Gson().fromJson(response.body().string(), WordData.class);
+//                if (wordData.getStatus() != 200) {
+//                    response.close();
+//                    throw new ApiErrorException();
+//                }
+//                return wordData;
+////                header.setIdentity(identityData.getData().getIdentity());
+//            }
+//            response.close();
+//            return null;
+//        } catch (IOException e) {
+//            throw new ApiErrorException();
+//        }
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                manage.initKeyword(null);
             }
-            response.close();
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                WordData wordData = new Gson().fromJson(response.body().string(), WordData.class);
+                if (wordData.getStatus() != 200) {
+                    manage.initKeyword(null);
+                } else {
+                    manage.initKeyword(wordData);
+                }
+                response.close();
+            }
+
+        });
     }
 
     public void upload(Result result, ApiWriter handler) {
@@ -204,6 +219,7 @@ public class HltApi {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                handler.handleResult(result.getType(), result.getPart(), false);
             }
 
             @Override

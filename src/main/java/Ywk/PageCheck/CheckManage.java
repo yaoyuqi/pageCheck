@@ -1,6 +1,5 @@
 package Ywk.PageCheck;
 
-import Ywk.Data.Info;
 import Ywk.Data.Keyword;
 import Ywk.Data.XMLWriter;
 
@@ -39,15 +38,15 @@ public class CheckManage implements Runnable {
                 }
             }
         } else {
-            //如果完了，就要写文件
-            if (type == Info.TYPE_PC) {
-                writer.flush(Info.TYPE_PC);
-            } else if (type == Info.TYPE_MOBILE) {
-                writer.flush(Info.TYPE_MOBILE);
-            } else {
-                writer.flush(Info.TYPE_PC);
-                writer.flush(Info.TYPE_MOBILE);
-            }
+//            //如果完了，就要写文件
+//            if (type == Info.TYPE_PC) {
+//                writer.flush(Info.TYPE_PC);
+//            } else if (type == Info.TYPE_MOBILE) {
+//                writer.flush(Info.TYPE_MOBILE);
+//            } else {
+//                writer.flush(Info.TYPE_PC);
+//                writer.flush(Info.TYPE_MOBILE);
+//            }
             finished = true;
         }
 

@@ -1,6 +1,7 @@
 package Ywk.PageCheck;
 
 
+import Ywk.Api.ApiErrorException;
 import Ywk.Api.HltApi;
 import Ywk.Api.WordData;
 import Ywk.Data.ApiWriter;
@@ -48,6 +49,8 @@ public class TaskManage implements Runnable
 
     private int runned = 0;
 
+    private boolean autoUpdate = false;
+
     private volatile int taskStatus;
 
     private BaiduCapture capture;
@@ -56,8 +59,8 @@ public class TaskManage implements Runnable
 
     private ApiWriter writer;
 
-    public TaskManage(String identity) {
-        this.identity = identity;
+    public void setAutoUpdate(boolean autoUpdate) {
+        this.autoUpdate = autoUpdate;
     }
 
     public TaskManage() {
@@ -87,26 +90,17 @@ public class TaskManage implements Runnable
         this.runned++;
     }
 
-    private void prepareKeyword() {
+    public void prepareKeyword() throws ApiErrorException {
         if (keyword == null) {
 //            String[] prefix = {"成都", "重庆", "肯尼亚"};
 //            String[] main = {"CCIC", "CCIB", "CCIA"};
 //            String[] suffix = {"怎么样", "如何"};
-
-//        setTaskStatus(TaskManage.TASK_STATUS_NEW);
-
             HltApi api = HltApi.getInstance();
-            WordData wordData = api.words();
 
-            keyword = new Keyword(wordData.getData().getPrefix().toArray(new String[]{}),
-                    wordData.getData().getMain().toArray(new String[]{}),
-                    wordData.getData().getSuffix().toArray(new String[]{}));
-
-
-//            keyword = new Keyword(prefix, main, suffix);
+            api.words(this);
         }
 
-        controller.setTotal(keyword.getTotal());
+
     }
 
     public int getTotal() {
@@ -114,7 +108,7 @@ public class TaskManage implements Runnable
     }
 
     private void prepareCheckTool() {
-        if (capture == null || manage == null) {
+        if (capture == null || manage == null || writer == null) {
 //            XMLWriter writer = new XMLWriter();
             writer = new ApiWriter();
             writer.setHandler(this);
@@ -154,11 +148,24 @@ public class TaskManage implements Runnable
         return speed * 5;
     }
 
+    /**
+     * 爬词
+     */
     @Override
     public void run() {
-        prepareKeyword();
+        /*
+            如果keyword为空，则初始化失败。
+            让用户直接重新打开
+         */
+        if (keyword == null) {
+            controller.alertNetError();
+            return;
+        }
+
+        //准备工具
         prepareCheckTool();
 
+        //对于重新开始的，初始化keyword的起始值
         if (taskStatus == TASK_STATUS_NEW_RUNNING) {
             prepareForNew();
         }
@@ -182,18 +189,37 @@ public class TaskManage implements Runnable
         controller.updateTaskStatus();
     }
 
+    /**
+     * 爬取完成 回调
+     */
     @Override
     public void finish() {
         setTaskStatus(TaskManage.TASK_STATUS_FINISHED);
+        //自动上传
+        if (autoUpdate) {
+            uploadResult();
+        }
     }
 
+    /**
+     * 当前是否是停止状态
+     *
+     * @return boolean
+     */
     @Override
     public boolean isStopped() {
         return taskStatus == TASK_STATUS_STOPPED
                 || taskStatus == TASK_UPLOAD_FINISHED_FINISHED
-                || taskStatus == TASK_UPLOAD_UNFINISHED_FINISHED;
+                || taskStatus == TASK_UPLOAD_UNFINISHED_FINISHED
+                || taskStatus == TASK_UPLOAD_UNFINISHED_RUNNING
+                || taskStatus == TASK_UPLOAD_FINISHED_RUNNING
+                || taskStatus == TASK_STATUS_FINISHED;
     }
 
+    /**
+     * 回调 检索出结果
+     * @param info
+     */
     @Override
     public void found(Info info) {
         if (info.getType() == Info.TYPE_PC) {
@@ -205,10 +231,29 @@ public class TaskManage implements Runnable
 
     }
 
+    /**
+     * 上传结果
+     */
     public void uploadResult() {
+        if (writer != null) {
+            writer.flush(Info.TYPE_PC);
+            writer.flush(Info.TYPE_MOBILE);
+        } else {
+            setTaskStatus(taskStatus == TaskManage.TASK_UPLOAD_UNFINISHED_RUNNING ?
+                    TaskManage.TASK_STATUS_STOPPED
+                    : TaskManage.TASK_STATUS_FINISHED);
+        }
 
-        writer.flush(Info.TYPE_PC);
-        writer.flush(Info.TYPE_MOBILE);
+    }
+
+    /**
+     * 上传成功回调
+     */
+    public void uploadSuccess() {
+        setTaskStatus(taskStatus == TaskManage.TASK_UPLOAD_UNFINISHED_RUNNING ?
+                TaskManage.TASK_UPLOAD_UNFINISHED_FINISHED
+                : TaskManage.TASK_UPLOAD_FINISHED_FINISHED);
+        controller.uploadSuccess();
     }
 
     public int getPcBingo() {
@@ -227,14 +272,36 @@ public class TaskManage implements Runnable
         this.mobileBingo = mobileBingo;
     }
 
+    /**
+     * 停止任务
+     */
     public void stopAll() {
         capture.getCapture().stopAll();
     }
 
+    /**
+     * 对于重新开始的，初始化keyword的起始值
+     */
     private void prepareForNew() {
-        keyword.setCurrent(-1, -1, -1);
+        if (keyword != null) {
+            keyword.setCurrent(-1, -1, -1);
+        }
     }
 
+    /**
+     * 回调 上传失败
+     */
+    public void uploadFail() {
+        setTaskStatus(taskStatus == TaskManage.TASK_UPLOAD_UNFINISHED_RUNNING ?
+                TaskManage.TASK_STATUS_STOPPED
+                : TaskManage.TASK_STATUS_FINISHED);
+
+        controller.alertUploadError();
+    }
+
+    /**
+     * 清除数据
+     */
     public void clearData() {
         if (writer != null) {
             writer.clear();
@@ -245,5 +312,25 @@ public class TaskManage implements Runnable
             writer.setDate(ft2.format(new Date()));
         }
 
+    }
+
+    public void initKeyword(WordData wordData) {
+        if (wordData == null) {
+            controller.alertVital();
+        } else {
+
+            keyword = new Keyword(wordData.getData().getPrefix().toArray(new String[]{}),
+                    wordData.getData().getMain().toArray(new String[]{}),
+                    wordData.getData().getSuffix().toArray(new String[]{}));
+//            String[] prefix = {"成都", "重庆", "肯尼亚"};
+//            String[] main = {"CCIC", "CCIB", "CCIA"};
+//            String[] suffix = {"怎么样", "如何"};
+//            keyword = new Keyword(prefix, main, suffix);
+            controller.setTotal(keyword.getTotal());
+        }
+    }
+
+    public void netError() {
+        controller.alertNetError();
     }
 }

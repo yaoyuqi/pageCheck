@@ -70,8 +70,10 @@ public class ApiWriter extends XMLWriter {
             return;
         }
         if (type == Info.TYPE_PC) {
+            apiResultPc.clear();
             chunkAndSend(listPc, Info.TYPE_PC, mark, date);
         } else {
+            apiResultMobile.clear();
             chunkAndSend(listMobile, Info.TYPE_MOBILE, mark, date);
         }
     }
@@ -127,10 +129,28 @@ public class ApiWriter extends XMLWriter {
         }
 
         if (finished) {
+            boolean ok = true;
+            for (int s : apiResultPc) {
+                if (s == STATUS_FAIL) {
+                    ok = false;
+                    break;
+                }
+            }
 
-            handler.setTaskStatus(handler.getTaskStatus() == TaskManage.TASK_UPLOAD_UNFINISHED_RUNNING ?
-                    TaskManage.TASK_UPLOAD_UNFINISHED_FINISHED
-                    : TaskManage.TASK_UPLOAD_FINISHED_FINISHED);
+            if (ok) {
+                for (int s : apiResultMobile) {
+                    if (s == STATUS_FAIL) {
+                        ok = false;
+                        break;
+                    }
+                }
+            }
+
+            if (!ok) {
+                handler.uploadFail();
+            } else {
+                handler.uploadSuccess();
+            }
         }
 //        System.out.println("current part=" + part);
 //

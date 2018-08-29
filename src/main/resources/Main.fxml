@@ -74,7 +74,7 @@
                         </CheckBox>
                         <HBox spacing="10.0">
                             <children>
-                                <Button fx:id="startBtn" mnemonicParsing="false" onAction="#HandleStart" text="开始"/>
+                                <Button fx:id="startBtn" mnemonicParsing="false" onAction="#handleStart" text="开始"/>
                                 <Button fx:id="resumeBtn" disable="true" mnemonicParsing="false"
                                         onAction="#handleResume" text="继续"/>
                                 <Button fx:id="stopBtn" disable="true" mnemonicParsing="false" onAction="#handleStop"

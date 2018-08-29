@@ -58,7 +58,7 @@ public class PageCapture {
             public void onResponse(Call call, Response response) throws IOException {
                 checker.checkPC(response.body().string(), keyword, page);
                 listener.updateRunningInfo();
-
+                response.close();
             }
         });
 
@@ -94,6 +94,7 @@ public class PageCapture {
             public void onResponse(Call call, Response response) throws IOException {
                 checker.checkMobile(response.body().string(), keyword, page);
                 listener.updateRunningInfo();
+                response.close();
 
             }
         });

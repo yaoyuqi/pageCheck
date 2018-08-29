@@ -3,13 +3,14 @@ package Ywk.Data;
 public class Keyword {
 
     private static final int CHUNK_NUMBER = 10;
-    private final String[] prefix;
-    private final String[] main;
-    private final String[] suffix;
+    private String[] prefix;
+    private String[] main;
+    private String[] suffix;
 
     private int curPrefix = -1;
     private int curMain = -1;
     private int curSuffix = -1;
+
 
     public Keyword(String[] prefix, String[] main, String[] suffix) {
         this.prefix = prefix;
