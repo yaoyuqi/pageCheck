@@ -30,7 +30,8 @@ public class ApiWriter extends XMLWriter {
     public ApiWriter() {
         SimpleDateFormat ft = new SimpleDateFormat("yyyyMMddHHmmss");
         SimpleDateFormat ft2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        new ApiWriter(ft.format(new Date()), ft2.format(new Date()));
+        mark = ft.format(new Date());
+        date = ft2.format(new Date());
     }
 
     public ApiWriter(String mark, String date) {
@@ -61,6 +62,13 @@ public class ApiWriter extends XMLWriter {
 
     @Override
     public synchronized void flush(int type) {
+        if (listPc.isEmpty() && listMobile.isEmpty()) {
+            handler.setTaskStatus(handler.getTaskStatus() == TaskManage.TASK_UPLOAD_UNFINISHED_RUNNING ?
+                    TaskManage.TASK_UPLOAD_UNFINISHED_FINISHED
+                    : TaskManage.TASK_UPLOAD_FINISHED_FINISHED);
+
+            return;
+        }
         if (type == Info.TYPE_PC) {
             chunkAndSend(listPc, Info.TYPE_PC, mark, date);
         } else {
@@ -119,7 +127,10 @@ public class ApiWriter extends XMLWriter {
         }
 
         if (finished) {
-            handler.setTaskStatus(TaskManage.TASK_UPLOAD_FINISHED);
+
+            handler.setTaskStatus(handler.getTaskStatus() == TaskManage.TASK_UPLOAD_UNFINISHED_RUNNING ?
+                    TaskManage.TASK_UPLOAD_UNFINISHED_FINISHED
+                    : TaskManage.TASK_UPLOAD_FINISHED_FINISHED);
         }
 //        System.out.println("current part=" + part);
 //

@@ -10,7 +10,7 @@ import java.util.List;
 
 public class XMLWriter implements Writer {
 
-    static final int CHUNK_TO_WRITE_MAX = 3;
+    static final int CHUNK_TO_WRITE_MAX = 3000;
     protected List<Info> listPc = new ArrayList<>();
     protected List<Info> listMobile = new ArrayList<>();
     private XStream xStream = new XStream();

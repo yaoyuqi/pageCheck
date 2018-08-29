@@ -139,16 +139,16 @@
                     <tabs>
                         <Tab text="百度电脑端">
                             <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="800.0">
                                     <children>
-                                        <TableView fx:id="listPcTv" prefHeight="600.0" prefWidth="600.0"
+                                        <TableView fx:id="listPcTv" prefHeight="600.0" prefWidth="800.0"
                                                    AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columns>
                                                 <TableColumn fx:id="pcKeywordsCl" prefWidth="200.0" text="关键词"/>
-                                                <TableColumn fx:id="pcPageCl" prefWidth="200.0" text="页数"/>
-                                                <TableColumn fx:id="pcLocCl" prefWidth="200.0" text="位置"/>
-                                                <TableColumn fx:id="pcCheckTimeCl" prefWidth="75.0" text="查询时间"/>
+                                                <TableColumn fx:id="pcPageCl" prefWidth="50.0" text="页数"/>
+                                                <TableColumn fx:id="pcLocCl" prefWidth="150.0" text="位置"/>
+                                                <TableColumn fx:id="pcCheckTimeCl" prefWidth="100.0" text="查询时间"/>
                                                 <TableColumn fx:id="pcOpenCl" prefWidth="75.0" text="查看页面"/>
                                             </columns>
                                             <columnResizePolicy>
@@ -161,16 +161,16 @@
                         </Tab>
                         <Tab text="百度移动端">
                             <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="800.0">
                                     <children>
-                                        <TableView fx:id="listMobileTv" prefHeight="600.0" prefWidth="600.0"
+                                        <TableView fx:id="listMobileTv" prefHeight="600.0" prefWidth="800.0"
                                                    AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columns>
                                                 <TableColumn fx:id="mobileKeywordsCl" prefWidth="200.0" text="关键词"/>
-                                                <TableColumn fx:id="mobilePageCl" prefWidth="100.0" text="页数"/>
-                                                <TableColumn fx:id="mobileLocCl" prefWidth="200.0" text="位置"/>
-                                                <TableColumn fx:id="mobileCheckTimeCl" prefWidth="75.0" text="查询时间"/>
+                                                <TableColumn fx:id="mobilePageCl" prefWidth="50.0" text="页数"/>
+                                                <TableColumn fx:id="mobileLocCl" prefWidth="150.0" text="位置"/>
+                                                <TableColumn fx:id="mobileCheckTimeCl" prefWidth="100.0" text="查询时间"/>
                                                 <TableColumn fx:id="mobileOpenCl" prefWidth="75.0" text="查看页面"/>
                                             </columns>
                                             <columnResizePolicy>

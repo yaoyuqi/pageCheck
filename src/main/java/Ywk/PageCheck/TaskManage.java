@@ -22,6 +22,10 @@ public class TaskManage implements Runnable
     public static final int TASK_STATUS_STOPPED = 3;
     public static final int TASK_STATUS_FINISHED = 4;
     public static final int TASK_UPLOAD_RUNNING = 5;
+    public static final int TASK_UPLOAD_UNFINISHED_RUNNING = 8;
+    public static final int TASK_UPLOAD_UNFINISHED_FINISHED = 9;
+    public static final int TASK_UPLOAD_FINISHED_RUNNING = 10;
+    public static final int TASK_UPLOAD_FINISHED_FINISHED = 11;
     public static final int TASK_UPLOAD_FINISHED = 6;
 
 
@@ -186,7 +190,8 @@ public class TaskManage implements Runnable
     @Override
     public boolean isStopped() {
         return taskStatus == TASK_STATUS_STOPPED
-                || taskStatus == TASK_UPLOAD_FINISHED;
+                || taskStatus == TASK_UPLOAD_FINISHED_FINISHED
+                || taskStatus == TASK_UPLOAD_UNFINISHED_FINISHED;
     }
 
     @Override
@@ -201,6 +206,7 @@ public class TaskManage implements Runnable
     }
 
     public void uploadResult() {
+
         writer.flush(Info.TYPE_PC);
         writer.flush(Info.TYPE_MOBILE);
     }

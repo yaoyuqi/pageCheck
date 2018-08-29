@@ -20,6 +20,8 @@ import okhttp3.OkHttpClient;
 
 public class HomeController {
 
+    private static final int MAX_SHOW = 1000;
+
     private MainApp app;
 
     @FXML
@@ -172,6 +174,32 @@ public class HomeController {
         HltApi api = HltApi.getInstance();
         api.identity(this);
 
+        pcKeywordsCl.setSortable(false);
+
+        pcPageCl.setSortable(false);
+        pcOpenCl.setSortable(false);
+        pcCheckTimeCl.setSortable(false);
+        pcLocCl.setSortable(false);
+
+//        pcKeywordsCl.setMaxWidth(150);
+//        pcPageCl.setMaxWidth(50);
+//        pcCheckTimeCl.setMaxWidth(150);
+//        pcLocCl.setMaxWidth(100);
+//        pcOpenCl.setMaxWidth(50);
+        pcCheckTimeCl.setMinWidth(80);
+        pcKeywordsCl.setMinWidth(150);
+
+
+        mobileKeywordsCl.setSortable(false);
+        mobilePageCl.setSortable(false);
+        mobileLocCl.setSortable(false);
+        mobileCheckTimeCl.setSortable(false);
+        mobileOpenCl.setSortable(false);
+
+        mobileCheckTimeCl.setMinWidth(80);
+        mobileKeywordsCl.setMinWidth(150);
+
+
         pcKeywordsCl.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TableColumn.CellDataFeatures<InfoModel, String> param) {
@@ -313,6 +341,7 @@ public class HomeController {
 
     @FXML
     private void HandleStart() {
+        manage.setTaskStatus(TaskManage.TASK_STATUS_NEW);
         boolean pcSelected = checkPcCb.isSelected();
         boolean mobileSelected = checkMobileCb.isSelected();
         int type = 0;
@@ -424,7 +453,10 @@ public class HomeController {
 
     @FXML
     private void handleUpload() {
-        manage.setTaskStatus(TaskManage.TASK_UPLOAD_RUNNING);
+
+        manage.setTaskStatus(manage.getTaskStatus() == TaskManage.TASK_STATUS_STOPPED ?
+                TaskManage.TASK_UPLOAD_UNFINISHED_RUNNING
+                : TaskManage.TASK_UPLOAD_FINISHED_RUNNING);
         manage.uploadResult();
 
     }
@@ -456,12 +488,15 @@ public class HomeController {
             updateRunningStatus();
         } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_STOPPED) {
             updateStopStatus();
-        } else if (manage.getTaskStatus() == TaskManage.TASK_UPLOAD_FINISHED) {
+        } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_FINISHED) {
             updateFinishedStatus();
-        } else if (manage.getTaskStatus() == TaskManage.TASK_UPLOAD_RUNNING) {
+        } else if (manage.getTaskStatus() == TaskManage.TASK_UPLOAD_FINISHED_RUNNING
+                || manage.getTaskStatus() == TaskManage.TASK_UPLOAD_UNFINISHED_RUNNING) {
             updateUploadingStatus();
-        } else if (manage.getTaskStatus() == TaskManage.TASK_UPLOAD_FINISHED) {
+        } else if (manage.getTaskStatus() == TaskManage.TASK_UPLOAD_FINISHED_FINISHED
+                || manage.getTaskStatus() == TaskManage.TASK_UPLOAD_UNFINISHED_FINISHED) {
             updateUploadFinishedStatus();
+            resumeBtn.setDisable(manage.getTaskStatus() == TaskManage.TASK_UPLOAD_FINISHED_FINISHED); //继续按钮
         }
     }
 
@@ -474,7 +509,14 @@ public class HomeController {
         manage.setPcBingo(0);
         showedMobileLabel.setText("0");
 
-        updateUploadFinishedStatus();
+        startBtn.setDisable(false);//开始按钮 可用
+        stopBtn.setDisable(true); //结束按钮 不可用
+        resumeBtn.setDisable(true); //继续按钮 不可用
+        checkPcCb.setDisable(false); //平台勾选 可用
+        checkMobileCb.setDisable(false); //平台勾选 可用
+        autoUploadCb.setDisable(false); //自动上传 可用
+        pageChoiceBox.setDisable(false); //检索深度 可用
+        uploadBtn.setDisable(false); //上传按钮 可用
 
         listPc.clear();
         listMobile.clear();
@@ -485,12 +527,14 @@ public class HomeController {
 
         startBtn.setDisable(false);//开始按钮 可用
         stopBtn.setDisable(true); //结束按钮 不可用
-        resumeBtn.setDisable(true); //继续按钮 不可用
+
         checkPcCb.setDisable(false); //平台勾选 可用
         checkMobileCb.setDisable(false); //平台勾选 可用
         autoUploadCb.setDisable(false); //自动上传 可用
         pageChoiceBox.setDisable(false); //检索深度 可用
         uploadBtn.setDisable(false); //上传按钮 可用
+
+        showAlert(Alert.AlertType.INFORMATION, "上传成功");
     }
 
 
@@ -521,6 +565,7 @@ public class HomeController {
         autoUploadCb.setDisable(false); //自动上传 可用
         pageChoiceBox.setDisable(false); //检索深度 可用
         uploadBtn.setDisable(false); //上传按钮 可用
+        showAlert(Alert.AlertType.INFORMATION, "已暂停 \n");
     }
 
 
@@ -551,10 +596,13 @@ public class HomeController {
 
     public synchronized void addResult(Info info) {
         if (info.getType() == Info.TYPE_PC) {
-
-            listPc.add(new InfoModel(info));
+            listPc.add(0, new InfoModel(info));
+            if (listPc.size() > MAX_SHOW) {
+                listPc.remove(MAX_SHOW - 1, listPc.size() - 1);
+            }
         } else {
-            listMobile.add(new InfoModel(info));
+            listMobile.add(0, new InfoModel(info));
+            listMobile.remove(MAX_SHOW - 1, listPc.size() - 1);
         }
 
         try {
@@ -568,6 +616,13 @@ public class HomeController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void showAlert(Alert.AlertType type, String message) {
+        Alert alert = new Alert(type);
+        alert.setContentText(message);
+        alert.setHeaderText(null);
+        alert.show();
     }
 
 

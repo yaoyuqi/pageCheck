@@ -107,6 +107,7 @@ public class HltApi {
                     LoginHeader.getInstance(loginOut.getData().getToken_type() + " " + loginOut.getData().getAccess_token());
                     controller.loginResult(true);
                 }
+                response.close();
 
             }
         });
@@ -145,6 +146,7 @@ public class HltApi {
                 IdentityData identityData = new Gson().fromJson(response.body().string(), IdentityData.class);
                 header.setIdentity(identityData.getData().getIdentity());
                 controller.setIdentity(header.getIdentity());
+                response.close();
             }
         });
 
@@ -175,9 +177,11 @@ public class HltApi {
             if (response.isSuccessful()) {
 //                System.out.println(response.body().string());
                 WordData wordData = new Gson().fromJson(response.body().string(), WordData.class);
+
                 return wordData;
 //                header.setIdentity(identityData.getData().getIdentity());
             }
+            response.close();
             return null;
         } catch (IOException e) {
             e.printStackTrace();
@@ -200,13 +204,13 @@ public class HltApi {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
 //                String responseText = response.body().toString();
                 handler.handleResult(result.getType(), result.getPart(), true);
+                response.close();
             }
         });
 
