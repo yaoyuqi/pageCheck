@@ -5,46 +5,42 @@ import com.thoughtworks.xstream.XStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.ArrayList;
+import java.util.List;
 
 public class XMLWriter implements Writer {
 
-    private static final int CHUNK_TO_WRITE_MAX = 1;
+    static final int CHUNK_TO_WRITE_MAX = 3;
+    protected List<Info> listPc = new ArrayList<>();
+    protected List<Info> listMobile = new ArrayList<>();
     private XStream xStream = new XStream();
-
-    private BlockingDeque<Info> listPc = new LinkedBlockingDeque<>();
-    private BlockingDeque<Info> listMobile = new LinkedBlockingDeque<>();
-
     private int filePC = 0;
     private int fileMobile = 0;
 
-    public void add(Info info) {
-        try {
-            if (info.getType() == Info.TYPE_PC) {
-                listPc.put(info);
-            } else {
-                listMobile.put(info);
-            }
-
-            if (isFull(Info.TYPE_PC)) {
-                flush(Info.TYPE_PC);
-            }
-
-            if (isFull(Info.TYPE_MOBILE)) {
-                flush(Info.TYPE_MOBILE);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    public synchronized void add(Info info) {
+        if (info.getType() == Info.TYPE_PC) {
+            listPc.add(info);
+        } else {
+            listMobile.add(info);
         }
+
+        if (isFull(Info.TYPE_PC)) {
+            flush(Info.TYPE_PC);
+        }
+
+        if (isFull(Info.TYPE_MOBILE)) {
+            flush(Info.TYPE_MOBILE);
+        }
+
     }
 
-    public synchronized void add(String keyword, int type, String[] loc, String time) {
+    public synchronized void add(String keyword, int page, int type, String[] loc, String time) {
         Info info = new Info();
         info.setKeyword(keyword);
         info.setType(type);
         info.setTime(time);
         info.setLoc(loc);
+        info.setPage(page);
         add(info);
     }
 
@@ -80,6 +76,11 @@ public class XMLWriter implements Writer {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public void clear() {
+        listMobile.clear();
+        listPc.clear();
     }
 
 }

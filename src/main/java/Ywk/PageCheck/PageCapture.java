@@ -39,7 +39,7 @@ public class PageCapture {
     }
 
 
-    public void pc(String url, String keyword) {
+    public void pc(String url, String keyword, int page) {
         Request request = new Request.Builder()
                 .get()
                 .url(url)
@@ -56,7 +56,7 @@ public class PageCapture {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                checker.checkPC(response.body().string(), keyword);
+                checker.checkPC(response.body().string(), keyword, page);
                 listener.updateRunningInfo();
 
             }
@@ -75,7 +75,7 @@ public class PageCapture {
     }
 
 
-    public void mobile(String url, String keyword) {
+    public void mobile(String url, String keyword, int page) {
         Request request = new Request.Builder()
                 .get()
                 .url(url)
@@ -92,7 +92,7 @@ public class PageCapture {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                checker.checkMobile(response.body().string(), keyword);
+                checker.checkMobile(response.body().string(), keyword, page);
                 listener.updateRunningInfo();
 
             }
@@ -113,14 +113,14 @@ public class PageCapture {
         dispatcher.cancelAll();
     }
 
-    public interface RunningUpdateListener {
-        public void updateRunningInfo();
-    }
-
     public void setSpeed(int speed) {
         Dispatcher dispatcher = client.dispatcher();
         dispatcher.setMaxRequestsPerHost(speed);
         dispatcher.setMaxRequests(speed);
+    }
+
+    public interface RunningUpdateListener {
+        public void updateRunningInfo();
     }
 
 }

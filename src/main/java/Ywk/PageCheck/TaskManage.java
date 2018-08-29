@@ -3,25 +3,33 @@ package Ywk.PageCheck;
 
 import Ywk.Api.HltApi;
 import Ywk.Api.WordData;
+import Ywk.Data.ApiWriter;
 import Ywk.Data.Info;
 import Ywk.Data.Keyword;
-import Ywk.Data.XMLWriter;
 import Ywk.UserInterface.Controller.HomeController;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class TaskManage implements Runnable
         , PageCapture.RunningUpdateListener
         , CheckManage.TaskFinishListener
         , BaiduChecker.CheckResult {
     public static final int TASK_STATUS_NEW = 0;
-    public static final int TASK_STATUS_RUNNING = 1;
+    public static final int TASK_STATUS_NEW_RUNNING = 1;
+    public static final int TASK_STATUS_RESUME_RUNNING = 7;
     public static final int TASK_STATUS_RESUME = 2;
     public static final int TASK_STATUS_STOPPED = 3;
     public static final int TASK_STATUS_FINISHED = 4;
+    public static final int TASK_UPLOAD_RUNNING = 5;
+    public static final int TASK_UPLOAD_FINISHED = 6;
 
 
     private int type = Info.TYPE_PC;
 
     private int speed = 1;
+
+    private int pageDepth = 1;
 
     private String identity;
 
@@ -42,11 +50,17 @@ public class TaskManage implements Runnable
 
     private HomeController controller;
 
+    private ApiWriter writer;
+
     public TaskManage(String identity) {
         this.identity = identity;
     }
 
     public TaskManage() {
+    }
+
+    public void setPageDepth(int pageDepth) {
+        this.pageDepth = pageDepth;
     }
 
     public void setIdentity(String identity) {
@@ -59,6 +73,10 @@ public class TaskManage implements Runnable
 
     public int getRunned() {
         return runned;
+    }
+
+    public void setRunned(int runned) {
+        this.runned = runned;
     }
 
     private void incrementRunned() {
@@ -87,17 +105,19 @@ public class TaskManage implements Runnable
         controller.setTotal(keyword.getTotal());
     }
 
-
     public int getTotal() {
         return total;
     }
 
     private void prepareCheckTool() {
         if (capture == null || manage == null) {
-            XMLWriter writer = new XMLWriter();
+//            XMLWriter writer = new XMLWriter();
+            writer = new ApiWriter();
+            writer.setHandler(this);
             BaiduChecker checker = new BaiduChecker(identity, writer);
 //            capture = new BaiduCapture(checker, getRunningSpeed());
             capture = new BaiduCapture(checker, controller.getClient());
+            capture.setCheckDepth(pageDepth);
             checker.setResultListener(this);
 
             PageCapture pageCapture = capture.getCapture();
@@ -109,6 +129,7 @@ public class TaskManage implements Runnable
             manage.setListener(this);
         } else {
             manage.setType(type);
+            capture.setCheckDepth(pageDepth);
         }
         capture.setSpeed(getRunningSpeed());
     }
@@ -129,19 +150,17 @@ public class TaskManage implements Runnable
         return speed * 5;
     }
 
-
     @Override
     public void run() {
         prepareKeyword();
         prepareCheckTool();
 
-        if (taskStatus == TASK_STATUS_NEW) {
+        if (taskStatus == TASK_STATUS_NEW_RUNNING) {
             prepareForNew();
         }
 
-        setTaskStatus(TaskManage.TASK_STATUS_RUNNING);
-
         manage.run();
+
     }
 
     @Override
@@ -159,7 +178,6 @@ public class TaskManage implements Runnable
         controller.updateTaskStatus();
     }
 
-
     @Override
     public void finish() {
         setTaskStatus(TaskManage.TASK_STATUS_FINISHED);
@@ -167,7 +185,8 @@ public class TaskManage implements Runnable
 
     @Override
     public boolean isStopped() {
-        return taskStatus == TASK_STATUS_STOPPED;
+        return taskStatus == TASK_STATUS_STOPPED
+                || taskStatus == TASK_UPLOAD_FINISHED;
     }
 
     @Override
@@ -181,8 +200,9 @@ public class TaskManage implements Runnable
 
     }
 
-    public void setRunned(int runned) {
-        this.runned = runned;
+    public void uploadResult() {
+        writer.flush(Info.TYPE_PC);
+        writer.flush(Info.TYPE_MOBILE);
     }
 
     public int getPcBingo() {
@@ -207,5 +227,17 @@ public class TaskManage implements Runnable
 
     private void prepareForNew() {
         keyword.setCurrent(-1, -1, -1);
+    }
+
+    public void clearData() {
+        if (writer != null) {
+            writer.clear();
+
+            SimpleDateFormat ft = new SimpleDateFormat("yyyyMMddHHmmss");
+            SimpleDateFormat ft2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            writer.setMark(ft.format(new Date()));
+            writer.setDate(ft2.format(new Date()));
+        }
+
     }
 }

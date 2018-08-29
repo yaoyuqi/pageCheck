@@ -52,7 +52,7 @@ public class MainApp extends Application {
 
     public void gotoMain() {
         try {
-            String identity = "xcWj2";
+//            String identity = "xcWj2";
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainApp.class.getResource("/Main.fxml"));
             AnchorPane pane = loader.load();

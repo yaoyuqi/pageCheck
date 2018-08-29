@@ -1,5 +1,6 @@
 package Ywk.Api;
 
+import Ywk.Data.ApiWriter;
 import Ywk.UserInterface.Controller.HomeController;
 import Ywk.UserInterface.Controller.LoginController;
 import com.google.gson.Gson;
@@ -56,11 +57,54 @@ public class HltApi {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+//                LoginData loginOut = new Gson().fromJson(response.body().string(), LoginData.class);
+//                if (loginOut.getAccess_token() == null || loginOut.getAccess_token().isEmpty()) {
+//                    controller.loginResult(false);
+//                } else {
+//                    LoginHeader.getInstance(loginOut.getToken_type() + " " + loginOut.getAccess_token());
+//                    controller.loginResult(true);
+//                }
+
+            }
+        });
+
+//        try (Response response = client.newCall(request).execute()) {
+//            if (response.isSuccessful()) {
+//                LoginData loginOut = new Gson().fromJson(response.body().string(), LoginData.class);
+//
+//                LoginHeader.getInstance(loginOut.getToken_type() + " " + loginOut.getAccess_token());
+//            }
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//        }
+    }
+
+    public void login(String identity, LoginController controller) {
+        String url = host + "api/hltapp/login";
+
+        RequestBody body = new FormBody.Builder()
+                .add("identity", identity)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                controller.loginResult(false);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
                 LoginData loginOut = new Gson().fromJson(response.body().string(), LoginData.class);
-                if (loginOut.getAccess_token() == null || loginOut.getAccess_token().isEmpty()) {
+                if (loginOut.getData().getAccess_token() == null || loginOut.getData().getAccess_token().isEmpty()) {
                     controller.loginResult(false);
                 } else {
-                    LoginHeader.getInstance(loginOut.getToken_type() + " " + loginOut.getAccess_token());
+                    LoginHeader.getInstance(loginOut.getData().getToken_type() + " " + loginOut.getData().getAccess_token());
                     controller.loginResult(true);
                 }
 
@@ -139,6 +183,33 @@ public class HltApi {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public void upload(Result result, ApiWriter handler) {
+
+        String url = host + "api/hltapp/results";
+        LoginHeader header = LoginHeader.getInstance();
+        RequestBody requestBody = FormBody.create(MediaType.parse("application/json; charset=utf-8"),
+                new Gson().toJson(result));
+        Request request = new Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .addHeader(header.getHeaderMark(), header.getAccessToken())
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+//                String responseText = response.body().toString();
+                handler.handleResult(result.getType(), result.getPart(), true);
+            }
+        });
+
     }
 }
 

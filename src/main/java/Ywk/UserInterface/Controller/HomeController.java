@@ -77,6 +77,8 @@ public class HomeController {
     @FXML
     private TableColumn<InfoModel, String> pcKeywordsCl;
     @FXML
+    private TableColumn<InfoModel, String> pcPageCl;
+    @FXML
     private TableColumn<InfoModel, String> pcLocCl;
     @FXML
     private TableColumn<InfoModel, String> pcCheckTimeCl;
@@ -85,6 +87,9 @@ public class HomeController {
 
     @FXML
     private TableColumn<InfoModel, String> mobileKeywordsCl;
+
+    @FXML
+    private TableColumn<InfoModel, String> mobilePageCl;
     @FXML
     private TableColumn<InfoModel, String> mobileLocCl;
     @FXML
@@ -98,19 +103,25 @@ public class HomeController {
     @FXML
     private Button uploadBtn;
 
+    @FXML
+    private ChoiceBox<Integer> pageChoiceBox;
+
 
     private TaskManage manage;
 
     private OkHttpClient client;
 
+
     public HomeController() {
+        manage = new TaskManage();
     }
 
     public void setApp(MainApp app) {
         this.app = app;
-//        manage = new TaskManage(identity);
         manage = new TaskManage();
         manage.setController(this);
+
+        manage.setTaskStatus(TaskManage.TASK_STATUS_NEW);
 
 
 //        for (int i = 0; i < 100000; i++) {
@@ -155,6 +166,9 @@ public class HomeController {
 
         speedSlider.setValue(50.0);
 
+        pageChoiceBox.setItems(FXCollections.observableArrayList(1, 2, 3));
+        pageChoiceBox.setValue(1);
+
         HltApi api = HltApi.getInstance();
         api.identity(this);
 
@@ -162,6 +176,13 @@ public class HomeController {
             @Override
             public ObservableValue<String> call(TableColumn.CellDataFeatures<InfoModel, String> param) {
                 return param.getValue().keywordProperty();
+            }
+        });
+
+        pcPageCl.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<InfoModel, String> param) {
+                return param.getValue().pageProperty();
             }
         });
 
@@ -214,7 +235,7 @@ public class HomeController {
 //                            }
 //                        }
                         if (model != null) {
-                            String url = BaiduCapture.makeUrl(Info.TYPE_PC, model.getKeyword());
+                            String url = BaiduCapture.makeUrl(Info.TYPE_PC, model.getKeyword(), model.getPage());
                             app.getHostServices().showDocument(url);
                         }
 
@@ -229,6 +250,13 @@ public class HomeController {
             @Override
             public ObservableValue<String> call(TableColumn.CellDataFeatures<InfoModel, String> param) {
                 return param.getValue().keywordProperty();
+            }
+        });
+
+        mobilePageCl.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<InfoModel, String> param) {
+                return param.getValue().pageProperty();
             }
         });
 
@@ -271,7 +299,7 @@ public class HomeController {
                         TableCell<InfoModel, String> cell = (TableCell<InfoModel, String>) event.getSource();
 
                         InfoModel model = listMobile.get(cell.getIndex());
-                        String url = BaiduCapture.makeUrl(Info.TYPE_MOBILE, model.getKeyword());
+                        String url = BaiduCapture.makeUrl(Info.TYPE_MOBILE, model.getKeyword(), model.getPage());
                         app.getHostServices().showDocument(url);
 
                     }
@@ -298,6 +326,8 @@ public class HomeController {
             //TODO error
         }
 
+        manage.setPageDepth(pageChoiceBox.getValue());
+
         manage.setType(type);
 
 
@@ -308,16 +338,15 @@ public class HomeController {
 
         manage.setSpeed(runSpeed);
 
+        manage.setTaskStatus(TaskManage.TASK_STATUS_NEW_RUNNING);
 
-        manage.setTaskStatus(TaskManage.TASK_STATUS_NEW);
 
         //new设置， 放在子线程里更新不上
 
 
         Thread thread = new Thread(manage);
+        thread.setDaemon(true);
         thread.start();
-
-
     }
 
     @FXML
@@ -350,13 +379,13 @@ public class HomeController {
             runSpeed = 1;
         }
 
+        manage.setPageDepth(pageChoiceBox.getValue());
         manage.setSpeed(runSpeed);
-
-
-        manage.setTaskStatus(TaskManage.TASK_STATUS_RESUME);
+        manage.setTaskStatus(TaskManage.TASK_STATUS_RESUME_RUNNING);
 
 
         Thread thread = new Thread(manage);
+        thread.setDaemon(true);
         thread.start();
 
     }
@@ -370,6 +399,7 @@ public class HomeController {
                     if (manage.getType() == Info.TYPE_BOTH) {
                         newTotal = total * 2;
                     }
+                    newTotal *= pageChoiceBox.getValue();
                     totalLabel.setText("" + newTotal);
                 }
             });
@@ -392,80 +422,132 @@ public class HomeController {
         }
     }
 
-    public void updateTaskStatus() {
+    @FXML
+    private void handleUpload() {
+        manage.setTaskStatus(TaskManage.TASK_UPLOAD_RUNNING);
+        manage.uploadResult();
 
-        if (manage.getTaskStatus() == TaskManage.TASK_STATUS_RUNNING
-                || manage.getTaskStatus() == TaskManage.TASK_STATUS_FINISHED
-                ) {
+    }
+
+    public void updateTaskStatus() {
+        if (!Platform.isFxApplicationThread()) {
             try {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        if (manage.getTaskStatus() == TaskManage.TASK_STATUS_RUNNING) {
-                            startBtn.setDisable(true);
-                            stopBtn.setDisable(false);
-                            resumeBtn.setDisable(true);
-                            checkPcCb.setDisable(true);
-                            checkMobileCb.setDisable(true);
-                            autoUploadCb.setDisable(true);
-                            uploadBtn.setDisable(true);
-                        } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_FINISHED) {
-                            startBtn.setDisable(false);
-                            startBtn.setText("开始");
-                            stopBtn.setDisable(true);
-                            resumeBtn.setDisable(true);
-                            checkPcCb.setDisable(false);
-                            checkMobileCb.setDisable(false);
-                            autoUploadCb.setDisable(true);
-                            uploadBtn.setDisable(false);
-                        }
+                        updateStatus();
                     }
                 });
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_NEW) {
-            checkedLabel.setText("0");
-            manage.setRunned(0);
+        } else {
+            updateStatus();
+        }
 
-            manage.setMobileBingo(0);
-            showedPcLabel.setText("0");
-            manage.setPcBingo(0);
-            showedMobileLabel.setText("0");
+    }
 
-            startBtn.setDisable(false);
-            stopBtn.setDisable(true);
-            resumeBtn.setDisable(true);
-            checkPcCb.setDisable(false);
-            checkMobileCb.setDisable(false);
-            autoUploadCb.setDisable(false);
-            uploadBtn.setDisable(false);
-
-            listPc.clear();
-            listMobile.clear();
+    private void updateStatus() {
+        if (manage.getTaskStatus() == TaskManage.TASK_STATUS_NEW) {
+            updateNewStatus();
+        } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_NEW_RUNNING
+                || manage.getTaskStatus() == TaskManage.TASK_STATUS_RESUME_RUNNING
+                ) {
+            updateRunningStatus();
         } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_STOPPED) {
-            startBtn.setDisable(false);
-            startBtn.setText("重新开始");
-            stopBtn.setDisable(true);
-            resumeBtn.setDisable(false);
-            checkPcCb.setDisable(false);
-            checkMobileCb.setDisable(false);
-
-            autoUploadCb.setDisable(true);
-            uploadBtn.setDisable(false);
-
-        } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_RESUME) {
-            //new设置， 放在子线程里更新不上
-            startBtn.setDisable(false);
-            stopBtn.setDisable(true);
-            resumeBtn.setDisable(true);
-            checkPcCb.setDisable(false);
-            checkMobileCb.setDisable(false);
-            autoUploadCb.setDisable(true);
-            uploadBtn.setDisable(false);
-
+            updateStopStatus();
+        } else if (manage.getTaskStatus() == TaskManage.TASK_UPLOAD_FINISHED) {
+            updateFinishedStatus();
+        } else if (manage.getTaskStatus() == TaskManage.TASK_UPLOAD_RUNNING) {
+            updateUploadingStatus();
+        } else if (manage.getTaskStatus() == TaskManage.TASK_UPLOAD_FINISHED) {
+            updateUploadFinishedStatus();
         }
     }
+
+    private void updateNewStatus() {
+        checkedLabel.setText("0");
+        manage.setRunned(0);
+
+        manage.setMobileBingo(0);
+        showedPcLabel.setText("0");
+        manage.setPcBingo(0);
+        showedMobileLabel.setText("0");
+
+        updateUploadFinishedStatus();
+
+        listPc.clear();
+        listMobile.clear();
+        manage.clearData();
+    }
+
+    private void updateUploadFinishedStatus() {
+
+        startBtn.setDisable(false);//开始按钮 可用
+        stopBtn.setDisable(true); //结束按钮 不可用
+        resumeBtn.setDisable(true); //继续按钮 不可用
+        checkPcCb.setDisable(false); //平台勾选 可用
+        checkMobileCb.setDisable(false); //平台勾选 可用
+        autoUploadCb.setDisable(false); //自动上传 可用
+        pageChoiceBox.setDisable(false); //检索深度 可用
+        uploadBtn.setDisable(false); //上传按钮 可用
+    }
+
+
+    private void updateRunningStatus() {
+        startBtn.setDisable(true); //开始按钮 不可用
+        stopBtn.setDisable(false); //结束按钮 可用
+        resumeBtn.setDisable(true); //继续按钮 不可用
+        checkPcCb.setDisable(true); //平台勾选 不可用
+        checkMobileCb.setDisable(true); //平台勾选 不可用
+        autoUploadCb.setDisable(true); //自动上传 不可用
+        pageChoiceBox.setDisable(true); //检索深度不可用
+        uploadBtn.setDisable(true); //上传按钮 不可用
+
+        if (manage.getTaskStatus() == TaskManage.TASK_STATUS_NEW_RUNNING) {
+            listPc.clear();
+            listMobile.clear();
+            manage.clearData();
+        }
+    }
+
+    private void updateStopStatus() {
+        startBtn.setDisable(false); //开始按钮 可用
+        startBtn.setText("重新开始");
+        stopBtn.setDisable(true);  //结束按钮 不可用
+        resumeBtn.setDisable(false);  //继续按钮 可用
+        checkPcCb.setDisable(false); //平台勾选 可用
+        checkMobileCb.setDisable(false); //平台勾选 可用
+        autoUploadCb.setDisable(false); //自动上传 可用
+        pageChoiceBox.setDisable(false); //检索深度 可用
+        uploadBtn.setDisable(false); //上传按钮 可用
+    }
+
+
+    private void updateFinishedStatus() {
+        startBtn.setDisable(false); //开始按钮 可用
+        startBtn.setText("开始");
+        stopBtn.setDisable(true);  //结束按钮 不可用
+        resumeBtn.setDisable(false);  //继续按钮 可用
+        checkPcCb.setDisable(false); //平台勾选 可用
+        checkMobileCb.setDisable(false); //平台勾选 可用
+        autoUploadCb.setDisable(false); //自动上传 可用
+        pageChoiceBox.setDisable(false); //检索深度 可用
+        uploadBtn.setDisable(false); //上传按钮 可用
+    }
+
+    private void updateUploadingStatus() {
+        //全部不可用
+        startBtn.setDisable(true); //开始按钮 可用
+        stopBtn.setDisable(true);  //结束按钮 不可用
+        resumeBtn.setDisable(true);  //继续按钮 可用
+        checkPcCb.setDisable(true); //平台勾选 可用
+        checkMobileCb.setDisable(true); //平台勾选 可用
+        autoUploadCb.setDisable(true); //自动上传 可用
+        pageChoiceBox.setDisable(true); //检索深度 可用
+        uploadBtn.setDisable(true); //上传按钮 可用
+    }
+
 
     public synchronized void addResult(Info info) {
         if (info.getType() == Info.TYPE_PC) {

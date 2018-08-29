@@ -17,35 +17,47 @@ import javafx.stage.StageStyle;
 public class LoginController {
 
     private MainApp app;
+    private Stage dialogStage;
+    @FXML
+    private TextField account;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private TextField identity;
 
     public void setApp(MainApp app) {
         this.app = app;
     }
 
-    private Stage dialogStage;
-
-    @FXML
-    private TextField account;
-
-    @FXML
-    private PasswordField passwordField;
-
     @FXML
     private void login() {
-        String username = account.getText();
-        String password = passwordField.getText();
+//        String username = account.getText();
+//        String password = passwordField.getText();
 
-        if (username.isEmpty() || password.isEmpty()) {
+//        if (username.isEmpty() || password.isEmpty()) {
+//            Alert alert = new Alert(Alert.AlertType.ERROR);
+//            alert.setHeaderText(null);
+//            alert.setContentText("请输入账户和密码");
+//            alert.showAndWait();
+//        } else {
+//            createDialog();
+//            HltApi api = HltApi.getInstance();
+//            api.login(username, password, this);
+//
+//
+////            app.gotoMain();
+//        }
+
+        String identifier = identity.getText();
+        if (identifier.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText(null);
-            alert.setContentText("请输入账户和密码");
+            alert.setContentText("查询码不能为空");
             alert.showAndWait();
         } else {
             createDialog();
             HltApi api = HltApi.getInstance();
-            api.login(username, password, this);
-
-
+            api.login(identifier, this);
 //            app.gotoMain();
         }
 
@@ -110,7 +122,9 @@ public class LoginController {
 
     @FXML
     private void initialize() {
-        account.setText("ywk7YRUGBrl");
-        passwordField.setText("123456");
+//        account.setText("ywk7YRUGBrl");
+//        passwordField.setText("123456");
+
+        identity.setText("ie8qnb");
     }
 }

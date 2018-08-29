@@ -27,7 +27,7 @@ public class BaiduChecker {
         this.resultListener = resultListener;
     }
 
-    public void checkPC(String content, String keyword) {
+    public void checkPC(String content, String keyword, int page) {
         if (content.contains(identity)) {
             Document doc = Jsoup.parse(content);
 
@@ -54,6 +54,7 @@ public class BaiduChecker {
                 info.setType(Info.TYPE_PC);
                 info.setTime(ft.format(new Date()));
                 info.setLoc(list.toArray(new String[list.size()]));
+                info.setPage(page);
                 writer.add(info);
                 resultListener.found(info);
 
@@ -74,7 +75,7 @@ public class BaiduChecker {
         System.out.println(keyword + " check in mobile fail");
     }
 
-    public void checkMobile(String content, String keyword) {
+    public void checkMobile(String content, String keyword, int page) {
         if (content.contains(identity)) {
             Document doc = Jsoup.parse(content);
 
@@ -122,6 +123,7 @@ public class BaiduChecker {
                 info.setType(Info.TYPE_MOBILE);
                 info.setTime(ft.format(new Date()));
                 info.setLoc(list.toArray(new String[list.size()]));
+                info.setPage(page);
                 writer.add(info);
                 resultListener.found(info);
             }

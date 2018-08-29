@@ -16,6 +16,8 @@ public class Info {
     //    private String searchUrl;
     private String time;
 
+    private int page = 1;
+
 
     public String getKeyword() {
         return keyword;
@@ -39,6 +41,10 @@ public class Info {
         total = loc.length;
     }
 
+    public String getLocString() {
+        return String.join(",", loc);
+    }
+
     public String getTime() {
         return time;
     }
@@ -59,4 +65,11 @@ public class Info {
         return total;
     }
 
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
 }

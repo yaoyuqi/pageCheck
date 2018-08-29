@@ -47,6 +47,17 @@
                                 <Insets left="10.0"/>
                             </padding>
                         </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="5.0">
+                            <children>
+                                <Label text="检索深度"/>
+                                <ChoiceBox fx:id="pageChoiceBox" prefWidth="50.0"/>
+                                <Label text="页"/>
+                            </children>
+                            <VBox.margin>
+                                <Insets left="10.0" right="10.0" top="10.0"/>
+                            </VBox.margin>
+                        </HBox>
+
                         <HBox spacing="5.0">
                             <children>
                                 <Label text="加速"/>
@@ -76,7 +87,7 @@
                                 <Insets left="10.0" top="10.0"/>
                             </padding>
                         </HBox>
-                        <Button fx:id="uploadBtn" mnemonicParsing="false" text="上传结果">
+                        <Button fx:id="uploadBtn" mnemonicParsing="false" onAction="#handleUpload" text="上传结果">
                             <VBox.margin>
                                 <Insets bottom="10.0" left="10.0" top="10.0"/>
                             </VBox.margin>
@@ -135,6 +146,7 @@
                                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columns>
                                                 <TableColumn fx:id="pcKeywordsCl" prefWidth="200.0" text="关键词"/>
+                                                <TableColumn fx:id="pcPageCl" prefWidth="200.0" text="页数"/>
                                                 <TableColumn fx:id="pcLocCl" prefWidth="200.0" text="位置"/>
                                                 <TableColumn fx:id="pcCheckTimeCl" prefWidth="75.0" text="查询时间"/>
                                                 <TableColumn fx:id="pcOpenCl" prefWidth="75.0" text="查看页面"/>
@@ -156,6 +168,7 @@
                                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columns>
                                                 <TableColumn fx:id="mobileKeywordsCl" prefWidth="200.0" text="关键词"/>
+                                                <TableColumn fx:id="mobilePageCl" prefWidth="100.0" text="页数"/>
                                                 <TableColumn fx:id="mobileLocCl" prefWidth="200.0" text="位置"/>
                                                 <TableColumn fx:id="mobileCheckTimeCl" prefWidth="75.0" text="查询时间"/>
                                                 <TableColumn fx:id="mobileOpenCl" prefWidth="75.0" text="查看页面"/>

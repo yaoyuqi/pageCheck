@@ -12,6 +12,8 @@ public class BaiduCapture {
 
     private PageCapture capture;
 
+    private int checkDepth = 1;
+
     public BaiduCapture(BaiduChecker check, int maxRequest) {
         capture = new PageCapture(maxRequest, maxRequest);
         capture.setChecker(check);
@@ -22,20 +24,24 @@ public class BaiduCapture {
         capture.setChecker(check);
     }
 
-    public static String makeUrl(int type, String keyword) {
+    public static String makeUrl(int type, String keyword, int page) {
         try {
             keyword = URLEncoder.encode(keyword, "UTF-8");
             if (type == Info.TYPE_PC) {
-                return PC_URL + keyword;
+                return PC_URL + keyword + "&pn=" + (page - 1) * 10;
 
             } else {
-                return MOBILE_URL + keyword;
+                return MOBILE_URL + keyword + "&pn=" + (page - 1) * 10;
             }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return null;
 
+    }
+
+    public void setCheckDepth(int checkDepth) {
+        this.checkDepth = checkDepth;
     }
 
     public PageCapture getCapture() {
@@ -47,14 +53,17 @@ public class BaiduCapture {
     }
 
     public void run(String keyword, int type) {
-        if (type == Info.TYPE_PC) {
-            capture.pc(makeUrl(type, keyword), keyword);
-        } else if (type == Info.TYPE_MOBILE) {
-            capture.mobile(makeUrl(type, keyword), keyword);
-        } else {
-            capture.pc(makeUrl(Info.TYPE_PC, keyword), keyword);
-            capture.mobile(makeUrl(Info.TYPE_MOBILE, keyword), keyword);
+        for (int i = 1; i <= checkDepth; i++) {
+            if (type == Info.TYPE_PC) {
+                capture.pc(makeUrl(type, keyword, i), keyword, i);
+            } else if (type == Info.TYPE_MOBILE) {
+                capture.mobile(makeUrl(type, keyword, i), keyword, i);
+            } else {
+                capture.pc(makeUrl(Info.TYPE_PC, keyword, i), keyword, i);
+                capture.mobile(makeUrl(Info.TYPE_MOBILE, keyword, i), keyword, i);
+            }
         }
+
     }
 
     public void setSpeed(int speed) {
