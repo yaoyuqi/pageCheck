@@ -96,6 +96,7 @@ public class TaskManage implements Runnable
 //            String[] prefix = {"成都", "重庆", "肯尼亚"};
 //            String[] main = {"CCIC", "CCIB", "CCIA"};
 //            String[] suffix = {"怎么样", "如何"};
+            keyword = new Keyword();
             HltApi api = HltApi.getInstance();
 
             api.words(this);
@@ -331,8 +332,10 @@ public class TaskManage implements Runnable
         if (wordData == null) {
             controller.alertVital();
         } else {
-
-            keyword = new Keyword(wordData.getData().getPrefix().toArray(new String[]{}),
+            if (keyword == null) {
+                keyword = new Keyword();
+            }
+            keyword.setWords(wordData.getData().getPrefix().toArray(new String[]{}),
                     wordData.getData().getMain().toArray(new String[]{}),
                     wordData.getData().getSuffix().toArray(new String[]{}));
 //            String[] prefix = {"成都", "重庆", "肯尼亚"};

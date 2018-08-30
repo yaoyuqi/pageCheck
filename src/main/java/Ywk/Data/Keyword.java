@@ -5,9 +5,12 @@ public class Keyword {
     private static final int CHUNK_NUMBER = 100;
     private MixType type = MixType.PREFIX_MAIN_SUFFIX;
     private String[] custom = new String[]{};
-    private String[] prefix;
-    private String[] main;
-    private String[] suffix;
+    private String[] prefix = new String[]{};
+    ;
+    private String[] main = new String[]{};
+    ;
+    private String[] suffix = new String[]{};
+    ;
     private int maxRun = 0;
 
     private int curPrefix = -1;
@@ -106,7 +109,8 @@ public class Keyword {
 
     }
 
-    public Keyword(String[] prefix, String[] main, String[] suffix) {
+
+    public void setWords(String[] prefix, String[] main, String[] suffix) {
         this.prefix = prefix;
         this.main = main;
         this.suffix = suffix;
@@ -184,7 +188,7 @@ public class Keyword {
     }
 
     public int getTotal() {
-        if (prefix.length == 0 && main.length == 0 && suffix.length == 0) {
+        if (type != MixType.CUSTOM && (prefix.length == 0 && main.length == 0 && suffix.length == 0)) {
             return 0;
         }
 
