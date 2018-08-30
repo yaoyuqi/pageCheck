@@ -30,13 +30,13 @@ public class Keyword {
     public int calculateChunkNumber() {
         int total = getTotal();
         if (total > 100000) {
-            return 1000;
+            return 2000;
         }
         else if (total > 10000) {
-            return 500;
+            return 1000;
         }
         else if (total > 1000) {
-            return 100;
+            return 500;
         }
         else {
             return 50;
