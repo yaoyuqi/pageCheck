@@ -1,23 +1,25 @@
 package Ywk.PageCheck;
 
 import Ywk.Data.Keyword;
-import Ywk.Data.XMLWriter;
 
 public class CheckManage implements Runnable {
     private int type;
     private Keyword keyword;
     private BaiduCapture baiduCapture;
-    private XMLWriter writer;
+
+    public CheckManage(Keyword keyword, BaiduCapture baiduCapture, int type) {
+        this.keyword = keyword;
+        this.baiduCapture = baiduCapture;
+
+        this.type = type;
+    }
+
     private volatile boolean finished = false;
 
     private TaskFinishListener listener;
 
-    public CheckManage(Keyword keyword, BaiduCapture baiduCapture, XMLWriter writer, int type) {
-        this.keyword = keyword;
-        this.baiduCapture = baiduCapture;
-        this.writer = writer;
-
-        this.type = type;
+    public void setFinished(boolean finished) {
+        this.finished = finished;
     }
 
     public void setListener(TaskFinishListener listener) {
@@ -27,6 +29,7 @@ public class CheckManage implements Runnable {
     @Override
     public void run() {
         if (listener.isStopped()) {
+            System.out.println("CheckManage run stopped");
             return;
         }
 
@@ -51,6 +54,7 @@ public class CheckManage implements Runnable {
         }
 
         if (finished) {
+            System.out.println("CheckManage run finished");
             listener.finish();
         }
 

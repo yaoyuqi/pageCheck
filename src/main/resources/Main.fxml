@@ -38,6 +38,15 @@
                                        GridPane.rowIndex="3"/>
                             </children>
                         </GridPane>
+                        <HBox alignment="CENTER_LEFT" spacing="5.0">
+                            <children>
+                                <Label text="上限"/>
+                                <TextField fx:id="maxTf" prefWidth="70.0" text="0"/>
+                            </children>
+                            <VBox.margin>
+                                <Insets bottom="10.0" left="10.0" right="10.0"/>
+                            </VBox.margin>
+                        </HBox>
                         <HBox spacing="10.0">
                             <children>
                                 <CheckBox fx:id="checkPcCb" mnemonicParsing="false" selected="true" text="PC端"/>
@@ -57,6 +66,22 @@
                                 <Insets left="10.0" right="10.0" top="10.0"/>
                             </VBox.margin>
                         </HBox>
+                        <VBox spacing="5.0">
+                            <children>
+
+                                <RadioButton fx:id="chooseMainRb" mnemonicParsing="false" text="[主词]"/>
+                                <RadioButton fx:id="choosePrefixMainRb" mnemonicParsing="false" text="[地区词] + [主词]"/>
+                                <RadioButton fx:id="choosePrefixMainSuffixRb" mnemonicParsing="false"
+                                             text="[地区词] + [主词] + [尾词]"/>
+                                <RadioButton fx:id="chooseMainSuffixRb" mnemonicParsing="false" text="[主词] + [尾词]"/>
+                                <RadioButton fx:id="chooseCustomRb" mnemonicParsing="false" text="[自定义]"/>
+                                <Button fx:id="selectTxtBtn" mnemonicParsing="false" onAction="#handleCustomKeywords"
+                                        text="选择文件(一行一条)" visible="false"/>
+                            </children>
+                            <VBox.margin>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                            </VBox.margin>
+                        </VBox>
 
                         <HBox spacing="5.0">
                             <children>
@@ -64,7 +89,7 @@
                                 <Slider fx:id="speedSlider"/>
                             </children>
                             <padding>
-                                <Insets left="10.0" top="10.0"/>
+                                <Insets left="10.0"/>
                             </padding>
                         </HBox>
                         <CheckBox fx:id="autoUploadCb" mnemonicParsing="false" text="完成后自动上传结果">

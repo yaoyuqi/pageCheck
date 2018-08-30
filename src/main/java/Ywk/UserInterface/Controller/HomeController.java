@@ -2,6 +2,7 @@ package Ywk.UserInterface.Controller;
 
 import Ywk.Api.HltApi;
 import Ywk.Data.Info;
+import Ywk.Data.Keyword;
 import Ywk.MainApp;
 import Ywk.PageCheck.BaiduCapture;
 import Ywk.PageCheck.TaskManage;
@@ -13,10 +14,23 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import okhttp3.OkHttpClient;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 public class HomeController {
 
@@ -108,10 +122,33 @@ public class HomeController {
     @FXML
     private ChoiceBox<Integer> pageChoiceBox;
 
+    @FXML
+    private RadioButton chooseMainRb;
+
+    @FXML
+    private RadioButton choosePrefixMainRb;
+
+    @FXML
+    private RadioButton choosePrefixMainSuffixRb;
+
+    @FXML
+    private RadioButton chooseMainSuffixRb;
+
+    @FXML
+    private RadioButton chooseCustomRb;
+
+    @FXML
+    private Button selectTxtBtn;
+
+    @FXML
+    private TextField maxTf;
+
 
     private TaskManage manage;
 
     private OkHttpClient client;
+
+    private List<String> customList = new LinkedList<>();
 
 
     public HomeController() {
@@ -170,13 +207,93 @@ public class HomeController {
 
         speedSlider.setValue(50.0);
 
-        pageChoiceBox.setItems(FXCollections.observableArrayList(1, 2, 3));
+
+        final ObservableList<Integer> choice = FXCollections.observableArrayList(1, 2, 3);
+        pageChoiceBox.setItems(choice);
         pageChoiceBox.setValue(1);
+        pageChoiceBox.getSelectionModel()
+                .selectedIndexProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    manage.setPageDepth(choice.get(newValue.intValue()));
+                    updateTotal();
+                });
+
+
+        checkPcCb.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            updatePlatFormSelect();
+            updateTotal();
+        });
+
+        checkMobileCb.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            updatePlatFormSelect();
+            updateTotal();
+        });
+
+        chooseMainRb.setUserData(Keyword.MixType.MAIN);
+        choosePrefixMainRb.setUserData(Keyword.MixType.PREFIX_MAIN);
+        choosePrefixMainSuffixRb.setUserData(Keyword.MixType.PREFIX_MAIN_SUFFIX);
+        chooseMainSuffixRb.setUserData(Keyword.MixType.MAIN_SUFFIX);
+        chooseCustomRb.setUserData(Keyword.MixType.CUSTOM);
+
+        final ToggleGroup group = new ToggleGroup();
+
+
+        chooseMainRb.setToggleGroup(group);
+        choosePrefixMainRb.setToggleGroup(group);
+        choosePrefixMainSuffixRb.setToggleGroup(group);
+        chooseMainSuffixRb.setToggleGroup(group);
+        chooseCustomRb.setToggleGroup(group);
+
+        choosePrefixMainSuffixRb.setSelected(true);
+
+        chooseMainRb.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                manage.setKeywordType(Keyword.MixType.MAIN);
+                updateTotal();
+            }
+        });
+
+        choosePrefixMainRb.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                manage.setKeywordType(Keyword.MixType.PREFIX_MAIN);
+                updateTotal();
+            }
+
+        });
+
+        choosePrefixMainSuffixRb.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                manage.setKeywordType(Keyword.MixType.PREFIX_MAIN_SUFFIX);
+                updateTotal();
+            }
+
+        });
+
+        chooseMainSuffixRb.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                manage.setKeywordType(Keyword.MixType.MAIN_SUFFIX);
+                updateTotal();
+            }
+
+        });
+
+
+        chooseCustomRb.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                manage.setKeywordType(Keyword.MixType.CUSTOM);
+                selectTxtBtn.setVisible(true);
+                updateTotal();
+            } else {
+                selectTxtBtn.setVisible(false);
+                updateTotal();
+            }
+        });
 
         HltApi api = HltApi.getInstance();
         api.identity(this);
 
         pcKeywordsCl.setSortable(false);
+
 
         pcPageCl.setSortable(false);
         pcOpenCl.setSortable(false);
@@ -339,22 +456,6 @@ public class HomeController {
     @FXML
     private void handleStart() {
         manage.setTaskStatus(TaskManage.TASK_STATUS_NEW);
-        boolean pcSelected = checkPcCb.isSelected();
-        boolean mobileSelected = checkMobileCb.isSelected();
-        int type = 0;
-        if (pcSelected && mobileSelected) {
-            type = Info.TYPE_BOTH;
-        } else if (pcSelected) {
-            type = Info.TYPE_PC;
-        } else if (mobileSelected) {
-            type = Info.TYPE_MOBILE;
-        } else {
-            //TODO error
-        }
-
-        manage.setPageDepth(pageChoiceBox.getValue());
-
-        manage.setType(type);
 
 
         int runSpeed = ((Double) speedSlider.getValue()).intValue() % 10;
@@ -367,6 +468,8 @@ public class HomeController {
         manage.setTaskStatus(TaskManage.TASK_STATUS_NEW_RUNNING);
 
         manage.setAutoUpdate(autoUploadCb.isSelected());
+
+        manage.setKeywordMax(Integer.parseInt(maxTf.getText()));
 
 
         //new设置， 放在子线程里更新不上
@@ -386,28 +489,14 @@ public class HomeController {
 
     @FXML
     private void handleResume() {
-        boolean pcSelected = checkPcCb.isSelected();
-        boolean mobileSelected = checkMobileCb.isSelected();
-        int type = 0;
-        if (pcSelected && mobileSelected) {
-            type = Info.TYPE_BOTH;
-        } else if (pcSelected) {
-            type = Info.TYPE_PC;
-        } else if (mobileSelected) {
-            type = Info.TYPE_MOBILE;
-        } else {
-            //TODO error
-        }
-
-        manage.setType(type);
 
         int runSpeed = ((Double) speedSlider.getValue()).intValue() % 10;
         if (runSpeed == 0) {
             runSpeed = 1;
         }
 
-        manage.setPageDepth(pageChoiceBox.getValue());
         manage.setSpeed(runSpeed);
+        manage.setKeywordMax(Integer.parseInt(maxTf.getText()));
         manage.setTaskStatus(TaskManage.TASK_STATUS_RESUME_RUNNING);
         manage.setAutoUpdate(autoUploadCb.isSelected());
 
@@ -419,30 +508,29 @@ public class HomeController {
 
     /**
      * 更新总数量
-     *
-     * @param total
      */
-    public void setTotal(final int total) {
-        try {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    int newTotal = total;
-                    if (manage.getType() == Info.TYPE_BOTH) {
-                        newTotal = total * 2;
+    public void updateTotal() {
+        if (!Platform.isFxApplicationThread()) {
+            try {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        totalLabel.setText("" + manage.getTotal());
                     }
-                    newTotal *= pageChoiceBox.getValue();
-                    totalLabel.setText("" + newTotal);
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            totalLabel.setText("" + manage.getTotal());
         }
 
     }
 
+
     /**
      * 更新已检索数量
+     *
      * @param runned
      */
     public void updateRunned(int runned) {
@@ -490,6 +578,7 @@ public class HomeController {
     }
 
     private void updateStatus() {
+        System.out.println("current status is " + manage.getTaskStatus());
         if (manage.getTaskStatus() == TaskManage.TASK_STATUS_NEW) {
             updateNewStatus();
         } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_NEW_RUNNING
@@ -528,6 +617,13 @@ public class HomeController {
         pageChoiceBox.setDisable(false); //检索深度 可用
         uploadBtn.setDisable(false); //上传按钮 可用
 
+        maxTf.setDisable(false);
+        chooseCustomRb.setDisable(false);
+        chooseMainRb.setDisable(false);
+        chooseMainSuffixRb.setDisable(false);
+        choosePrefixMainSuffixRb.setDisable(false);
+        choosePrefixMainRb.setDisable(false);
+
         listPc.clear();
         listMobile.clear();
         manage.clearData();
@@ -544,6 +640,14 @@ public class HomeController {
         pageChoiceBox.setDisable(false); //检索深度 可用
         uploadBtn.setDisable(false); //上传按钮 可用
 
+        maxTf.setDisable(false);
+        chooseCustomRb.setDisable(false);
+        chooseMainRb.setDisable(false);
+        chooseMainSuffixRb.setDisable(false);
+        choosePrefixMainSuffixRb.setDisable(false);
+        choosePrefixMainRb.setDisable(false);
+        selectTxtBtn.setDisable(false);
+
     }
 
 
@@ -556,6 +660,13 @@ public class HomeController {
         autoUploadCb.setDisable(true); //自动上传 不可用
         pageChoiceBox.setDisable(true); //检索深度不可用
         uploadBtn.setDisable(true); //上传按钮 不可用
+        maxTf.setDisable(true);
+        chooseCustomRb.setDisable(true);
+        chooseMainRb.setDisable(true);
+        chooseMainSuffixRb.setDisable(true);
+        choosePrefixMainSuffixRb.setDisable(true);
+        choosePrefixMainRb.setDisable(true);
+        selectTxtBtn.setDisable(true);
 
         if (manage.getTaskStatus() == TaskManage.TASK_STATUS_NEW_RUNNING) {
             listPc.clear();
@@ -566,7 +677,6 @@ public class HomeController {
 
     private void updateStopStatus() {
         startBtn.setDisable(false); //开始按钮 可用
-        startBtn.setText("重新开始");
         stopBtn.setDisable(true);  //结束按钮 不可用
         resumeBtn.setDisable(false);  //继续按钮 可用
         checkPcCb.setDisable(false); //平台勾选 可用
@@ -574,19 +684,35 @@ public class HomeController {
         autoUploadCb.setDisable(false); //自动上传 可用
         pageChoiceBox.setDisable(false); //检索深度 可用
         uploadBtn.setDisable(false); //上传按钮 可用
+
+        maxTf.setDisable(false);
+        chooseCustomRb.setDisable(false);
+        chooseMainRb.setDisable(false);
+        chooseMainSuffixRb.setDisable(false);
+        choosePrefixMainSuffixRb.setDisable(false);
+        choosePrefixMainRb.setDisable(false);
+        selectTxtBtn.setDisable(false);
     }
 
 
     private void updateFinishedStatus() {
         startBtn.setDisable(false); //开始按钮 可用
-        startBtn.setText("开始");
         stopBtn.setDisable(true);  //结束按钮 不可用
-        resumeBtn.setDisable(false);  //继续按钮 可用
+        resumeBtn.setDisable(true);  //继续按钮 不可用
         checkPcCb.setDisable(false); //平台勾选 可用
         checkMobileCb.setDisable(false); //平台勾选 可用
         autoUploadCb.setDisable(false); //自动上传 可用
         pageChoiceBox.setDisable(false); //检索深度 可用
         uploadBtn.setDisable(false); //上传按钮 可用
+
+        maxTf.setDisable(false);
+        chooseCustomRb.setDisable(false);
+        chooseMainRb.setDisable(false);
+        chooseMainSuffixRb.setDisable(false);
+        choosePrefixMainSuffixRb.setDisable(false);
+        choosePrefixMainRb.setDisable(false);
+        selectTxtBtn.setDisable(false);
+
     }
 
     private void updateUploadingStatus() {
@@ -599,12 +725,22 @@ public class HomeController {
         autoUploadCb.setDisable(true); //自动上传 可用
         pageChoiceBox.setDisable(true); //检索深度 可用
         uploadBtn.setDisable(true); //上传按钮 可用
+
+        maxTf.setDisable(true);
+        chooseCustomRb.setDisable(true);
+        chooseMainRb.setDisable(true);
+        chooseMainSuffixRb.setDisable(true);
+        choosePrefixMainSuffixRb.setDisable(true);
+        choosePrefixMainRb.setDisable(true);
+        selectTxtBtn.setDisable(true);
+
     }
 
 
     /**
      * 回调， 将爬取结果放回列表显示
      * 同时更新页面命中数
+     *
      * @param info
      */
     public synchronized void addResult(Info info) {
@@ -632,91 +768,130 @@ public class HomeController {
     }
 
     private void showAlert(Alert.AlertType type, String message) {
-        Alert alert = new Alert(type);
-        alert.setContentText(message);
-        alert.setHeaderText(null);
-        alert.show();
+        if (!Platform.isFxApplicationThread()) {
+            try {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        Alert alert = new Alert(type);
+                        alert.setContentText(message);
+                        alert.setHeaderText(null);
+                        alert.show();
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            Alert alert = new Alert(type);
+            alert.setContentText(message);
+            alert.setHeaderText(null);
+            alert.show();
+        }
+
+
     }
 
     /**
      * 显示网络异常alert
      */
     public void alertNetError() {
-        if (!Platform.isFxApplicationThread()) {
-            try {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        showAlert(Alert.AlertType.ERROR, "网络错误，请检查网络并上后重试");
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            showAlert(Alert.AlertType.ERROR, "网络错误，请检查网络并上后重试");
-        }
-
-
+        showAlert(Alert.AlertType.ERROR, "网络错误，请检查网络并上后重试");
     }
 
     public void alertVital() {
-        if (!Platform.isFxApplicationThread()) {
-            try {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        showAlert(Alert.AlertType.ERROR, "初始化失败，请重启软件");
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            showAlert(Alert.AlertType.ERROR, "初始化失败，请重启软件");
-        }
+        showAlert(Alert.AlertType.ERROR, "初始化失败，请重启软件");
     }
 
     /**
      * 显示上传成功alert
      */
     public void uploadSuccess() {
-        if (!Platform.isFxApplicationThread()) {
-            try {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        showAlert(Alert.AlertType.INFORMATION, "上传成功");
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            showAlert(Alert.AlertType.INFORMATION, "上传成功");
-        }
+        showAlert(Alert.AlertType.INFORMATION, "上传成功");
     }
 
     /**
      * 显示上传失败alert
      */
     public void alertUploadError() {
-        if (!Platform.isFxApplicationThread()) {
-            try {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        showAlert(Alert.AlertType.ERROR, "结果上传出错，请稍后重试");
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            showAlert(Alert.AlertType.ERROR, "结果上传出错，请稍后重试");
+        showAlert(Alert.AlertType.ERROR, "结果上传出错，请稍后重试");
+
+
+    }
+
+    @FXML
+    private void handleCustomKeywords() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("选择关键词");
+        File file = fileChooser.showOpenDialog(app.getPrimaryStage());
+        if (file != null) {
+            readFile(file);
         }
 
+    }
 
+    private void readFile(File file) {
+        Platform.runLater(() -> {
+            try {
+//                Desktop desktop = Desktop.getDesktop();
+//                desktop.open(file);
+                FileReader fileReader = new FileReader(file);
+                BufferedReader br = new BufferedReader(fileReader);
+
+                String line;
+                while ((line = br.readLine()) != null) {
+                    customList.add(line.trim());
+                }
+                br.close();
+                fileReader.close();
+                if (!showCustomKeywordDialog(customList)) {
+                    customList.clear();
+                }
+                manage.setCustomKeywords(customList);
+                updateTotal();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private boolean showCustomKeywordDialog(List<String> list) {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainApp.class.getResource("/KeywordsList.fxml"));
+            AnchorPane page = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle("自定义关键词");
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(app.getPrimaryStage());
+            Scene scene = new Scene(page);
+            stage.setScene(scene);
+
+            KeywordsController keywordsController = loader.getController();
+            keywordsController.setDialogStage(stage);
+            keywordsController.setCustomList(list);
+            stage.showAndWait();
+            return keywordsController.isOkClicked();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private void updatePlatFormSelect() {
+        boolean pcSelected = checkPcCb.isSelected();
+        boolean mobileSelected = checkMobileCb.isSelected();
+        int type = 0;
+        if (pcSelected && mobileSelected) {
+            type = Info.TYPE_BOTH;
+        } else if (pcSelected) {
+            type = Info.TYPE_PC;
+        } else if (mobileSelected) {
+            type = Info.TYPE_MOBILE;
+        }
+
+        manage.setType(type);
     }
 
 

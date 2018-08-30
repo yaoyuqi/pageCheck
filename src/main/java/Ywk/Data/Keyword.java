@@ -2,15 +2,109 @@ package Ywk.Data;
 
 public class Keyword {
 
-    private static final int CHUNK_NUMBER = 10;
+    private static final int CHUNK_NUMBER = 100;
+    private MixType type = MixType.PREFIX_MAIN_SUFFIX;
+    private String[] custom = new String[]{};
     private String[] prefix;
     private String[] main;
     private String[] suffix;
+    private int maxRun = 0;
 
     private int curPrefix = -1;
     private int curMain = -1;
     private int curSuffix = -1;
+    private int curRun = 0;
 
+    public void setMaxRun(int maxRun) {
+        this.maxRun = maxRun;
+    }
+
+    public void setCurRun(int curRun) {
+        this.curRun = curRun;
+    }
+
+    public synchronized String next() {
+        if (isFinished() || isMax()) {
+            System.out.println("keyword next finished");
+            return null;
+        }
+
+        String out = "";
+
+        switch (type) {
+            case MAIN:
+                curMain++;
+                if (curMain != -1 && curMain < main.length) {
+                    out += main[curMain];
+                }
+                break;
+            case PREFIX_MAIN:
+                curMain++;
+                if (curMain == main.length) {
+                    curMain = -1;
+                    curPrefix++;
+                }
+                if (curPrefix != -1 && curPrefix < prefix.length) {
+                    out += prefix[curPrefix];
+                }
+                if (curMain != -1 && curMain < main.length) {
+                    out += main[curMain];
+                }
+                break;
+            case PREFIX_MAIN_SUFFIX:
+                curSuffix++;
+
+                if (curSuffix == suffix.length) {
+                    curSuffix = -1;
+                    curMain++;
+                }
+
+                if (curMain == main.length) {
+                    curMain = -1;
+                    curPrefix++;
+                }
+
+
+                if (curPrefix != -1 && curPrefix < prefix.length) {
+                    out += prefix[curPrefix];
+                }
+
+                if (curMain != -1 && curMain < main.length) {
+                    out += main[curMain];
+                }
+
+                if (curSuffix != -1 && curSuffix < suffix.length) {
+                    out += suffix[curSuffix];
+                }
+                break;
+            case MAIN_SUFFIX:
+                curSuffix++;
+
+                if (curSuffix == suffix.length) {
+                    curSuffix = -1;
+                    curMain++;
+                }
+                if (curMain != -1 && curMain < main.length) {
+                    out += main[curMain];
+                }
+
+                if (curSuffix != -1 && curSuffix < suffix.length) {
+                    out += suffix[curSuffix];
+                }
+                break;
+            case CUSTOM:
+                if (curSuffix < custom.length) {
+                    out = custom[curRun];
+
+                }
+                break;
+        }
+        curRun++;
+
+        return out;
+
+
+    }
 
     public Keyword(String[] prefix, String[] main, String[] suffix) {
         this.prefix = prefix;
@@ -24,45 +118,25 @@ public class Keyword {
         this.curSuffix = curSuffix;
     }
 
-
-    public synchronized String next() {
-        if (isFinished()) {
-            return null;
-        }
-
-        curSuffix++;
-
-        if (curSuffix == suffix.length) {
-            curSuffix = -1;
-            curMain++;
-        }
-
-        if (curMain == main.length) {
-            curMain = -1;
-            curPrefix++;
-        }
-
-        String out = "";
-        if (curPrefix != -1 && curPrefix < prefix.length) {
-            out += prefix[curPrefix];
-        }
-
-        if (curMain != -1 && curMain < main.length) {
-            out += main[curMain];
-        }
-
-        if (curSuffix != -1 && curSuffix < suffix.length) {
-            out += suffix[curSuffix];
-        }
-
-        return out;
-
-    }
-
     private boolean isFinished() {
-        return curMain == main.length - 1
-                && curPrefix == prefix.length - 1
-                && curSuffix == suffix.length - 1;
+        switch (type) {
+            case MAIN:
+                return curMain == main.length;
+            case PREFIX_MAIN:
+                return curMain == main.length - 1
+                        && curPrefix == prefix.length - 1;
+            case PREFIX_MAIN_SUFFIX:
+                return curMain == main.length - 1
+                        && curPrefix == prefix.length - 1
+                        && curSuffix == suffix.length - 1;
+            case MAIN_SUFFIX:
+                return curMain == main.length - 1
+                        && curSuffix == suffix.length - 1;
+            case CUSTOM:
+                return curRun == custom.length;
+            default:
+                return true;
+        }
     }
 
     public synchronized String[] nextChunk() {
@@ -70,23 +144,86 @@ public class Keyword {
             return null;
         }
 
-        String[] words = new String[CHUNK_NUMBER];
-        for (int i = 0; i < CHUNK_NUMBER; i++) {
-            String next = next();
-            if (next != null) {
-                words[i] = next;
+        int chunkNumber = 0;
+        if (!isMax()) {
+            if (maxRun == 0) {
+                chunkNumber = CHUNK_NUMBER;
             } else {
-                break;
+                if (maxRun - curRun < CHUNK_NUMBER) {
+                    chunkNumber = maxRun - curRun;
+                } else {
+                    chunkNumber = CHUNK_NUMBER;
+                }
             }
         }
-        return words;
+
+        if (chunkNumber > 0) {
+            String[] words = new String[chunkNumber];
+            for (int i = 0; i < chunkNumber; i++) {
+                String next = next();
+                if (next != null) {
+                    words[i] = next;
+                } else {
+                    break;
+                }
+            }
+            return words;
+        }
+
+        return null;
+
+
+    }
+
+    public void setType(MixType type) {
+        this.type = type;
+    }
+
+    public void setCustom(String[] custom) {
+        this.custom = custom;
     }
 
     public int getTotal() {
         if (prefix.length == 0 && main.length == 0 && suffix.length == 0) {
             return 0;
         }
-        return (prefix.length + 1) * (main.length + 1) * (suffix.length + 1) - 1;
+
+        int total = 0;
+
+        switch (type) {
+            case MAIN:
+                total = main.length;
+                break;
+            case PREFIX_MAIN_SUFFIX:
+                total = (prefix.length + 1) * (main.length + 1) * (suffix.length + 1) - 1;
+                break;
+            case MAIN_SUFFIX:
+                total = (main.length + 1) * (suffix.length + 1) - 1;
+                break;
+            case PREFIX_MAIN:
+                total = (prefix.length + 1) * (main.length + 1) - 1;
+                break;
+            case CUSTOM:
+                total = custom.length;
+                break;
+        }
+        return total;
+    }
+
+    private boolean isMax() {
+        if (maxRun == 0) {
+            return false;
+        } else {
+            return curRun >= maxRun;
+        }
+    }
+
+    public enum MixType {
+        PREFIX_MAIN_SUFFIX,
+        PREFIX_MAIN,
+        MAIN,
+        MAIN_SUFFIX,
+        CUSTOM
     }
 
 }

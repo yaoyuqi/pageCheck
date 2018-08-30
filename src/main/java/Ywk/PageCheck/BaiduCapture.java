@@ -25,17 +25,21 @@ public class BaiduCapture {
     }
 
     public static String makeUrl(int type, String keyword, int page) {
-        try {
-            keyword = URLEncoder.encode(keyword, "UTF-8");
-            if (type == Info.TYPE_PC) {
-                return PC_URL + keyword + "&pn=" + (page - 1) * 10;
 
-            } else {
-                return MOBILE_URL + keyword + "&pn=" + (page - 1) * 10;
+        if (keyword != null && !keyword.isEmpty()) {
+            try {
+                keyword = URLEncoder.encode(keyword, "UTF-8");
+                if (type == Info.TYPE_PC) {
+                    return PC_URL + keyword + "&pn=" + (page - 1) * 10;
+
+                } else {
+                    return MOBILE_URL + keyword + "&pn=" + (page - 1) * 10;
+                }
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
             }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         }
+
         return null;
 
     }

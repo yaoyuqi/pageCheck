@@ -40,6 +40,9 @@ public class PageCapture {
 
 
     public void pc(String url, String keyword, int page) {
+        if (url == null || url.isEmpty() || keyword == null || keyword.isEmpty()) {
+            return;
+        }
         Request request = new Request.Builder()
                 .get()
                 .url(url)
@@ -76,6 +79,9 @@ public class PageCapture {
 
 
     public void mobile(String url, String keyword, int page) {
+        if (url == null || url.isEmpty() || keyword == null || keyword.isEmpty()) {
+            return;
+        }
         Request request = new Request.Builder()
                 .get()
                 .url(url)

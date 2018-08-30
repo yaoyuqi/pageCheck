@@ -11,6 +11,7 @@ import Ywk.UserInterface.Controller.HomeController;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class TaskManage implements Runnable
         , PageCapture.RunningUpdateListener
@@ -104,7 +105,7 @@ public class TaskManage implements Runnable
     }
 
     public int getTotal() {
-        return total;
+        return keyword.getTotal() * pageDepth * platFormSelectedRate();
     }
 
     private void prepareCheckTool() {
@@ -121,7 +122,7 @@ public class TaskManage implements Runnable
             PageCapture pageCapture = capture.getCapture();
             pageCapture.setListener(this);
 
-            manage = new CheckManage(keyword, capture, writer, type);
+            manage = new CheckManage(keyword, capture, type);
             capture.setIdleHandler(manage);
 
             manage.setListener(this);
@@ -197,6 +198,7 @@ public class TaskManage implements Runnable
         setTaskStatus(TaskManage.TASK_STATUS_FINISHED);
         //自动上传
         if (autoUpdate) {
+            setTaskStatus(TaskManage.TASK_UPLOAD_FINISHED_RUNNING);
             uploadResult();
         }
     }
@@ -235,13 +237,14 @@ public class TaskManage implements Runnable
      * 上传结果
      */
     public void uploadResult() {
+
         if (writer != null) {
             writer.flush(Info.TYPE_PC);
             writer.flush(Info.TYPE_MOBILE);
         } else {
             setTaskStatus(taskStatus == TaskManage.TASK_UPLOAD_UNFINISHED_RUNNING ?
-                    TaskManage.TASK_STATUS_STOPPED
-                    : TaskManage.TASK_STATUS_FINISHED);
+                    TaskManage.TASK_UPLOAD_UNFINISHED_FINISHED
+                    : TaskManage.TASK_UPLOAD_FINISHED_FINISHED);
         }
 
     }
@@ -285,7 +288,14 @@ public class TaskManage implements Runnable
     private void prepareForNew() {
         if (keyword != null) {
             keyword.setCurrent(-1, -1, -1);
+            keyword.setCurRun(0);
         }
+
+        if (manage != null) {
+            manage.setFinished(false);
+        }
+
+
     }
 
     /**
@@ -310,7 +320,10 @@ public class TaskManage implements Runnable
             SimpleDateFormat ft2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             writer.setMark(ft.format(new Date()));
             writer.setDate(ft2.format(new Date()));
+
+
         }
+
 
     }
 
@@ -326,11 +339,33 @@ public class TaskManage implements Runnable
 //            String[] main = {"CCIC", "CCIB", "CCIA"};
 //            String[] suffix = {"怎么样", "如何"};
 //            keyword = new Keyword(prefix, main, suffix);
-            controller.setTotal(keyword.getTotal());
+            controller.updateTotal();
         }
     }
 
     public void netError() {
         controller.alertNetError();
+    }
+
+    public void setCustomKeywords(List<String> e) {
+        keyword.setCustom(e.toArray(new String[]{}));
+    }
+
+    public void setKeywordType(Keyword.MixType type) {
+        keyword.setType(type);
+    }
+
+    public void setKeywordMax(int max) {
+        keyword.setMaxRun(max);
+    }
+
+    private int platFormSelectedRate() {
+        if (type == Info.TYPE_BOTH) {
+            return 2;
+        } else if (type == Info.TYPE_PC
+                || type == Info.TYPE_MOBILE) {
+            return 1;
+        }
+        return 0;
     }
 }

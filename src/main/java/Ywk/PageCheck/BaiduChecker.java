@@ -28,7 +28,7 @@ public class BaiduChecker {
     }
 
     public void checkPC(String content, String keyword, int page) {
-        if (content.contains(identity)) {
+        if (content != null && content.contains(identity)) {
             Document doc = Jsoup.parse(content);
 
             ArrayList<String> list = new ArrayList<>();
@@ -76,7 +76,7 @@ public class BaiduChecker {
     }
 
     public void checkMobile(String content, String keyword, int page) {
-        if (content.contains(identity)) {
+        if (content != null && content.contains(identity)) {
             Document doc = Jsoup.parse(content);
 
             Elements results = doc.select("#results div.result.c-result");
