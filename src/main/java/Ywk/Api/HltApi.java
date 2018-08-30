@@ -91,14 +91,21 @@ public class HltApi {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                LoginData loginOut = new Gson().fromJson(response.body().string(), LoginData.class);
-                if (loginOut.getData().getAccess_token() == null || loginOut.getData().getAccess_token().isEmpty()) {
+                try {
+                    LoginData loginOut = new Gson().fromJson(response.body().string(), LoginData.class);
+                    if (loginOut.getData().getAccess_token() == null || loginOut.getData().getAccess_token().isEmpty()) {
+                        controller.loginResult(false);
+                    } else {
+                        LoginHeader.getInstance(loginOut.getData().getToken_type() + " " + loginOut.getData().getAccess_token());
+                        controller.loginResult(true);
+                    }
+                } catch (Exception e) {
                     controller.loginResult(false);
-                } else {
-                    LoginHeader.getInstance(loginOut.getData().getToken_type() + " " + loginOut.getData().getAccess_token());
-                    controller.loginResult(true);
+                } finally {
+                    response.close();
                 }
-                response.close();
+
+
 
             }
         });
