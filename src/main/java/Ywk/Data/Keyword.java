@@ -18,12 +18,29 @@ public class Keyword {
     private int curSuffix = -1;
     private int curRun = 0;
 
+
     public void setMaxRun(int maxRun) {
         this.maxRun = maxRun;
     }
 
     public void setCurRun(int curRun) {
         this.curRun = curRun;
+    }
+
+    public int calculateChunkNumber() {
+        int total = getTotal();
+        if (total > 100000) {
+            return 1000;
+        }
+        else if (total > 10000) {
+            return 500;
+        }
+        else if (total > 1000) {
+            return 100;
+        }
+        else {
+            return 50;
+        }
     }
 
     public synchronized String next() {
@@ -151,12 +168,12 @@ public class Keyword {
         int chunkNumber = 0;
         if (!isMax()) {
             if (maxRun == 0) {
-                chunkNumber = CHUNK_NUMBER;
+                chunkNumber = calculateChunkNumber();
             } else {
-                if (maxRun - curRun < CHUNK_NUMBER) {
+                if (maxRun - curRun < calculateChunkNumber()) {
                     chunkNumber = maxRun - curRun;
                 } else {
-                    chunkNumber = CHUNK_NUMBER;
+                    chunkNumber = calculateChunkNumber();
                 }
             }
         }
