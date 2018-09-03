@@ -8,6 +8,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -38,6 +39,10 @@ public class MainApp extends Application {
         HltApi.getInstance(client);
 
         this.primaryStage = primaryStage;
+
+
+        primaryStage.getIcons().add(new Image(MainApp.class.getResourceAsStream("/logo128.png")));
+
         primaryStage.setOnCloseRequest((WindowEvent event) -> {
             Platform.exit();
             System.exit(0);

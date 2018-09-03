@@ -71,8 +71,14 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>8.8.3</version>
                 <configuration>
-                    <vendor>海量推</vendor>
+                    <vendor>com.neozhan</vendor>
                     <mainClass>Ywk.MainApp</mainClass>
+                    <!--<nativeReleaseVersion>${project.version}</nativeReleaseVersion>-->
+                    <appName>海量推万词霸屏</appName>
+                    <bundleArguments>
+                        <icon.ico>src/main/resources/icons/logo.ico</icon.ico>
+                        <icon.png>src/main/resources/icons/logo128.png</icon.png>
+                    </bundleArguments>
                 </configuration>
             </plugin>
             <plugin>

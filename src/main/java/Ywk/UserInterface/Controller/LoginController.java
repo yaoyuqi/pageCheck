@@ -125,6 +125,5 @@ public class LoginController {
 //        account.setText("ywk7YRUGBrl");
 //        passwordField.setText("123456");
 
-//        identity.setText("ie8qnb");
     }
 }
