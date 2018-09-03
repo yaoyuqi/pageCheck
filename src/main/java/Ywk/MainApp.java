@@ -41,7 +41,7 @@ public class MainApp extends Application {
         this.primaryStage = primaryStage;
 
 
-        primaryStage.getIcons().add(new Image(MainApp.class.getResourceAsStream("/logo128.png")));
+        primaryStage.getIcons().add(new Image(MainApp.class.getResourceAsStream("/icons/logo128.png")));
 
         primaryStage.setOnCloseRequest((WindowEvent event) -> {
             Platform.exit();

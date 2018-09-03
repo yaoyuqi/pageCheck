@@ -74,10 +74,11 @@
                     <vendor>com.neozhan</vendor>
                     <mainClass>Ywk.MainApp</mainClass>
                     <!--<nativeReleaseVersion>${project.version}</nativeReleaseVersion>-->
-                    <appName>海量推万词霸屏</appName>
+                    <appName>${project.name}</appName>
                     <bundleArguments>
                         <icon.ico>src/main/resources/icons/logo.ico</icon.ico>
                         <icon.png>src/main/resources/icons/logo128.png</icon.png>
+                        <icon.icns>src/main/resources/icons/logo.icns</icon.icns>
                     </bundleArguments>
                 </configuration>
             </plugin>
