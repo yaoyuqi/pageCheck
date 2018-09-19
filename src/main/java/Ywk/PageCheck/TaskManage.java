@@ -30,7 +30,7 @@ public class TaskManage implements Runnable
     public static final int TASK_UPLOAD_FINISHED_FINISHED = 11;
     public static final int TASK_UPLOAD_FINISHED = 6;
 
-    static final int SPEED_RATE = 20;
+    static final int SPEED_RATE = 100;
 
     private int type = Info.TYPE_PC;
 

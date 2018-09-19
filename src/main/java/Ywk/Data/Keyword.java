@@ -2,15 +2,11 @@ package Ywk.Data;
 
 public class Keyword {
 
-    private static final int CHUNK_NUMBER = 100;
     private MixType type = MixType.PREFIX_MAIN_SUFFIX;
     private String[] custom = new String[]{};
     private String[] prefix = new String[]{};
-    ;
     private String[] main = new String[]{};
-    ;
     private String[] suffix = new String[]{};
-    ;
     private int maxRun = 0;
 
     private int curPrefix = -1;
@@ -72,16 +68,24 @@ public class Keyword {
                 }
                 break;
             case PREFIX_MAIN_SUFFIX:
-                curSuffix++;
 
-                if (curSuffix == suffix.length) {
-                    curSuffix = -1;
-                    curMain++;
+                /*
+                    跑词顺序调整
+                    1。 先跑主词
+                    2。前缀+主词
+                    3。 前缀+主词 一轮+ 后缀
+                 */
+
+
+                curMain++;
+                if (curMain == main.length) {
+                    curMain = 0;
+                    curPrefix++;
                 }
 
-                if (curMain == main.length) {
-                    curMain = -1;
-                    curPrefix++;
+                if (curPrefix == prefix.length) {
+                    curPrefix = -1;
+                    curSuffix++;
                 }
 
 
