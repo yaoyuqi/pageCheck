@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class HltApi {
     private static final String key = "33ic8HIz52vDFogcFgA3rwGx7Nke9dArqjyevN3O";
-    private static final String host = "http://hlt.neozhan.com/";
+    private static final String host = "http://hlf.91huoke.com/";
     private static HltApi api;
     private OkHttpClient client;
 

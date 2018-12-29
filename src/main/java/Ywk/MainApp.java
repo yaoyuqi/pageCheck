@@ -56,7 +56,7 @@ public class MainApp extends Application {
         loginController.setApp(this);
 
         Scene scene = new Scene(root, 400, 300);
-        primaryStage.setTitle("海量推万词霸屏");
+        primaryStage.setTitle("91海量发万词霸屏");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
