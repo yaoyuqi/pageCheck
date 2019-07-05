@@ -12,7 +12,7 @@
         <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="30.0" AnchorPane.bottomAnchor="10.0"
               AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
             <children>
-                <Label text="91海量发">
+                <Label text="云占位">
                     <padding>
                         <Insets left="50.0" right="50.0"/>
                     </padding>

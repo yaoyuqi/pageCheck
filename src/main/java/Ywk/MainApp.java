@@ -8,7 +8,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -41,7 +40,7 @@ public class MainApp extends Application {
         this.primaryStage = primaryStage;
 
 
-        primaryStage.getIcons().add(new Image(MainApp.class.getResourceAsStream("/icons/logo128.png")));
+//        primaryStage.getIcons().add(new Image(MainApp.class.getResourceAsStream("/icons/logo128.png")));
 
         primaryStage.setOnCloseRequest((WindowEvent event) -> {
             Platform.exit();
@@ -56,7 +55,7 @@ public class MainApp extends Application {
         loginController.setApp(this);
 
         Scene scene = new Scene(root, 400, 300);
-        primaryStage.setTitle("91海量发万词霸屏");
+        primaryStage.setTitle("云占位推广系统");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
