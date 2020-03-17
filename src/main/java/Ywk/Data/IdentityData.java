@@ -1,16 +1,18 @@
-package Ywk.Api;
+package Ywk.Data;
+
+import java.util.List;
 
 public class IdentityData {
 
     /**
      * status : 200
      * msg :
-     * data : {"identity":"UG43I7ZF"}
+     * data : [{"name":"海量发","identity":"0vk8gf"},{"name":"AI海量发","identity":"KTme70"},{"name":"新闻中心","identity":"rQDIXT"},{"name":"产品中心","identity":"qi9vVv"},{"name":"超级云站","identity":"wKlbYK"},{"name":"牛站","identity":"JuWytz"}]
      */
 
     private int status;
     private String msg;
-    private DataBean data;
+    private List<DataBean> data;
 
     public int getStatus() {
         return status;
@@ -28,20 +30,30 @@ public class IdentityData {
         this.msg = msg;
     }
 
-    public DataBean getData() {
+    public List<DataBean> getData() {
         return data;
     }
 
-    public void setData(DataBean data) {
+    public void setData(List<DataBean> data) {
         this.data = data;
     }
 
     public static class DataBean {
         /**
-         * identity : UG43I7ZF
+         * name : 海量发
+         * identity : 0vk8gf
          */
 
+        private String name;
         private String identity;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
 
         public String getIdentity() {
             return identity;

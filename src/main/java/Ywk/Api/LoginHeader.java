@@ -1,6 +1,6 @@
 package Ywk.Api;
 
-public class LoginHeader {
+class LoginHeader {
 
     private static LoginHeader instance;
 
@@ -8,21 +8,19 @@ public class LoginHeader {
 
     private String accessToken;
 
-    private String identity;
-
     private LoginHeader(String mark, String accessToken) {
         this.accessToken = accessToken;
         this.headerMark = mark;
     }
 
-    public static LoginHeader getInstance() {
+    static LoginHeader getInstance() {
         if (instance == null) {
             instance = getInstance("");
         }
         return instance;
     }
 
-    public static LoginHeader getInstance(String token) {
+    static LoginHeader getInstance(String token) {
         if (instance == null) {
             instance = new LoginHeader("Authorization", token);
         } else {
@@ -31,19 +29,12 @@ public class LoginHeader {
         return instance;
     }
 
-    public String getIdentity() {
-        return identity;
-    }
 
-    public void setIdentity(String identity) {
-        this.identity = identity;
-    }
-
-    public String getHeaderMark() {
+    String getHeaderMark() {
         return headerMark;
     }
 
-    public String getAccessToken() {
+    String getAccessToken() {
         return accessToken;
     }
 }

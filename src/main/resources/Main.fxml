@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0"
-            xmlns="http://javafx.com/javafx/8.0.121" fx:controller="Ywk.UserInterface.Controller.HomeController">
+            xmlns="http://javafx.com/javafx/11.0.1" fx:controller="Ywk.UserInterface.Controller.HomeController">
     <children>
         <HBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" AnchorPane.bottomAnchor="0.0"
               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="600.0" AnchorPane.topAnchor="0.0">
@@ -22,6 +22,8 @@
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                             </rowConstraints>
                             <VBox.margin>
                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
@@ -31,11 +33,15 @@
                                 <Label fx:id="totalLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
                                 <Label text="已检索" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                                 <Label fx:id="checkedLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                                <Label text="PC上屏" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                                <Label text="百度PC上屏" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
                                 <Label fx:id="showedPcLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-                                <Label text="手机上屏" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                                <Label text="百度手机上屏" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
                                 <Label fx:id="showedMobileLabel" text="0" GridPane.columnIndex="1"
                                        GridPane.rowIndex="3"/>
+                                <Label text="神马上屏" GridPane.rowIndex="4"/>
+                                <Label fx:id="shenmaLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                                <Label text="头条上屏" GridPane.rowIndex="5"/>
+                                <Label fx:id="toutiaoLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
                             </children>
                         </GridPane>
                         <HBox alignment="CENTER_LEFT" spacing="5.0">
@@ -47,15 +53,30 @@
                                 <Insets bottom="10.0" left="10.0" right="10.0"/>
                             </VBox.margin>
                         </HBox>
-                        <HBox spacing="10.0">
+                        <GridPane>
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="86.0" minWidth="10.0" prefWidth="66.0"/>
+                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="115.0" minWidth="10.0"
+                                                   prefWidth="114.0"/>
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                            </rowConstraints>
+                            <VBox.margin>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                            </VBox.margin>
                             <children>
-                                <CheckBox fx:id="checkPcCb" mnemonicParsing="false" selected="true" text="PC端"/>
-                                <CheckBox fx:id="checkMobileCb" mnemonicParsing="false" text="手机端"/>
+                                <CheckBox fx:id="checkMobileCb" mnemonicParsing="false" text="百度移动端"
+                                          GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                <CheckBox fx:id="checkPcCb" mnemonicParsing="false" selected="true" text="百度PC端"
+                                          GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                                <CheckBox fx:id="checkSMCb" mnemonicParsing="false" text="神马搜索" GridPane.columnIndex="0"
+                                          GridPane.rowIndex="1"/>
+                                <CheckBox fx:id="checkTTCb" mnemonicParsing="false" text="头条搜索" GridPane.columnIndex="1"
+                                          GridPane.rowIndex="1"/>
                             </children>
-                            <padding>
-                                <Insets left="10.0"/>
-                            </padding>
-                        </HBox>
+                        </GridPane>
                         <HBox alignment="CENTER_LEFT" spacing="5.0">
                             <children>
                                 <Label text="检索深度"/>
@@ -99,7 +120,7 @@
                         </CheckBox>
                         <HBox spacing="10.0">
                             <children>
-                                <Button fx:id="startBtn" mnemonicParsing="false" onAction="#handleStart" text="开始"/>
+                                <Button fx:id="startBtn" mnemonicParsing="false" onAction="#handleNewStart" text="开始"/>
                                 <Button fx:id="resumeBtn" disable="true" mnemonicParsing="false"
                                         onAction="#handleResume" text="继续"/>
                                 <Button fx:id="stopBtn" disable="true" mnemonicParsing="false" onAction="#handleStop"
@@ -171,6 +192,7 @@
                                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columns>
                                                 <TableColumn fx:id="pcKeywordsCl" prefWidth="200.0" text="关键词"/>
+                                                <TableColumn fx:id="pcProductCl" prefWidth="200.0" text="产品"/>
                                                 <TableColumn fx:id="pcPageCl" prefWidth="50.0" text="页数"/>
                                                 <TableColumn fx:id="pcLocCl" prefWidth="150.0" text="位置"/>
                                                 <TableColumn fx:id="pcCheckTimeCl" prefWidth="100.0" text="查询时间"/>
@@ -193,10 +215,57 @@
                                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columns>
                                                 <TableColumn fx:id="mobileKeywordsCl" prefWidth="200.0" text="关键词"/>
+                                                <TableColumn fx:id="mobileProductCl" prefWidth="200.0" text="产品"/>
                                                 <TableColumn fx:id="mobilePageCl" prefWidth="50.0" text="页数"/>
                                                 <TableColumn fx:id="mobileLocCl" prefWidth="150.0" text="位置"/>
                                                 <TableColumn fx:id="mobileCheckTimeCl" prefWidth="100.0" text="查询时间"/>
                                                 <TableColumn fx:id="mobileOpenCl" prefWidth="75.0" text="查看页面"/>
+                                            </columns>
+                                            <columnResizePolicy>
+                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                            </columnResizePolicy>
+                                        </TableView>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+                        <Tab text="什么搜索">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="800.0">
+                                    <children>
+                                        <TableView fx:id="listShenmaTv" prefHeight="600.0" prefWidth="800.0"
+                                                   AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <columns>
+                                                <TableColumn fx:id="shenmaKeywordsCl" prefWidth="200.0" text="关键词"/>
+                                                <TableColumn fx:id="shenmaProductCl" prefWidth="200.0" text="产品"/>
+                                                <TableColumn fx:id="shenmaPageCl" prefWidth="50.0" text="页数"/>
+                                                <TableColumn fx:id="shenmaLocCl" prefWidth="150.0" text="位置"/>
+                                                <TableColumn fx:id="shenmaCheckTimeCl" prefWidth="100.0" text="查询时间"/>
+                                                <TableColumn fx:id="shenmaOpenCl" prefWidth="75.0" text="查看页面"/>
+                                            </columns>
+                                            <columnResizePolicy>
+                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                            </columnResizePolicy>
+                                        </TableView>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+                        <Tab text="头条搜索">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="600.0" prefWidth="800.0">
+                                    <children>
+                                        <TableView fx:id="listToutiaoTv" prefHeight="600.0" prefWidth="800.0"
+                                                   AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <columns>
+                                                <TableColumn fx:id="toutiaoKeywordsCl" prefWidth="200.0" text="关键词"/>
+                                                <TableColumn fx:id="toutiaoProductCl" prefWidth="200.0" text="产品"/>
+                                                <TableColumn fx:id="toutiaoPageCl" prefWidth="50.0" text="页数"/>
+                                                <TableColumn fx:id="toutiaoLocCl" prefWidth="150.0" text="位置"/>
+                                                <TableColumn fx:id="toutiaoCheckTimeCl" prefWidth="100.0" text="查询时间"/>
+                                                <TableColumn fx:id="toutiaoOpenCl" prefWidth="75.0" text="查看页面"/>
                                             </columns>
                                             <columnResizePolicy>
                                                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>

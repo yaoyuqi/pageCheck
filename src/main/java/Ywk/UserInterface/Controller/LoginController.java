@@ -1,6 +1,8 @@
 package Ywk.UserInterface.Controller;
 
 import Ywk.Api.HltApi;
+import Ywk.Data.IdentityWrapper;
+import Ywk.Data.KeywordGenerator;
 import Ywk.MainApp;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -22,8 +24,8 @@ public class LoginController {
     private TextField account;
     @FXML
     private PasswordField passwordField;
-    @FXML
-    private TextField identity;
+//    @FXML
+//    private TextField identity;
 
     public void setApp(MainApp app) {
         this.app = app;
@@ -31,58 +33,41 @@ public class LoginController {
 
     @FXML
     private void login() {
-//        String username = account.getText();
-//        String password = passwordField.getText();
+        String user = account.getText();
+        String password = passwordField.getText();
 
-//        if (username.isEmpty() || password.isEmpty()) {
-//            Alert alert = new Alert(Alert.AlertType.ERROR);
-//            alert.setHeaderText(null);
-//            alert.setContentText("请输入账户和密码");
-//            alert.showAndWait();
-//        } else {
-//            createDialog();
-//            HltApi api = HltApi.getInstance();
-//            api.login(username, password, this);
-//
-//
-////            app.gotoMain();
-//        }
-
-        String identifier = identity.getText();
-        if (identifier.isEmpty()) {
+        user = "lymczs";
+        password = "qwe123";
+        if (user.isEmpty() || password.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText(null);
-            alert.setContentText("查询码不能为空");
+            alert.setContentText("账户或密码不能为空");
             alert.showAndWait();
         } else {
             createDialog();
             HltApi api = HltApi.getInstance();
-            api.login(identifier, this);
-//            app.gotoMain();
+            api.login(user, password, this);
         }
 
     }
 
     public void loginResult(boolean isOk) {
         try {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    dialogStage.close();
-                    if (isOk) {
-                        app.gotoMain();
-                    } else {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setContentText("登录失败");
-                        alert.setHeaderText(null);
-                        alert.show();
-                    }
+            Platform.runLater(() -> {
+                if (!isOk) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setContentText("登录失败");
+                    alert.setHeaderText(null);
+                    alert.show();
+                } else {
+                    HltApi api = HltApi.getInstance();
+                    api.identity(this);
+                    api.words(this);
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
         }
-
 
     }
 
@@ -122,8 +107,27 @@ public class LoginController {
 
     @FXML
     private void initialize() {
-//        account.setText("ywk7YRUGBrl");
-//        passwordField.setText("123456");
 
+
+    }
+
+    public void apiInitFinished() {
+        if (IdentityWrapper.getInstance().isInit()
+                && KeywordGenerator.getInstance().isInit()
+        ) {
+            try {
+                Platform.runLater(() -> {
+                    dialogStage.close();
+                    app.gotoMain();
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    public void vitalError() {
+        HomeController.showAlert(Alert.AlertType.ERROR, "初始化失败，请重启软件");
     }
 }

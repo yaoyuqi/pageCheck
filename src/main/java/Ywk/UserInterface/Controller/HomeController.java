@@ -1,18 +1,20 @@
 package Ywk.UserInterface.Controller;
 
-import Ywk.Api.HltApi;
 import Ywk.Data.Info;
-import Ywk.Data.Keyword;
+import Ywk.Data.KeywordGenerator;
+import Ywk.Data.SearchPlatform;
 import Ywk.MainApp;
-import Ywk.PageCheck.BaiduCapture;
 import Ywk.PageCheck.TaskManage;
+import Ywk.PageCheck.TaskStatus;
+import Ywk.PageCheck.UploadStatus;
 import Ywk.UserInterface.Model.InfoModel;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -23,38 +25,60 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import okhttp3.OkHttpClient;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class HomeController {
 
-    private static final int MAX_SHOW = 1000;
+//    private static final int MAX_SHOW = 1000;
 
     private MainApp app;
 
     @FXML
     private Label totalLabel;
+    private SimpleIntegerProperty totalProperty = new SimpleIntegerProperty(0);
 
     @FXML
     private Label checkedLabel;
+    private SimpleIntegerProperty checkedProperty = new SimpleIntegerProperty(0);
 
     @FXML
     private Label showedPcLabel;
+    private SimpleIntegerProperty pcBingoProperty = new SimpleIntegerProperty(0);
+
 
     @FXML
     private Label showedMobileLabel;
+    private SimpleIntegerProperty mobileBingoProperty = new SimpleIntegerProperty(0);
+
+
+    @FXML
+    private Label shenmaLabel;
+    private SimpleIntegerProperty shenmaBingoProperty = new SimpleIntegerProperty(0);
+
+
+    @FXML
+    private Label toutiaoLabel;
+    private SimpleIntegerProperty toutiaoBingoProperty = new SimpleIntegerProperty(0);
+
 
     @FXML
     private CheckBox checkPcCb;
-
     @FXML
     private CheckBox checkMobileCb;
+
+    @FXML
+    private CheckBox checkSMCb;
+
+
+    @FXML
+    private CheckBox checkTTCb;
 
     @FXML
     private Slider speedSlider;
@@ -62,23 +86,24 @@ public class HomeController {
     @FXML
     private Button startBtn;
 
+
     @FXML
     private Button resumeBtn;
 
     @FXML
     private Button stopBtn;
 
-    @FXML
-    private Label runnedLabel;
-
-    @FXML
-    private Label estimateLabel;
-
-    @FXML
-    private ProgressBar progressBar;
-
-    @FXML
-    private ListView<String> infoLv;
+//    @FXML
+//    private Label runnedLabel;
+//
+//    @FXML
+//    private Label estimateLabel;
+//
+//    @FXML
+//    private ProgressBar progressBar;
+//
+//    @FXML
+//    private ListView<String> infoLv;
 
     @FXML
     private TableView<InfoModel> listPcTv;
@@ -86,12 +111,22 @@ public class HomeController {
     @FXML
     private TableView<InfoModel> listMobileTv;
 
+    @FXML
+    private TableView<InfoModel> listShenmaTv;
+
+    @FXML
+    private TableView<InfoModel> listToutiaoTv;
+
 
     private ObservableList<InfoModel> listPc = FXCollections.observableArrayList();
     private ObservableList<InfoModel> listMobile = FXCollections.observableArrayList();
+    private ObservableList<InfoModel> listShenma = FXCollections.observableArrayList();
+    private ObservableList<InfoModel> listToutiao = FXCollections.observableArrayList();
 
     @FXML
     private TableColumn<InfoModel, String> pcKeywordsCl;
+    @FXML
+    private TableColumn<InfoModel, String> pcProductCl;
     @FXML
     private TableColumn<InfoModel, String> pcPageCl;
     @FXML
@@ -103,7 +138,8 @@ public class HomeController {
 
     @FXML
     private TableColumn<InfoModel, String> mobileKeywordsCl;
-
+    @FXML
+    private TableColumn<InfoModel, String> mobileProductCl;
     @FXML
     private TableColumn<InfoModel, String> mobilePageCl;
     @FXML
@@ -112,6 +148,34 @@ public class HomeController {
     private TableColumn<InfoModel, String> mobileCheckTimeCl;
     @FXML
     private TableColumn<InfoModel, String> mobileOpenCl;
+
+
+    @FXML
+    private TableColumn<InfoModel, String> shenmaKeywordsCl;
+    @FXML
+    private TableColumn<InfoModel, String> shenmaProductCl;
+    @FXML
+    private TableColumn<InfoModel, String> shenmaPageCl;
+    @FXML
+    private TableColumn<InfoModel, String> shenmaLocCl;
+    @FXML
+    private TableColumn<InfoModel, String> shenmaCheckTimeCl;
+    @FXML
+    private TableColumn<InfoModel, String> shenmaOpenCl;
+
+
+    @FXML
+    private TableColumn<InfoModel, String> toutiaoKeywordsCl;
+    @FXML
+    private TableColumn<InfoModel, String> toutiaoProductCl;
+    @FXML
+    private TableColumn<InfoModel, String> toutiaoPageCl;
+    @FXML
+    private TableColumn<InfoModel, String> toutiaoLocCl;
+    @FXML
+    private TableColumn<InfoModel, String> toutiaoCheckTimeCl;
+    @FXML
+    private TableColumn<InfoModel, String> toutiaoOpenCl;
 
     @FXML
     private CheckBox autoUploadCb;
@@ -143,97 +207,232 @@ public class HomeController {
     @FXML
     private TextField maxTf;
 
+    private TaskManage task;
 
-    private TaskManage manage;
-
-    private OkHttpClient client;
 
     private List<String> customList = new LinkedList<>();
 
+    private List<SearchPlatform> selectedPlatforms = new ArrayList<>();
 
-    public HomeController() {
-        manage = new TaskManage();
+    public static void showAlert(Alert.AlertType type, String message) {
+        if (!Platform.isFxApplicationThread()) {
+            try {
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(type);
+                    alert.setContentText(message);
+                    alert.setHeaderText(null);
+                    alert.show();
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            Alert alert = new Alert(type);
+            alert.setContentText(message);
+            alert.setHeaderText(null);
+            alert.show();
+        }
 
 
+    }
+
+    public void initTaskManager() {
+        task = new TaskManage(this);
+        this.updateTotal();
     }
 
     public void setApp(MainApp app) {
         this.app = app;
-        manage = new TaskManage();
-        manage.setController(this);
-        manage.setTaskStatus(TaskManage.TASK_STATUS_NEW);
-        manage.prepareKeyword();
-
-//        for (int i = 0; i < 100000; i++) {
-//            Info info = new Info();
-//            info.setType(1);
-//            info.setLoc(new String[]{"1", "2", "3"});
-//            info.setTime("2018-12-1 1:1:1");
-//            info.setKeyword("肯尼亚CICC" + i);
-//            listPc.add(new InfoModel(info));
-//        }
-//
-//        for (int i = 0; i < 100000; i++) {
-//            Info info = new Info();
-//            info.setType(2);
-//            info.setLoc(new String[]{"1", "2", "3"});
-//            info.setTime("2018-12-1 1:1:1");
-//            info.setKeyword("肯尼亚CICC" + i);
-//            listMobile.add(new InfoModel(info));
-//        }
     }
 
-    public OkHttpClient getClient() {
-        return client;
-    }
-
-    public void setClient(OkHttpClient client) {
-        this.client = client;
-    }
-
-    public void setIdentity(String identity) {
-        manage.setIdentity(identity);
-//        manage.setIdentity("xcWj2");
-        System.out.println("identity=" + identity);
+    public void initFinished() {
+        alertInitFinished();
     }
 
     @FXML
     private void initialize() {
+        /*
+        设定页面的默认项目
+         */
+        totalLabel.textProperty().bind(totalProperty.asString());
+        checkedLabel.textProperty().bind(checkedProperty.asString());
+        showedPcLabel.textProperty().bind(pcBingoProperty.asString());
+        showedMobileLabel.textProperty().bind(mobileBingoProperty.asString());
+        shenmaLabel.textProperty().bind(shenmaBingoProperty.asString());
+        toutiaoLabel.textProperty().bind(toutiaoBingoProperty.asString());
+
         listPcTv.setItems(listPc);
         listMobileTv.setItems(listMobile);
+        listShenmaTv.setItems(listShenma);
+        listToutiaoTv.setItems(listToutiao);
 
         uploadBtn.setDisable(true);
         autoUploadCb.setSelected(true);
 
         speedSlider.setValue(50.0);
+        pageDepthSelectSet();
+        searchPlatformSelectSet();
+
+        keywordsRadioSet();
+        tableCellSet();
+
+        initTaskManager();
+
+    }
+
+    private void tableCellSet() {
+        pcKeywordsCl.setSortable(false);
+        pcProductCl.setSortable(false);
+        pcPageCl.setSortable(false);
+        pcOpenCl.setSortable(false);
+        pcCheckTimeCl.setSortable(false);
+        pcLocCl.setSortable(false);
+        pcCheckTimeCl.setMinWidth(80);
+        pcKeywordsCl.setMinWidth(150);
+        pcProductCl.setMinWidth(80);
+
+        mobileKeywordsCl.setSortable(false);
+        mobileProductCl.setSortable(false);
+        mobilePageCl.setSortable(false);
+        mobileLocCl.setSortable(false);
+        mobileCheckTimeCl.setSortable(false);
+        mobileOpenCl.setSortable(false);
+        mobileCheckTimeCl.setMinWidth(80);
+        mobileKeywordsCl.setMinWidth(150);
+        mobileProductCl.setMinWidth(80);
+
+        shenmaKeywordsCl.setSortable(false);
+        shenmaProductCl.setSortable(false);
+        shenmaPageCl.setSortable(false);
+        shenmaLocCl.setSortable(false);
+        shenmaCheckTimeCl.setSortable(false);
+        shenmaOpenCl.setSortable(false);
+        shenmaCheckTimeCl.setMinWidth(80);
+        shenmaKeywordsCl.setMinWidth(150);
+        shenmaProductCl.setMinWidth(80);
 
 
+        toutiaoKeywordsCl.setSortable(false);
+        toutiaoProductCl.setSortable(false);
+        toutiaoPageCl.setSortable(false);
+        toutiaoLocCl.setSortable(false);
+        toutiaoCheckTimeCl.setSortable(false);
+        toutiaoOpenCl.setSortable(false);
+        toutiaoCheckTimeCl.setMinWidth(80);
+        toutiaoKeywordsCl.setMinWidth(150);
+        toutiaoProductCl.setMinWidth(80);
+
+        Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> keywordCallback =
+                (param) -> param.getValue().keywordProperty();
+
+        Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> pageCallback =
+                (param) -> param.getValue().pageProperty();
+
+        Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> locCallback =
+                (param) -> param.getValue().locProperty();
+
+
+        Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> timeCallback =
+                (param) -> param.getValue().timeProperty();
+
+        Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> productCallback =
+                (param) -> param.getValue().productProperty();
+
+
+        pcKeywordsCl.setCellValueFactory(keywordCallback);
+        pcProductCl.setCellValueFactory(productCallback);
+        pcPageCl.setCellValueFactory(pageCallback);
+        pcLocCl.setCellValueFactory(locCallback);
+        pcCheckTimeCl.setCellValueFactory(timeCallback);
+        pcOpenCl.setCellValueFactory(cellData -> new SimpleStringProperty("点击查看"));
+        pcOpenCl.setCellFactory(urlClickOpenCallback(listPc, SearchPlatform.BAIDU));
+
+
+        mobileKeywordsCl.setCellValueFactory(keywordCallback);
+        mobileProductCl.setCellValueFactory(productCallback);
+        mobilePageCl.setCellValueFactory(pageCallback);
+        mobileLocCl.setCellValueFactory(locCallback);
+        mobileCheckTimeCl.setCellValueFactory(timeCallback);
+        mobileOpenCl.setCellValueFactory(cellData -> new SimpleStringProperty("点击查看"));
+        mobileOpenCl.setCellFactory(urlClickOpenCallback(listMobile, SearchPlatform.BAIDU_MOBILE));
+
+
+        shenmaKeywordsCl.setCellValueFactory(keywordCallback);
+        shenmaProductCl.setCellValueFactory(productCallback);
+        shenmaPageCl.setCellValueFactory(pageCallback);
+        shenmaLocCl.setCellValueFactory(locCallback);
+        shenmaCheckTimeCl.setCellValueFactory(timeCallback);
+        shenmaOpenCl.setCellValueFactory(cellData -> new SimpleStringProperty("点击查看"));
+        shenmaOpenCl.setCellFactory(urlClickOpenCallback(listShenma, SearchPlatform.SHENMA));
+
+        toutiaoKeywordsCl.setCellValueFactory(keywordCallback);
+        toutiaoProductCl.setCellValueFactory(productCallback);
+        toutiaoPageCl.setCellValueFactory(pageCallback);
+        toutiaoLocCl.setCellValueFactory(locCallback);
+        toutiaoCheckTimeCl.setCellValueFactory(timeCallback);
+        toutiaoOpenCl.setCellValueFactory(cellData -> new SimpleStringProperty("点击查看"));
+        toutiaoOpenCl.setCellFactory(urlClickOpenCallback(listToutiao, SearchPlatform.TOUTIAO));
+    }
+
+    private Callback<TableColumn<InfoModel, String>, TableCell<InfoModel, String>> urlClickOpenCallback(ObservableList<InfoModel> list, SearchPlatform platform) {
+        return (TableColumn<InfoModel, String> infoModelStringTableColumn) -> {
+            TableCell<InfoModel, String> cell = new TableCell<InfoModel, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null || empty) {
+                        setText(null);
+                    } else {
+                        setText(item);
+                    }
+                }
+
+            };
+
+            cell.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEvent -> {
+                System.out.println("double clicked!");
+                TableCell<InfoModel, String> tableCell = (TableCell<InfoModel, String>) mouseEvent.getSource();
+                InfoModel model = list.get(tableCell.getIndex());
+                if (model != null) {
+                    String url = platform.nextPageUrl(model.getKeyword(), model.getPage());
+                    app.getHostServices().showDocument(url);
+                }
+            });
+            return cell;
+        };
+    }
+
+    private void searchPlatformSelectSet() {
+        ChangeListener<Boolean> cbChangeListener = (observable, oldValue, newValue) -> {
+            updatePlatFormSelect();
+            updateTotal();
+        };
+
+        checkPcCb.selectedProperty().addListener(cbChangeListener);
+        checkMobileCb.selectedProperty().addListener(cbChangeListener);
+        checkSMCb.selectedProperty().addListener(cbChangeListener);
+        checkTTCb.selectedProperty().addListener(cbChangeListener);
+    }
+
+    private void pageDepthSelectSet() {
         final ObservableList<Integer> choice = FXCollections.observableArrayList(1, 2, 3);
         pageChoiceBox.setItems(choice);
         pageChoiceBox.setValue(1);
         pageChoiceBox.getSelectionModel()
                 .selectedIndexProperty()
                 .addListener((observable, oldValue, newValue) -> {
-                    manage.setPageDepth(choice.get(newValue.intValue()));
+                    task.setPageDepth(choice.get(newValue.intValue()));
                     updateTotal();
                 });
 
+    }
 
-        checkPcCb.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            updatePlatFormSelect();
-            updateTotal();
-        });
-
-        checkMobileCb.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            updatePlatFormSelect();
-            updateTotal();
-        });
-
-        chooseMainRb.setUserData(Keyword.MixType.MAIN);
-        choosePrefixMainRb.setUserData(Keyword.MixType.PREFIX_MAIN);
-        choosePrefixMainSuffixRb.setUserData(Keyword.MixType.PREFIX_MAIN_SUFFIX);
-        chooseMainSuffixRb.setUserData(Keyword.MixType.MAIN_SUFFIX);
-        chooseCustomRb.setUserData(Keyword.MixType.CUSTOM);
+    private void keywordsRadioSet() {
+        chooseMainRb.setUserData(KeywordGenerator.MixType.MAIN);
+        choosePrefixMainRb.setUserData(KeywordGenerator.MixType.PREFIX_MAIN);
+        choosePrefixMainSuffixRb.setUserData(KeywordGenerator.MixType.PREFIX_MAIN_SUFFIX);
+        chooseMainSuffixRb.setUserData(KeywordGenerator.MixType.MAIN_SUFFIX);
+        chooseCustomRb.setUserData(KeywordGenerator.MixType.CUSTOM);
 
         final ToggleGroup group = new ToggleGroup();
 
@@ -248,14 +447,14 @@ public class HomeController {
 
         chooseMainRb.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                manage.setKeywordType(Keyword.MixType.MAIN);
+                task.setKeywordType(KeywordGenerator.MixType.MAIN);
                 updateTotal();
             }
         });
 
         choosePrefixMainRb.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                manage.setKeywordType(Keyword.MixType.PREFIX_MAIN);
+                task.setKeywordType(KeywordGenerator.MixType.PREFIX_MAIN);
                 updateTotal();
             }
 
@@ -263,7 +462,7 @@ public class HomeController {
 
         choosePrefixMainSuffixRb.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                manage.setKeywordType(Keyword.MixType.PREFIX_MAIN_SUFFIX);
+                task.setKeywordType(KeywordGenerator.MixType.PREFIX_MAIN_SUFFIX);
                 updateTotal();
             }
 
@@ -271,7 +470,7 @@ public class HomeController {
 
         chooseMainSuffixRb.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                manage.setKeywordType(Keyword.MixType.MAIN_SUFFIX);
+                task.setKeywordType(KeywordGenerator.MixType.MAIN_SUFFIX);
                 updateTotal();
             }
 
@@ -280,7 +479,7 @@ public class HomeController {
 
         chooseCustomRb.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
-                manage.setKeywordType(Keyword.MixType.CUSTOM);
+                task.setKeywordType(KeywordGenerator.MixType.CUSTOM);
                 selectTxtBtn.setVisible(true);
                 updateTotal();
             } else {
@@ -289,219 +488,52 @@ public class HomeController {
             }
         });
 
-        HltApi api = HltApi.getInstance();
-        api.identity(this);
-
-        pcKeywordsCl.setSortable(false);
-
-
-        pcPageCl.setSortable(false);
-        pcOpenCl.setSortable(false);
-        pcCheckTimeCl.setSortable(false);
-        pcLocCl.setSortable(false);
-
-        pcCheckTimeCl.setMinWidth(80);
-        pcKeywordsCl.setMinWidth(150);
-
-
-        mobileKeywordsCl.setSortable(false);
-        mobilePageCl.setSortable(false);
-        mobileLocCl.setSortable(false);
-        mobileCheckTimeCl.setSortable(false);
-        mobileOpenCl.setSortable(false);
-
-        mobileCheckTimeCl.setMinWidth(80);
-        mobileKeywordsCl.setMinWidth(150);
-
-
-        pcKeywordsCl.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<InfoModel, String> param) {
-                return param.getValue().keywordProperty();
-            }
-        });
-
-        pcPageCl.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<InfoModel, String> param) {
-                return param.getValue().pageProperty();
-            }
-        });
-
-        pcLocCl.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<InfoModel, String> param) {
-                return param.getValue().locProperty();
-            }
-        });
-
-        pcCheckTimeCl.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<InfoModel, String> param) {
-                return param.getValue().timeProperty();
-            }
-        });
-
-
-        pcOpenCl.setCellValueFactory(cellData -> new SimpleStringProperty("点击查看"));
-
-        pcOpenCl.setCellFactory(new Callback<TableColumn<InfoModel, String>, TableCell<InfoModel, String>>() {
-            @Override
-            public TableCell<InfoModel, String> call(TableColumn<InfoModel, String> param) {
-                TableCell<InfoModel, String> cell = new TableCell<InfoModel, String>() {
-                    @Override
-                    protected void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (item == null || empty) {
-                            setText(null);
-                        } else {
-                            setText(item);
-                        }
-                    }
-
-                };
-
-                cell.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        System.out.println("double clicked!");
-                        TableCell<InfoModel, String> cell = (TableCell<InfoModel, String>) event.getSource();
-
-                        InfoModel model = listPc.get(cell.getIndex());
-
-//                        if (model != null && Desktop.isDesktopSupported()) {
-//                            try {
-//                                Desktop.getDesktop().browse(new URI(model.getUrl()));
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-                        if (model != null) {
-                            String url = BaiduCapture.makeUrl(Info.TYPE_PC, model.getKeyword(), model.getPage());
-                            app.getHostServices().showDocument(url);
-                        }
-
-//
-                    }
-                });
-                return cell;
-            }
-        });
-
-        mobileKeywordsCl.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<InfoModel, String> param) {
-                return param.getValue().keywordProperty();
-            }
-        });
-
-        mobilePageCl.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<InfoModel, String> param) {
-                return param.getValue().pageProperty();
-            }
-        });
-
-        mobileLocCl.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<InfoModel, String> param) {
-                return param.getValue().locProperty();
-            }
-        });
-
-        mobileCheckTimeCl.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<InfoModel, String> param) {
-                return param.getValue().timeProperty();
-            }
-        });
-
-        mobileOpenCl.setCellValueFactory(cellData -> new SimpleStringProperty("点击查看"));
-
-        mobileOpenCl.setCellFactory(new Callback<TableColumn<InfoModel, String>, TableCell<InfoModel, String>>() {
-            @Override
-            public TableCell<InfoModel, String> call(TableColumn<InfoModel, String> param) {
-                TableCell<InfoModel, String> cell = new TableCell<InfoModel, String>() {
-                    @Override
-                    protected void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (item == null || empty) {
-                            setText(null);
-                        } else {
-                            setText(item);
-                        }
-                    }
-
-                };
-
-                cell.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        System.out.println("double clicked!");
-                        TableCell<InfoModel, String> cell = (TableCell<InfoModel, String>) event.getSource();
-
-                        InfoModel model = listMobile.get(cell.getIndex());
-                        String url = BaiduCapture.makeUrl(Info.TYPE_MOBILE, model.getKeyword(), model.getPage());
-                        app.getHostServices().showDocument(url);
-
-                    }
-                });
-                return cell;
-            }
-        });
-
     }
 
-
     @FXML
-    private void handleStart() {
-        manage.setTaskStatus(TaskManage.TASK_STATUS_NEW);
-
+    private void handleNewStart() {
+        task.newTask();
+        listPc.clear();
+        listMobile.clear();
+        listShenma.clear();
+        listToutiao.clear();
 
         int runSpeed = ((Double) speedSlider.getValue()).intValue() % 10;
         if (runSpeed == 0) {
             runSpeed = 1;
         }
 
-        manage.setSpeed(runSpeed);
+        task.setSpeed(runSpeed);
 
-        manage.setTaskStatus(TaskManage.TASK_STATUS_NEW_RUNNING);
+        task.setAutoUpdate(autoUploadCb.isSelected());
 
-        manage.setAutoUpdate(autoUploadCb.isSelected());
-
-        manage.setKeywordMax(Integer.parseInt(maxTf.getText()));
-
+        task.setKeywordMax(Integer.parseInt(maxTf.getText()));
 
         //new设置， 放在子线程里更新不上
+        task.start();
 
-
-        Thread thread = new Thread(manage);
+        Thread thread = new Thread(task);
 //        thread.setDaemon(true);
         thread.start();
     }
 
     @FXML
     private void handleStop() {
-        manage.stopAll();
-        manage.setTaskStatus(TaskManage.TASK_STATUS_STOPPED);
+        task.stopAll();
         showAlert(Alert.AlertType.INFORMATION, "已停止 \n");
     }
 
     @FXML
     private void handleResume() {
-
         int runSpeed = ((Double) speedSlider.getValue()).intValue() % 10;
         if (runSpeed == 0) {
             runSpeed = 1;
         }
-
-        manage.setSpeed(runSpeed);
-        manage.setKeywordMax(Integer.parseInt(maxTf.getText()));
-        manage.setTaskStatus(TaskManage.TASK_STATUS_RESUME_RUNNING);
-        manage.setAutoUpdate(autoUploadCb.isSelected());
-
-        Thread thread = new Thread(manage);
-//        thread.setDaemon(true);
+        task.setSpeed(runSpeed);
+        task.setKeywordMax(Integer.parseInt(maxTf.getText()));
+        task.setAutoUpdate(autoUploadCb.isSelected());
+        task.start();
+        Thread thread = new Thread(task);
         thread.start();
 
     }
@@ -512,48 +544,49 @@ public class HomeController {
     public void updateTotal() {
         if (!Platform.isFxApplicationThread()) {
             try {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        totalLabel.setText("" + manage.getTotal());
-                    }
-                });
+                Platform.runLater(() -> totalProperty.setValue(task.getTotal()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
-            totalLabel.setText("" + manage.getTotal());
+            totalProperty.setValue(task.getTotal());
         }
 
     }
 
-
     /**
      * 更新已检索数量
      *
-     * @param runned
+     * @param ran
      */
-    public void updateRunned(int runned) {
+    public void updateRanCnt(int ran) {
         try {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    checkedLabel.setText("" + runned);
-                }
+            Platform.runLater(() -> checkedProperty.setValue(ran));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 更新上词数
+     */
+    public void updateBingoCnt(int pc, int mobile, int shenma, int toutiao) {
+        try {
+            Platform.runLater(() -> {
+                pcBingoProperty.setValue(pc);
+                mobileBingoProperty.setValue(mobile);
+                shenmaBingoProperty.setValue(shenma);
+                toutiaoBingoProperty.setValue(toutiao);
             });
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+
     @FXML
     private void handleUpload() {
-
-        manage.setTaskStatus(manage.getTaskStatus() == TaskManage.TASK_STATUS_STOPPED ?
-                TaskManage.TASK_UPLOAD_UNFINISHED_RUNNING
-                : TaskManage.TASK_UPLOAD_FINISHED_RUNNING);
-        manage.uploadResult();
-
+        task.uploadResult();
     }
 
     /**
@@ -562,12 +595,7 @@ public class HomeController {
     public void updateTaskStatus() {
         if (!Platform.isFxApplicationThread()) {
             try {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateStatus();
-                    }
-                });
+                Platform.runLater(() -> updateStatus());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -578,41 +606,34 @@ public class HomeController {
     }
 
     private void updateStatus() {
-        System.out.println("current status is " + manage.getTaskStatus());
-        if (manage.getTaskStatus() == TaskManage.TASK_STATUS_NEW) {
+        System.out.println("current status is " + task.getTaskStatus());
+        if (task.getTaskStatus() == TaskStatus.NEW) {
             updateNewStatus();
-        } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_NEW_RUNNING
-                || manage.getTaskStatus() == TaskManage.TASK_STATUS_RESUME_RUNNING
-                ) {
+        } else if (task.getTaskStatus() == TaskStatus.RUNNING) {
             updateRunningStatus();
-        } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_STOPPED) {
-            updateStopStatus();
-        } else if (manage.getTaskStatus() == TaskManage.TASK_STATUS_FINISHED) {
+        } else if (task.getTaskStatus() == TaskStatus.PAUSE) {
+            updatePauseStatus();
+        } else if (task.getTaskStatus() == TaskStatus.FINISHED) {
             updateFinishedStatus();
-        } else if (manage.getTaskStatus() == TaskManage.TASK_UPLOAD_FINISHED_RUNNING
-                || manage.getTaskStatus() == TaskManage.TASK_UPLOAD_UNFINISHED_RUNNING) {
+        } else if (task.getUploadStatus() == UploadStatus.UPLOADING) {
             updateUploadingStatus();
-        } else if (manage.getTaskStatus() == TaskManage.TASK_UPLOAD_FINISHED_FINISHED
-                || manage.getTaskStatus() == TaskManage.TASK_UPLOAD_UNFINISHED_FINISHED) {
+        } else if (task.getUploadStatus() == UploadStatus.FAIL
+                || task.getUploadStatus() == UploadStatus.SUCCESS) {
             updateUploadFinishedStatus();
-            resumeBtn.setDisable(manage.getTaskStatus() == TaskManage.TASK_UPLOAD_FINISHED_FINISHED); //继续按钮
+            resumeBtn.setDisable(task.getTaskStatus() == TaskStatus.FINISHED); //继续按钮
         }
     }
 
     private void updateNewStatus() {
-        checkedLabel.setText("0");
-        manage.setRunned(0);
-
-        manage.setMobileBingo(0);
-        showedPcLabel.setText("0");
-        manage.setPcBingo(0);
-        showedMobileLabel.setText("0");
-
         startBtn.setDisable(false);//开始按钮 可用
         stopBtn.setDisable(true); //结束按钮 不可用
         resumeBtn.setDisable(true); //继续按钮 不可用
+
         checkPcCb.setDisable(false); //平台勾选 可用
         checkMobileCb.setDisable(false); //平台勾选 可用
+        checkSMCb.setDisable(false); //平台勾选 可用
+        checkTTCb.setDisable(false); //平台勾选 可用
+
         autoUploadCb.setDisable(false); //自动上传 可用
         pageChoiceBox.setDisable(false); //检索深度 可用
         uploadBtn.setDisable(false); //上传按钮 可用
@@ -626,7 +647,9 @@ public class HomeController {
 
         listPc.clear();
         listMobile.clear();
-        manage.clearData();
+        listShenma.clear();
+        listToutiao.clear();
+        task.newTask();
     }
 
     private void updateUploadFinishedStatus() {
@@ -650,7 +673,6 @@ public class HomeController {
 
     }
 
-
     private void updateRunningStatus() {
         startBtn.setDisable(true); //开始按钮 不可用
         stopBtn.setDisable(false); //结束按钮 可用
@@ -667,15 +689,9 @@ public class HomeController {
         choosePrefixMainSuffixRb.setDisable(true);
         choosePrefixMainRb.setDisable(true);
         selectTxtBtn.setDisable(true);
-
-        if (manage.getTaskStatus() == TaskManage.TASK_STATUS_NEW_RUNNING) {
-            listPc.clear();
-            listMobile.clear();
-            manage.clearData();
-        }
     }
 
-    private void updateStopStatus() {
+    private void updatePauseStatus() {
         startBtn.setDisable(false); //开始按钮 可用
         stopBtn.setDisable(true);  //结束按钮 不可用
         resumeBtn.setDisable(false);  //继续按钮 可用
@@ -693,7 +709,6 @@ public class HomeController {
         choosePrefixMainRb.setDisable(false);
         selectTxtBtn.setDisable(false);
     }
-
 
     private void updateFinishedStatus() {
         startBtn.setDisable(false); //开始按钮 可用
@@ -736,7 +751,6 @@ public class HomeController {
 
     }
 
-
     /**
      * 回调， 将爬取结果放回列表显示
      * 同时更新页面命中数
@@ -744,52 +758,21 @@ public class HomeController {
      * @param info
      */
     public synchronized void addResult(Info info) {
-        if (info.getType() == Info.TYPE_PC) {
-            listPc.add(0, new InfoModel(info));
-            if (listPc.size() > MAX_SHOW) {
-                listPc.remove(MAX_SHOW - 1, listPc.size() - 1);
-            }
-        } else {
-            listMobile.add(0, new InfoModel(info));
-            listMobile.remove(MAX_SHOW - 1, listPc.size() - 1);
+
+        switch (info.getPlatform()) {
+            case BAIDU:
+                listPc.add(0, new InfoModel(info));
+                break;
+            case BAIDU_MOBILE:
+                listMobile.add(0, new InfoModel(info));
+                break;
+            case SHENMA:
+                listShenma.add(0, new InfoModel(info));
+                break;
+            case TOUTIAO:
+                listToutiao.add(0, new InfoModel(info));
+                break;
         }
-
-        try {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    showedMobileLabel.setText(manage.getMobileBingo() + "");
-                    showedPcLabel.setText(manage.getPcBingo() + "");
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void showAlert(Alert.AlertType type, String message) {
-        if (!Platform.isFxApplicationThread()) {
-            try {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        Alert alert = new Alert(type);
-                        alert.setContentText(message);
-                        alert.setHeaderText(null);
-                        alert.show();
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            Alert alert = new Alert(type);
-            alert.setContentText(message);
-            alert.setHeaderText(null);
-            alert.show();
-        }
-
-
     }
 
     /**
@@ -801,6 +784,10 @@ public class HomeController {
 
     public void alertVital() {
         showAlert(Alert.AlertType.ERROR, "初始化失败，请重启软件");
+    }
+
+    public void alertInitFinished() {
+        showAlert(Alert.AlertType.INFORMATION, "初始化完毕");
     }
 
     /**
@@ -833,8 +820,7 @@ public class HomeController {
     private void readFile(File file) {
         Platform.runLater(() -> {
             try {
-//                Desktop desktop = Desktop.getDesktop();
-//                desktop.open(file);
+
                 FileReader fileReader = new FileReader(file);
                 BufferedReader br = new BufferedReader(fileReader);
 
@@ -847,7 +833,7 @@ public class HomeController {
                 if (!showCustomKeywordDialog(customList)) {
                     customList.clear();
                 }
-                manage.setCustomKeywords(customList);
+                task.setCustomKeywords(customList);
                 updateTotal();
 
             } catch (IOException e) {
@@ -880,19 +866,19 @@ public class HomeController {
     }
 
     private void updatePlatFormSelect() {
-        boolean pcSelected = checkPcCb.isSelected();
-        boolean mobileSelected = checkMobileCb.isSelected();
-        int type = 0;
-        if (pcSelected && mobileSelected) {
-            type = Info.TYPE_BOTH;
-        } else if (pcSelected) {
-            type = Info.TYPE_PC;
-        } else if (mobileSelected) {
-            type = Info.TYPE_MOBILE;
+        selectedPlatforms.clear();
+        if (checkPcCb.isSelected()) {
+            selectedPlatforms.add(SearchPlatform.BAIDU);
         }
-
-        manage.setType(type);
+        if (checkMobileCb.isSelected()) {
+            selectedPlatforms.add(SearchPlatform.BAIDU_MOBILE);
+        }
+        if (checkSMCb.isSelected()) {
+            selectedPlatforms.add(SearchPlatform.SHENMA);
+        }
+        if (checkTTCb.isSelected()) {
+            selectedPlatforms.add(SearchPlatform.TOUTIAO);
+        }
     }
-
 
 }

@@ -1,29 +1,27 @@
 package Ywk.UserInterface.Model;
 
+import Ywk.Data.IdentityWrapper;
 import Ywk.Data.Info;
-import Ywk.PageCheck.BaiduCapture;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class InfoModel {
-
     private final StringProperty keyword;
     private final StringProperty loc;
     private final StringProperty time;
-    private final int type;
-
-    private final int page;
+    private final StringProperty product;
+    private final Info info;
 
     public InfoModel(Info info) {
         keyword = new SimpleStringProperty(info.getKeyword());
         loc = new SimpleStringProperty(String.join(",", info.getLoc()));
         time = new SimpleStringProperty(info.getTime());
-        type = info.getType();
-        page = info.getPage();
+        product = new SimpleStringProperty(IdentityWrapper.getInstance().name(info.getIdentity()));
+        this.info = info;
     }
 
     public String getUrl() {
-        return BaiduCapture.makeUrl(type, getKeyword(), page);
+        return info.getPlatform().nextPageUrl(getKeyword(), info.getPage());
     }
 
     public String getKeyword() {
@@ -51,16 +49,24 @@ public class InfoModel {
     }
 
     public int getPage() {
-        return page;
+        return info.getPage();
     }
 
     public StringProperty pageProperty() {
-        String mark = "";
-        if (page == 1) {
+        String mark;
+        if (info.getPage() == 1) {
             mark = "首页";
         } else {
-            mark = "第" + page + "页";
+            mark = "第" + info.getPage() + "页";
         }
         return new SimpleStringProperty(mark);
+    }
+
+    public StringProperty productProperty() {
+        return product;
+    }
+
+    public String getProduct() {
+        return product.get();
     }
 }

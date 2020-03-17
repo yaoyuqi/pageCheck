@@ -2,22 +2,17 @@ package Ywk.Data;
 
 
 public class Info {
-    public static int TYPE_PC = 1;
-    public static int TYPE_MOBILE = 2;
-    public static int TYPE_BOTH = 3;
-
     private String keyword;
-    private int type;
-
-    private int total = 0;
-
-    //    private String url;
+    private SearchPlatform platform;
+    private String identity;
     private String[] loc;
-    //    private String searchUrl;
     private String time;
 
     private int page = 1;
 
+    public int total() {
+        return loc == null ? 0 : loc.length;
+    }
 
     public String getKeyword() {
         return keyword;
@@ -27,10 +22,21 @@ public class Info {
         this.keyword = keyword;
     }
 
-//    public String getUrl() {
-//        return url;
-//    }
+    public SearchPlatform getPlatform() {
+        return platform;
+    }
 
+    public void setPlatform(SearchPlatform platform) {
+        this.platform = platform;
+    }
+
+    public String getIdentity() {
+        return identity;
+    }
+
+    public void setIdentity(String identity) {
+        this.identity = identity;
+    }
 
     public String[] getLoc() {
         return loc;
@@ -38,7 +44,6 @@ public class Info {
 
     public void setLoc(String[] loc) {
         this.loc = loc;
-        total = loc.length;
     }
 
     public String getLocString() {
@@ -51,18 +56,6 @@ public class Info {
 
     public void setTime(String time) {
         this.time = time;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-
-    public int getTotal() {
-        return total;
     }
 
     public int getPage() {

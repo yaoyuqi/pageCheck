@@ -1,8 +1,6 @@
 package Ywk.Api;
 
-import Ywk.Data.ApiWriter;
-import Ywk.PageCheck.TaskManage;
-import Ywk.UserInterface.Controller.HomeController;
+import Ywk.Data.*;
 import Ywk.UserInterface.Controller.LoginController;
 import com.google.gson.Gson;
 import okhttp3.*;
@@ -10,8 +8,8 @@ import okhttp3.*;
 import java.io.IOException;
 
 public class HltApi {
-    private static final String key = "33ic8HIz52vDFogcFgA3rwGx7Nke9dArqjyevN3O";
-    private static final String host = "http://hlf.91huoke.com/";
+    private static final String key = "1typhdp9zbo2Lbz9YkdfTLE9Tm4jW7nCSKssakFj";
+    private static final String host = "http://member.91huoke.com/";
     private static HltApi api;
     private OkHttpClient client;
 
@@ -27,30 +25,11 @@ public class HltApi {
     }
 
     public static HltApi getInstance() {
-        if (api == null) {
-            api = new HltApi((new OkHttpClient.Builder()).build());
-        }
-        return api;
+        return HltApi.getInstance(new OkHttpClient.Builder().build());
     }
 
-    public void login(String account, String password, LoginController controller) {
-        String url = host + "oauth/token";
-
-        RequestBody body = new FormBody.Builder()
-                .add("grant_type", "password")
-                .add("client_id", "2")
-                .add("client_secret", key)
-                .add("username", account)
-                .add("password", password)
-                .add("scope", "")
-                .build();
-
-        Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
+    private Callback loginCallback(LoginController controller) {
+        return new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 controller.loginResult(false);
@@ -58,19 +37,51 @@ public class HltApi {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-//                LoginData loginOut = new Gson().fromJson(response.body().string(), LoginData.class);
-//                if (loginOut.getAccess_token() == null || loginOut.getAccess_token().isEmpty()) {
-//                    controller.loginResult(false);
-//                } else {
-//                    LoginHeader.getInstance(loginOut.getToken_type() + " " + loginOut.getAccess_token());
-//                    controller.loginResult(true);
-//                }
+                try {
+                    TokenData loginOut = new Gson().fromJson(response.body().string(), TokenData.class);
+                    if (loginOut.getAccess_token() == null || loginOut.getAccess_token().isEmpty()) {
+                        controller.loginResult(false);
+                    } else {
+                        LoginHeader.getInstance(loginOut.getToken_type() + " " + loginOut.getAccess_token());
+                        System.out.println(LoginHeader.getInstance().getAccessToken());
 
+                        controller.loginResult(true);
+                    }
+                } catch (Exception e) {
+                    controller.loginResult(false);
+                } finally {
+                    response.close();
+                }
             }
-        });
+        };
+    }
+
+    public void login(String account, String password, LoginController controller) {
+        String url = host + "oauth/token";
+
+        RequestBody body = new FormBody.Builder()
+                .add("grant_type", "password")
+                .add("client_id", "9")
+                .add("client_secret", key)
+                .add("username", account)
+                .add("password", password)
+                .add("scope", "*")
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+
+        client.newCall(request).enqueue(loginCallback(controller));
 
     }
 
+    /**
+     * @param identity
+     * @param controller
+     * @deprecated
+     */
     public void login(String identity, LoginController controller) {
         String url = host + "api/hltapp/login";
 
@@ -106,24 +117,12 @@ public class HltApi {
                 }
 
 
-
             }
         });
-
-//        try (Response response = client.newCall(request).execute()) {
-//            if (response.isSuccessful()) {
-//                LoginData loginOut = new Gson().fromJson(response.body().string(), LoginData.class);
-//
-//                LoginHeader.getInstance(loginOut.getToken_type() + " " + loginOut.getAccess_token());
-//            }
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
-    public void identity(HomeController controller) {
-        String url = host + "api/hltapp/identity";
+    public void identity(LoginController controller) {
+        String url = host + "api/desktop/identities";
 
         LoginHeader header = LoginHeader.getInstance();
 
@@ -136,36 +135,31 @@ public class HltApi {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                controller.alertNetError();
+                controller.vitalError();
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+//                System.out.println(response.body().string());
+
                 IdentityData identityData = new Gson().fromJson(response.body().string(), IdentityData.class);
                 if (identityData.getStatus() != 200) {
                     response.close();
-                    throw new ApiErrorException();
+                    controller.vitalError();
+                } else {
+                    IdentityWrapper wrapper = IdentityWrapper.getInstance();
+                    wrapper.initList(identityData.getData());
+                    controller.apiInitFinished();
                 }
-                header.setIdentity(identityData.getData().getIdentity());
-                controller.setIdentity(header.getIdentity());
+
                 response.close();
             }
         });
-
-//        try (Response response = client.newCall(request).execute()) {
-//            if (response.isSuccessful()) {
-//                IdentityData identityData = new Gson().fromJson(response.body().string(), IdentityData.class);
-//                header.setIdentity(identityData.getData().getIdentity());
-//            }
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
 
-    public void words(TaskManage manage) throws ApiErrorException {
-        String url = host + "api/hltapp/words";
+    public void words(LoginController controller) throws ApiErrorException {
+        String url = host + "api/desktop/words";
 
         LoginHeader header = LoginHeader.getInstance();
 
@@ -175,35 +169,26 @@ public class HltApi {
                 .addHeader(header.getHeaderMark(), header.getAccessToken())
                 .build();
 
-//        try (Response response = client.newCall(request).execute()) {
-//            if (response.isSuccessful()) {
-////                System.out.println(response.body().string());
-//                WordData wordData = new Gson().fromJson(response.body().string(), WordData.class);
-//                if (wordData.getStatus() != 200) {
-//                    response.close();
-//                    throw new ApiErrorException();
-//                }
-//                return wordData;
-////                header.setIdentity(identityData.getData().getIdentity());
-//            }
-//            response.close();
-//            return null;
-//        } catch (IOException e) {
-//            throw new ApiErrorException();
-//        }
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                manage.initKeyword(null);
+                controller.vitalError();
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+//                System.out.println(response.body().string());
+
                 WordData wordData = new Gson().fromJson(response.body().string(), WordData.class);
                 if (wordData.getStatus() != 200) {
-                    manage.initKeyword(null);
+                    controller.vitalError();
                 } else {
-                    manage.initKeyword(wordData);
+                    KeywordGenerator generator = KeywordGenerator.getInstance();
+                    generator.setWords(wordData.getData().getPrefix().toArray(new String[]{}),
+                            wordData.getData().getMain().toArray(new String[]{}),
+                            wordData.getData().getSuffix().toArray(new String[]{}));
+                    controller.apiInitFinished();
+
                 }
                 response.close();
             }
@@ -226,13 +211,13 @@ public class HltApi {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                handler.handleResult(result.getType(), result.getPart(), false);
+                handler.handleResult(result.getPart(), false);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
 //                String responseText = response.body().toString();
-                handler.handleResult(result.getType(), result.getPart(), true);
+                handler.handleResult(result.getPart(), true);
                 response.close();
             }
         });

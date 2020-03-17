@@ -12,20 +12,20 @@ class TestBaidu {
 //        String[] prefix = {"成都","重庆", "肯尼亚"};
 //        String[] main = {"CCIC","CCIB", "CCIA"};
 //        String[] suffix = {"怎么样","如何"};
-//        Keyword keyword = new Keyword(prefix,main, suffix);
+//        KeywordGenerator keyword = new KeywordGenerator(prefix,main, suffix);
 //        XMLWriter writer = new XMLWriter();
-//        BaiduChecker checker = new BaiduChecker(identity, writer);
+//        BaiduContentChecker checker = new BaiduContentChecker(identity, writer);
 //
-//        BaiduCapture capture = new BaiduCapture(checker, 50);
+//        BaiduRunner spider = new BaiduRunner(checker, 50);
 //
-//        CheckManage manage = new CheckManage(keyword, capture, writer, Info.TYPE_MOBILE);
+//        RunningContainer manage = new RunningContainer(keyword, spider, writer, Info.TYPE_MOBILE);
 //
-//        capture.setIdleHandler(manage);
+//        spider.setIdleHandler(manage);
 //
 //        TaskManage taskManage = new TaskManage(manage);
 //        try {
 //            String word = keyword.next();
-//            capture.run(word, Info.TYPE_MOBILE);
+//            spider.run(word, Info.TYPE_MOBILE);
 //            FutureTask<Boolean> futureTask = new FutureTask<>(taskManage);
 //
 //            Thread thread = new Thread(futureTask);

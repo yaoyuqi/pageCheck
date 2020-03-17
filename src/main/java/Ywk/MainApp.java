@@ -1,6 +1,7 @@
 package Ywk;
 
 import Ywk.Api.HltApi;
+import Ywk.Api.HttpClientWrapper;
 import Ywk.UserInterface.Controller.HomeController;
 import Ywk.UserInterface.Controller.LoginController;
 import javafx.application.Application;
@@ -34,7 +35,7 @@ public class MainApp extends Application {
     }
 
     public void start(Stage primaryStage) throws Exception {
-        client = (new OkHttpClient.Builder()).build();
+        client = HttpClientWrapper.getClient();
 
         HltApi.getInstance(client);
 
@@ -78,7 +79,6 @@ public class MainApp extends Application {
 
             Scene scene = new Scene(pane, SCREEN_WIDTH, SCREEN_HEIGHT);
             HomeController controller = loader.getController();
-            controller.setClient(client);
             controller.setApp(this);
             primaryStage.setScene(scene);
         } catch (IOException e) {

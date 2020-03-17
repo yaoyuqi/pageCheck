@@ -1,4 +1,4 @@
-package Ywk.Api;
+package Ywk.Data;
 
 public class LoginData {
 

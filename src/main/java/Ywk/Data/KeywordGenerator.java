@@ -1,7 +1,8 @@
 package Ywk.Data;
 
-public class Keyword {
+public class KeywordGenerator {
 
+    private static KeywordGenerator instance;
     private MixType type = MixType.PREFIX_MAIN_SUFFIX;
     private String[] custom = new String[]{};
     private String[] prefix = new String[]{};
@@ -13,7 +14,21 @@ public class Keyword {
     private int curMain = -1;
     private int curSuffix = -1;
     private int curRun = 0;
+    private boolean init = false;
 
+    private KeywordGenerator() {
+    }
+
+    public static KeywordGenerator getInstance() {
+        if (instance == null) {
+            instance = new KeywordGenerator();
+        }
+        return instance;
+    }
+
+    public boolean isInit() {
+        return init;
+    }
 
     public void setMaxRun(int maxRun) {
         this.maxRun = maxRun;
@@ -27,14 +42,11 @@ public class Keyword {
         int total = getTotal();
         if (total > 100000) {
             return 2000;
-        }
-        else if (total > 10000) {
+        } else if (total > 10000) {
             return 1000;
-        }
-        else if (total > 1000) {
+        } else if (total > 1000) {
             return 500;
-        }
-        else {
+        } else {
             return 50;
         }
     }
@@ -135,6 +147,7 @@ public class Keyword {
         this.prefix = prefix;
         this.main = main;
         this.suffix = suffix;
+        init = true;
     }
 
     public void setCurrent(int curPrefix, int curMain, int curSuffix) {
