@@ -5,6 +5,7 @@ import Ywk.Data.KeywordGenerator;
 import Ywk.Data.PlatformWrapper;
 import Ywk.Data.SearchPlatform;
 import Ywk.MainApp;
+import Ywk.PageCheck.ContentChecker;
 import Ywk.PageCheck.TaskManage;
 import Ywk.PageCheck.TaskStatus;
 import Ywk.PageCheck.UploadStatus;
@@ -26,6 +27,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -38,7 +40,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class HomeController {
+public class HomeController implements ContentChecker.PageValidate {
     private MainApp app;
 
     @FXML
@@ -864,4 +866,28 @@ public class HomeController {
         }
     }
 
+    public void openWebview(String url) {
+        Platform.runLater(() -> {
+            WebView webView = new WebView();
+
+            webView.getEngine().load(url);
+            Stage stage = new Stage();
+            stage.setTitle("安全验证");
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(app.getPrimaryStage());
+
+            VBox vBox = new VBox(webView);
+            Scene scene = new Scene(vBox, 960, 600);
+
+            stage.setScene(scene);
+            stage.showAndWait();
+        });
+
+    }
+
+    @Override
+    public void validate(String url) {
+        task.stopAll();
+        openWebview(url);
+    }
 }

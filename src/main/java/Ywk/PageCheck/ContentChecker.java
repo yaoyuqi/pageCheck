@@ -22,6 +22,12 @@ public class ContentChecker {
     private NewItemFound foundListener;
     private SearchPlatform platform;
 
+    private PageValidate validateListener;
+
+    public void setValidateListener(PageValidate validateListener) {
+        this.validateListener = validateListener;
+    }
+
     ContentChecker(List<String> identities, XMLWriter writer, SearchPlatform platform, NewItemFound newItemFound) {
         this.identities = identities;
         this.writer = writer;
@@ -33,7 +39,16 @@ public class ContentChecker {
         return platform;
     }
 
-    public void check(String content, String keyword, int page) {
+    public void check(String content, String keyword, int page, String url) {
+        if (content != null
+                && content.contains("安全验证")
+        ) {
+            System.out.println(keyword + " 出现安全验证");
+            System.out.println(content);
+            validateListener.validate(url);
+            return;
+        }
+
         if (content != null
                 && identities.stream().parallel().anyMatch(content::contains)
         ) {
@@ -96,5 +111,9 @@ public class ContentChecker {
      */
     public interface NewItemFound {
         void found(Info info);
+    }
+
+    public interface PageValidate {
+        void validate(String url);
     }
 }

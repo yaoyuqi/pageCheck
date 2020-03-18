@@ -108,7 +108,10 @@ public class TaskManage implements Runnable
 
         for (SearchPlatform platform :
                 PlatformWrapper.getInstance().getList()) {
-            runners.add(new PageRunner(new PageSpider(HttpClientWrapper.getClient(), new ContentChecker(identities, writer, platform, this))));
+            ContentChecker checker = new ContentChecker(identities, writer, platform, this);
+            checker.setValidateListener(controller);
+
+            runners.add(new PageRunner(new PageSpider(HttpClientWrapper.getClient(), checker)));
         }
 
         runners.forEach(pageRunner -> {
