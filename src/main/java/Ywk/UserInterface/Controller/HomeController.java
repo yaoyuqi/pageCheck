@@ -9,6 +9,7 @@ import Ywk.PageCheck.TaskStatus;
 import Ywk.PageCheck.UploadStatus;
 import Ywk.UserInterface.Model.InfoModel;
 import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -21,6 +22,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -30,14 +34,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class HomeController {
-
-//    private static final int MAX_SHOW = 1000;
-
     private MainApp app;
 
     @FXML
@@ -48,37 +48,13 @@ public class HomeController {
     private Label checkedLabel;
     private SimpleIntegerProperty checkedProperty = new SimpleIntegerProperty(0);
 
-    @FXML
-    private Label showedPcLabel;
-    private SimpleIntegerProperty pcBingoProperty = new SimpleIntegerProperty(0);
-
+    private Map<Integer, IntegerProperty> bingoCntProperties = new HashMap<>();
 
     @FXML
-    private Label showedMobileLabel;
-    private SimpleIntegerProperty mobileBingoProperty = new SimpleIntegerProperty(0);
-
+    private VBox searchPlatformsPlaceholder;
 
     @FXML
-    private Label shenmaLabel;
-    private SimpleIntegerProperty shenmaBingoProperty = new SimpleIntegerProperty(0);
-
-
-    @FXML
-    private Label toutiaoLabel;
-    private SimpleIntegerProperty toutiaoBingoProperty = new SimpleIntegerProperty(0);
-
-
-    @FXML
-    private CheckBox checkPcCb;
-    @FXML
-    private CheckBox checkMobileCb;
-
-    @FXML
-    private CheckBox checkSMCb;
-
-
-    @FXML
-    private CheckBox checkTTCb;
+    private GridPane bingCntPlaceholder;
 
     @FXML
     private Slider speedSlider;
@@ -94,88 +70,80 @@ public class HomeController {
     private Button stopBtn;
 
 //    @FXML
-//    private Label runnedLabel;
+//    private TableView<InfoModel> listPcTv;
 //
 //    @FXML
-//    private Label estimateLabel;
+//    private TableView<InfoModel> listMobileTv;
 //
 //    @FXML
-//    private ProgressBar progressBar;
+//    private TableView<InfoModel> listShenmaTv;
 //
 //    @FXML
-//    private ListView<String> infoLv;
+//    private TableView<InfoModel> listToutiaoTv;
 
     @FXML
-    private TableView<InfoModel> listPcTv;
+    private TabPane tabPlaceholder;
+    private Map<Integer, ObservableList<InfoModel>> listData = new HashMap<>();
 
-    @FXML
-    private TableView<InfoModel> listMobileTv;
+//
+//    private ObservableList<InfoModel> listPc = FXCollections.observableArrayList();
+//    private ObservableList<InfoModel> listMobile = FXCollections.observableArrayList();
+//    private ObservableList<InfoModel> listShenma = FXCollections.observableArrayList();
+//    private ObservableList<InfoModel> listToutiao = FXCollections.observableArrayList();
 
-    @FXML
-    private TableView<InfoModel> listShenmaTv;
-
-    @FXML
-    private TableView<InfoModel> listToutiaoTv;
-
-
-    private ObservableList<InfoModel> listPc = FXCollections.observableArrayList();
-    private ObservableList<InfoModel> listMobile = FXCollections.observableArrayList();
-    private ObservableList<InfoModel> listShenma = FXCollections.observableArrayList();
-    private ObservableList<InfoModel> listToutiao = FXCollections.observableArrayList();
-
-    @FXML
-    private TableColumn<InfoModel, String> pcKeywordsCl;
-    @FXML
-    private TableColumn<InfoModel, String> pcProductCl;
-    @FXML
-    private TableColumn<InfoModel, String> pcPageCl;
-    @FXML
-    private TableColumn<InfoModel, String> pcLocCl;
-    @FXML
-    private TableColumn<InfoModel, String> pcCheckTimeCl;
-    @FXML
-    private TableColumn<InfoModel, String> pcOpenCl;
-
-    @FXML
-    private TableColumn<InfoModel, String> mobileKeywordsCl;
-    @FXML
-    private TableColumn<InfoModel, String> mobileProductCl;
-    @FXML
-    private TableColumn<InfoModel, String> mobilePageCl;
-    @FXML
-    private TableColumn<InfoModel, String> mobileLocCl;
-    @FXML
-    private TableColumn<InfoModel, String> mobileCheckTimeCl;
-    @FXML
-    private TableColumn<InfoModel, String> mobileOpenCl;
-
-
-    @FXML
-    private TableColumn<InfoModel, String> shenmaKeywordsCl;
-    @FXML
-    private TableColumn<InfoModel, String> shenmaProductCl;
-    @FXML
-    private TableColumn<InfoModel, String> shenmaPageCl;
-    @FXML
-    private TableColumn<InfoModel, String> shenmaLocCl;
-    @FXML
-    private TableColumn<InfoModel, String> shenmaCheckTimeCl;
-    @FXML
-    private TableColumn<InfoModel, String> shenmaOpenCl;
-
-
-    @FXML
-    private TableColumn<InfoModel, String> toutiaoKeywordsCl;
-    @FXML
-    private TableColumn<InfoModel, String> toutiaoProductCl;
-    @FXML
-    private TableColumn<InfoModel, String> toutiaoPageCl;
-    @FXML
-    private TableColumn<InfoModel, String> toutiaoLocCl;
-    @FXML
-    private TableColumn<InfoModel, String> toutiaoCheckTimeCl;
-    @FXML
-    private TableColumn<InfoModel, String> toutiaoOpenCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> pcKeywordsCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> pcProductCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> pcPageCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> pcLocCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> pcCheckTimeCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> pcOpenCl;
+//
+//    @FXML
+//    private TableColumn<InfoModel, String> mobileKeywordsCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> mobileProductCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> mobilePageCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> mobileLocCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> mobileCheckTimeCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> mobileOpenCl;
+//
+//
+//    @FXML
+//    private TableColumn<InfoModel, String> shenmaKeywordsCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> shenmaProductCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> shenmaPageCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> shenmaLocCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> shenmaCheckTimeCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> shenmaOpenCl;
+//
+//
+//    @FXML
+//    private TableColumn<InfoModel, String> toutiaoKeywordsCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> toutiaoProductCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> toutiaoPageCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> toutiaoLocCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> toutiaoCheckTimeCl;
+//    @FXML
+//    private TableColumn<InfoModel, String> toutiaoOpenCl;
 
     @FXML
     private CheckBox autoUploadCb;
@@ -212,7 +180,6 @@ public class HomeController {
 
     private List<String> customList = new LinkedList<>();
 
-    private List<SearchPlatform> selectedPlatforms = new ArrayList<>();
 
     public static void showAlert(Alert.AlertType type, String message) {
         if (!Platform.isFxApplicationThread()) {
@@ -236,10 +203,6 @@ public class HomeController {
 
     }
 
-    public void initTaskManager() {
-        task = new TaskManage(this);
-        this.updateTotal();
-    }
 
     public void setApp(MainApp app) {
         this.app = app;
@@ -251,20 +214,10 @@ public class HomeController {
 
     @FXML
     private void initialize() {
-        /*
-        设定页面的默认项目
-         */
-        totalLabel.textProperty().bind(totalProperty.asString());
-        checkedLabel.textProperty().bind(checkedProperty.asString());
-        showedPcLabel.textProperty().bind(pcBingoProperty.asString());
-        showedMobileLabel.textProperty().bind(mobileBingoProperty.asString());
-        shenmaLabel.textProperty().bind(shenmaBingoProperty.asString());
-        toutiaoLabel.textProperty().bind(toutiaoBingoProperty.asString());
+        task = new TaskManage(this);
 
-        listPcTv.setItems(listPc);
-        listMobileTv.setItems(listMobile);
-        listShenmaTv.setItems(listShenma);
-        listToutiaoTv.setItems(listToutiao);
+        initCntLabel();
+
 
         uploadBtn.setDisable(true);
         autoUploadCb.setSelected(true);
@@ -272,106 +225,99 @@ public class HomeController {
         speedSlider.setValue(50.0);
         pageDepthSelectSet();
         searchPlatformSelectSet();
-
         keywordsRadioSet();
-        tableCellSet();
+        initResultTabs();
 
-        initTaskManager();
+
+        this.updateTotal();
 
     }
 
-    private void tableCellSet() {
-        pcKeywordsCl.setSortable(false);
-        pcProductCl.setSortable(false);
-        pcPageCl.setSortable(false);
-        pcOpenCl.setSortable(false);
-        pcCheckTimeCl.setSortable(false);
-        pcLocCl.setSortable(false);
-        pcCheckTimeCl.setMinWidth(80);
-        pcKeywordsCl.setMinWidth(150);
-        pcProductCl.setMinWidth(80);
-
-        mobileKeywordsCl.setSortable(false);
-        mobileProductCl.setSortable(false);
-        mobilePageCl.setSortable(false);
-        mobileLocCl.setSortable(false);
-        mobileCheckTimeCl.setSortable(false);
-        mobileOpenCl.setSortable(false);
-        mobileCheckTimeCl.setMinWidth(80);
-        mobileKeywordsCl.setMinWidth(150);
-        mobileProductCl.setMinWidth(80);
-
-        shenmaKeywordsCl.setSortable(false);
-        shenmaProductCl.setSortable(false);
-        shenmaPageCl.setSortable(false);
-        shenmaLocCl.setSortable(false);
-        shenmaCheckTimeCl.setSortable(false);
-        shenmaOpenCl.setSortable(false);
-        shenmaCheckTimeCl.setMinWidth(80);
-        shenmaKeywordsCl.setMinWidth(150);
-        shenmaProductCl.setMinWidth(80);
+    private void initResultTabs() {
+        for (SearchPlatform platform : SearchPlatform.values()) {
+            ObservableList<InfoModel> list = FXCollections.observableArrayList();
+            listData.put(platform.getId(), list);
 
 
-        toutiaoKeywordsCl.setSortable(false);
-        toutiaoProductCl.setSortable(false);
-        toutiaoPageCl.setSortable(false);
-        toutiaoLocCl.setSortable(false);
-        toutiaoCheckTimeCl.setSortable(false);
-        toutiaoOpenCl.setSortable(false);
-        toutiaoCheckTimeCl.setMinWidth(80);
-        toutiaoKeywordsCl.setMinWidth(150);
-        toutiaoProductCl.setMinWidth(80);
-
-        Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> keywordCallback =
-                (param) -> param.getValue().keywordProperty();
-
-        Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> pageCallback =
-                (param) -> param.getValue().pageProperty();
-
-        Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> locCallback =
-                (param) -> param.getValue().locProperty();
+            TableView<InfoModel> tableView = new TableView<>();
+            tableView.setItems(list);
 
 
-        Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> timeCallback =
-                (param) -> param.getValue().timeProperty();
+            TableColumn<InfoModel, String> keywordCell = new TableColumn<>("关键词");
+            TableColumn<InfoModel, String> productCell = new TableColumn<>("产品");
+            TableColumn<InfoModel, String> pageCell = new TableColumn<>("页数");
+            TableColumn<InfoModel, String> locCell = new TableColumn<>("位置");
+            TableColumn<InfoModel, String> checkTimeCell = new TableColumn<>("查询时间");
+            TableColumn<InfoModel, String> browseCell = new TableColumn<>("查看页面");
 
-        Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> productCallback =
-                (param) -> param.getValue().productProperty();
+            keywordCell.setSortable(false);
+            productCell.setSortable(false);
+            pageCell.setSortable(false);
+            browseCell.setSortable(false);
+            checkTimeCell.setSortable(false);
+            locCell.setSortable(false);
+            checkTimeCell.setMinWidth(80);
+            keywordCell.setMinWidth(150);
+            productCell.setMinWidth(80);
+
+            Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> keywordCallback =
+                    (param) -> param.getValue().keywordProperty();
+
+            Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> pageCallback =
+                    (param) -> param.getValue().pageProperty();
+
+            Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> locCallback =
+                    (param) -> param.getValue().locProperty();
 
 
-        pcKeywordsCl.setCellValueFactory(keywordCallback);
-        pcProductCl.setCellValueFactory(productCallback);
-        pcPageCl.setCellValueFactory(pageCallback);
-        pcLocCl.setCellValueFactory(locCallback);
-        pcCheckTimeCl.setCellValueFactory(timeCallback);
-        pcOpenCl.setCellValueFactory(cellData -> new SimpleStringProperty("点击查看"));
-        pcOpenCl.setCellFactory(urlClickOpenCallback(listPc, SearchPlatform.BAIDU));
+            Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> timeCallback =
+                    (param) -> param.getValue().timeProperty();
+
+            Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> productCallback =
+                    (param) -> param.getValue().productProperty();
 
 
-        mobileKeywordsCl.setCellValueFactory(keywordCallback);
-        mobileProductCl.setCellValueFactory(productCallback);
-        mobilePageCl.setCellValueFactory(pageCallback);
-        mobileLocCl.setCellValueFactory(locCallback);
-        mobileCheckTimeCl.setCellValueFactory(timeCallback);
-        mobileOpenCl.setCellValueFactory(cellData -> new SimpleStringProperty("点击查看"));
-        mobileOpenCl.setCellFactory(urlClickOpenCallback(listMobile, SearchPlatform.BAIDU_MOBILE));
+            keywordCell.setCellValueFactory(keywordCallback);
+            productCell.setCellValueFactory(productCallback);
+            pageCell.setCellValueFactory(pageCallback);
+            locCell.setCellValueFactory(locCallback);
+            checkTimeCell.setCellValueFactory(timeCallback);
+            browseCell.setCellValueFactory(cellData -> new SimpleStringProperty("点击查看"));
+            browseCell.setCellFactory(urlClickOpenCallback(list, platform));
 
+            tableView.getColumns().setAll(keywordCell, productCell, pageCell, locCell, checkTimeCell, browseCell);
+            Tab tab = new Tab();
+            tab.setText(platform.getName());
+            tabPlaceholder.getTabs().add(tab);
 
-        shenmaKeywordsCl.setCellValueFactory(keywordCallback);
-        shenmaProductCl.setCellValueFactory(productCallback);
-        shenmaPageCl.setCellValueFactory(pageCallback);
-        shenmaLocCl.setCellValueFactory(locCallback);
-        shenmaCheckTimeCl.setCellValueFactory(timeCallback);
-        shenmaOpenCl.setCellValueFactory(cellData -> new SimpleStringProperty("点击查看"));
-        shenmaOpenCl.setCellFactory(urlClickOpenCallback(listShenma, SearchPlatform.SHENMA));
+            tab.setContent(tableView);
+        }
+    }
 
-        toutiaoKeywordsCl.setCellValueFactory(keywordCallback);
-        toutiaoProductCl.setCellValueFactory(productCallback);
-        toutiaoPageCl.setCellValueFactory(pageCallback);
-        toutiaoLocCl.setCellValueFactory(locCallback);
-        toutiaoCheckTimeCl.setCellValueFactory(timeCallback);
-        toutiaoOpenCl.setCellValueFactory(cellData -> new SimpleStringProperty("点击查看"));
-        toutiaoOpenCl.setCellFactory(urlClickOpenCallback(listToutiao, SearchPlatform.TOUTIAO));
+    private void initCntLabel() {
+         /*
+        设定页面的默认项目
+         */
+        totalLabel.textProperty().bind(totalProperty.asString());
+        checkedLabel.textProperty().bind(checkedProperty.asString());
+
+        int row = 2;
+        bingCntPlaceholder.getColumnConstraints().add(new ColumnConstraints(130));
+        bingCntPlaceholder.getColumnConstraints().add(new ColumnConstraints(130));
+        for (SearchPlatform platform : SearchPlatform.values()) {
+            Label label = new Label(platform.getName() + "上屏");
+            GridPane.setConstraints(label, 0, row);
+            SimpleIntegerProperty property = new SimpleIntegerProperty(0);
+            bingoCntProperties.put(platform.getId(), property);
+            Label cntLabel = new Label();
+            cntLabel.textProperty().bind(property.asString());
+
+            GridPane.setConstraints(cntLabel, 1, row);
+            row++;
+
+            bingCntPlaceholder.getChildren().addAll(label, cntLabel);
+        }
+
     }
 
     private Callback<TableColumn<InfoModel, String>, TableCell<InfoModel, String>> urlClickOpenCallback(ObservableList<InfoModel> list, SearchPlatform platform) {
@@ -404,14 +350,31 @@ public class HomeController {
 
     private void searchPlatformSelectSet() {
         ChangeListener<Boolean> cbChangeListener = (observable, oldValue, newValue) -> {
-            updatePlatFormSelect();
             updateTotal();
         };
 
-        checkPcCb.selectedProperty().addListener(cbChangeListener);
-        checkMobileCb.selectedProperty().addListener(cbChangeListener);
-        checkSMCb.selectedProperty().addListener(cbChangeListener);
-        checkTTCb.selectedProperty().addListener(cbChangeListener);
+        for (SearchPlatform platform : SearchPlatform.values()) {
+            CheckBox cb = new CheckBox(platform.getName());
+            cb.selectedProperty().addListener(cbChangeListener);
+            searchPlatformsPlaceholder.getChildren().add(cb);
+        }
+
+        CheckBox cb = (CheckBox) searchPlatformsPlaceholder.getChildren().get(0);
+        cb.setSelected(true);
+    }
+
+    private List<SearchPlatform> getSelectedPlatforms() {
+        return searchPlatformsPlaceholder.getChildren().stream().filter(node -> {
+            CheckBox cb = (CheckBox) node;
+            return cb.isSelected();
+        }).map(node -> {
+            String name = ((CheckBox) node).getText();
+            return Arrays.stream(SearchPlatform.values()).filter(platform -> platform.getName().equals(name)).findAny();
+        })
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+
     }
 
     private void pageDepthSelectSet() {
@@ -493,10 +456,10 @@ public class HomeController {
     @FXML
     private void handleNewStart() {
         task.newTask();
-        listPc.clear();
-        listMobile.clear();
-        listShenma.clear();
-        listToutiao.clear();
+
+        for (int key : listData.keySet()) {
+            listData.get(key).clear();
+        }
 
         int runSpeed = ((Double) speedSlider.getValue()).intValue() % 10;
         if (runSpeed == 0) {
@@ -508,6 +471,7 @@ public class HomeController {
         task.setAutoUpdate(autoUploadCb.isSelected());
 
         task.setKeywordMax(Integer.parseInt(maxTf.getText()));
+        task.setAvailablePlatforms(getSelectedPlatforms());
 
         //new设置， 放在子线程里更新不上
         task.start();
@@ -520,6 +484,8 @@ public class HomeController {
     @FXML
     private void handleStop() {
         task.stopAll();
+
+        updateTaskStatus();
         showAlert(Alert.AlertType.INFORMATION, "已停止 \n");
     }
 
@@ -533,25 +499,40 @@ public class HomeController {
         task.setKeywordMax(Integer.parseInt(maxTf.getText()));
         task.setAutoUpdate(autoUploadCb.isSelected());
         task.start();
+        updateTaskStatus();
+
         Thread thread = new Thread(task);
         thread.start();
+
 
     }
 
     /**
      * 更新总数量
      */
-    public void updateTotal() {
+    private void updateTotal() {
         if (!Platform.isFxApplicationThread()) {
             try {
-                Platform.runLater(() -> totalProperty.setValue(task.getTotal()));
+                Platform.runLater(() -> {
+                    updateTotalStatus();
+                });
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
-            totalProperty.setValue(task.getTotal());
+            updateTotalStatus();
         }
 
+    }
+
+    private void updateTotalStatus() {
+        int total = task.getTotal() * getSelectedPlatforms().size();
+        totalProperty.setValue(total);
+        if (total == 0) {
+            startBtn.setDisable(true);
+        } else if (task.getTaskStatus() != TaskStatus.RUNNING) {
+            startBtn.setDisable(false);
+        }
     }
 
     /**
@@ -570,13 +551,10 @@ public class HomeController {
     /**
      * 更新上词数
      */
-    public void updateBingoCnt(int pc, int mobile, int shenma, int toutiao) {
+    public void updateBingoCnt(int id, int cnt) {
         try {
             Platform.runLater(() -> {
-                pcBingoProperty.setValue(pc);
-                mobileBingoProperty.setValue(mobile);
-                shenmaBingoProperty.setValue(shenma);
-                toutiaoBingoProperty.setValue(toutiao);
+                bingoCntProperties.get(id).setValue(cnt);
             });
         } catch (Exception e) {
             e.printStackTrace();
@@ -629,10 +607,13 @@ public class HomeController {
         stopBtn.setDisable(true); //结束按钮 不可用
         resumeBtn.setDisable(true); //继续按钮 不可用
 
-        checkPcCb.setDisable(false); //平台勾选 可用
-        checkMobileCb.setDisable(false); //平台勾选 可用
-        checkSMCb.setDisable(false); //平台勾选 可用
-        checkTTCb.setDisable(false); //平台勾选 可用
+
+        //平台勾选 可用
+        searchPlatformsPlaceholder.getChildren().forEach(action -> {
+            CheckBox cb = (CheckBox) action;
+            cb.setDisable(false);
+        });
+
 
         autoUploadCb.setDisable(false); //自动上传 可用
         pageChoiceBox.setDisable(false); //检索深度 可用
@@ -645,10 +626,10 @@ public class HomeController {
         choosePrefixMainSuffixRb.setDisable(false);
         choosePrefixMainRb.setDisable(false);
 
-        listPc.clear();
-        listMobile.clear();
-        listShenma.clear();
-        listToutiao.clear();
+        for (int key : listData.keySet()) {
+            listData.get(key).clear();
+        }
+
         task.newTask();
     }
 
@@ -657,8 +638,12 @@ public class HomeController {
         startBtn.setDisable(false);//开始按钮 可用
         stopBtn.setDisable(true); //结束按钮 不可用
 
-        checkPcCb.setDisable(false); //平台勾选 可用
-        checkMobileCb.setDisable(false); //平台勾选 可用
+        //平台勾选 可用
+        searchPlatformsPlaceholder.getChildren().forEach(action -> {
+            CheckBox cb = (CheckBox) action;
+            cb.setDisable(false);
+        });
+
         autoUploadCb.setDisable(false); //自动上传 可用
         pageChoiceBox.setDisable(false); //检索深度 可用
         uploadBtn.setDisable(false); //上传按钮 可用
@@ -677,8 +662,12 @@ public class HomeController {
         startBtn.setDisable(true); //开始按钮 不可用
         stopBtn.setDisable(false); //结束按钮 可用
         resumeBtn.setDisable(true); //继续按钮 不可用
-        checkPcCb.setDisable(true); //平台勾选 不可用
-        checkMobileCb.setDisable(true); //平台勾选 不可用
+        //平台勾选 不可用
+        searchPlatformsPlaceholder.getChildren().forEach(action -> {
+            CheckBox cb = (CheckBox) action;
+            cb.setDisable(true);
+        });
+
         autoUploadCb.setDisable(true); //自动上传 不可用
         pageChoiceBox.setDisable(true); //检索深度不可用
         uploadBtn.setDisable(true); //上传按钮 不可用
@@ -695,8 +684,13 @@ public class HomeController {
         startBtn.setDisable(false); //开始按钮 可用
         stopBtn.setDisable(true);  //结束按钮 不可用
         resumeBtn.setDisable(false);  //继续按钮 可用
-        checkPcCb.setDisable(false); //平台勾选 可用
-        checkMobileCb.setDisable(false); //平台勾选 可用
+
+        //平台勾选 可用
+        searchPlatformsPlaceholder.getChildren().forEach(action -> {
+            CheckBox cb = (CheckBox) action;
+            cb.setDisable(false);
+        });
+
         autoUploadCb.setDisable(false); //自动上传 可用
         pageChoiceBox.setDisable(false); //检索深度 可用
         uploadBtn.setDisable(false); //上传按钮 可用
@@ -714,8 +708,13 @@ public class HomeController {
         startBtn.setDisable(false); //开始按钮 可用
         stopBtn.setDisable(true);  //结束按钮 不可用
         resumeBtn.setDisable(true);  //继续按钮 不可用
-        checkPcCb.setDisable(false); //平台勾选 可用
-        checkMobileCb.setDisable(false); //平台勾选 可用
+
+        //平台勾选 可用
+        searchPlatformsPlaceholder.getChildren().forEach(action -> {
+            CheckBox cb = (CheckBox) action;
+            cb.setDisable(false);
+        });
+
         autoUploadCb.setDisable(false); //自动上传 可用
         pageChoiceBox.setDisable(false); //检索深度 可用
         uploadBtn.setDisable(false); //上传按钮 可用
@@ -735,8 +734,13 @@ public class HomeController {
         startBtn.setDisable(true); //开始按钮 可用
         stopBtn.setDisable(true);  //结束按钮 不可用
         resumeBtn.setDisable(true);  //继续按钮 可用
-        checkPcCb.setDisable(true); //平台勾选 可用
-        checkMobileCb.setDisable(true); //平台勾选 可用
+
+        //平台勾选 可用
+        searchPlatformsPlaceholder.getChildren().forEach(action -> {
+            CheckBox cb = (CheckBox) action;
+            cb.setDisable(false);
+        });
+
         autoUploadCb.setDisable(true); //自动上传 可用
         pageChoiceBox.setDisable(true); //检索深度 可用
         uploadBtn.setDisable(true); //上传按钮 可用
@@ -758,21 +762,7 @@ public class HomeController {
      * @param info
      */
     public synchronized void addResult(Info info) {
-
-        switch (info.getPlatform()) {
-            case BAIDU:
-                listPc.add(0, new InfoModel(info));
-                break;
-            case BAIDU_MOBILE:
-                listMobile.add(0, new InfoModel(info));
-                break;
-            case SHENMA:
-                listShenma.add(0, new InfoModel(info));
-                break;
-            case TOUTIAO:
-                listToutiao.add(0, new InfoModel(info));
-                break;
-        }
+        listData.get(info.getPlatform().getId()).add(new InfoModel(info));
     }
 
     /**
@@ -862,22 +852,6 @@ public class HomeController {
         } catch (IOException e) {
             e.printStackTrace();
             return false;
-        }
-    }
-
-    private void updatePlatFormSelect() {
-        selectedPlatforms.clear();
-        if (checkPcCb.isSelected()) {
-            selectedPlatforms.add(SearchPlatform.BAIDU);
-        }
-        if (checkMobileCb.isSelected()) {
-            selectedPlatforms.add(SearchPlatform.BAIDU_MOBILE);
-        }
-        if (checkSMCb.isSelected()) {
-            selectedPlatforms.add(SearchPlatform.SHENMA);
-        }
-        if (checkTTCb.isSelected()) {
-            selectedPlatforms.add(SearchPlatform.TOUTIAO);
         }
     }
 

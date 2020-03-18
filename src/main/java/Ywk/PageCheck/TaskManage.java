@@ -8,9 +8,7 @@ import Ywk.PageCheck.Capture.PageSpider;
 import Ywk.UserInterface.Controller.HomeController;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class TaskManage implements Runnable
         , PageSpider.PageChecked
@@ -62,10 +60,8 @@ public class TaskManage implements Runnable
      */
     private List<PageRunner> runners;
 
-    private int pcBingo = 0;
-    private int mbBingo = 0;
-    private int shenmaBingo = 0;
-    private int toutiaoBingo = 0;
+    private Map<Integer, Integer> bingoCnt = new HashMap<>();
+
 
     public TaskManage(HomeController controller) {
         writer = new ApiWriter();
@@ -79,8 +75,12 @@ public class TaskManage implements Runnable
         identities = IdentityWrapper.getInstance().identities();
         initRunners();
         prepareCheckTool();
-
         runningContainer.setTaskFinishedListener(this);
+
+        for (SearchPlatform platform : SearchPlatform.values()) {
+            bingoCnt.put(platform.getId(), 0);
+        }
+
 
     }
 
@@ -199,16 +199,7 @@ public class TaskManage implements Runnable
      */
     @Override
     public boolean isStopped() {
-        return (taskStatus == TaskStatus.FINISHED
-                || taskStatus == TaskStatus.PAUSE
-                || taskStatus == TaskStatus.NEW)
-                &&
-                (
-                        uploadStatus == UploadStatus.WAITING
-                                || uploadStatus == UploadStatus.SUCCESS
-                                || uploadStatus == UploadStatus.FAIL
-                );
-
+        return taskStatus != TaskStatus.RUNNING;
     }
 
     /**
@@ -235,8 +226,9 @@ public class TaskManage implements Runnable
      * 停止任务
      */
     public void stopAll() {
-        runners.forEach(PageRunner::stop);
         taskStatus = TaskStatus.PAUSE;
+        runners.forEach(PageRunner::stop);
+
     }
 
     public void newTask() {
@@ -303,22 +295,12 @@ public class TaskManage implements Runnable
         return 1;
     }
 
+    public void setAvailablePlatforms(List<SearchPlatform> platforms) {
+        runningContainer.setAvailablePlatforms(platforms);
+    }
+
     @Override
     public void found(Info info) {
-        switch (info.getPlatform()) {
-            case BAIDU:
-                pcBingo++;
-                break;
-            case BAIDU_MOBILE:
-                mbBingo++;
-                break;
-            case SHENMA:
-                shenmaBingo++;
-                break;
-            case TOUTIAO:
-                toutiaoBingo++;
-                break;
-        }
-        controller.updateBingoCnt(pcBingo, mbBingo, shenmaBingo, toutiaoBingo);
+        bingoCnt.put(info.getPlatform().getId(), bingoCnt.get(info.getPlatform().getId()) + 1);
     }
 }

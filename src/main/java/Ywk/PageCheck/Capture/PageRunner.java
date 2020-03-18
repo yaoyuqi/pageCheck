@@ -1,8 +1,11 @@
 package Ywk.PageCheck.Capture;
 
 
+import Ywk.Data.SearchPlatform;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class PageRunner {
 
@@ -17,7 +20,7 @@ public class PageRunner {
     private String makeUrl(String keyword, int page) {
         if (keyword != null && !keyword.isEmpty()) {
             try {
-                keyword = URLEncoder.encode(keyword, "UTF-8");
+                keyword = URLEncoder.encode(keyword, StandardCharsets.UTF_8.toString());
 //                return spider.getPlatform().getUrl() + keyword + "&pn=" + (page - 1) * 10;
                 return spider.getPlatform().nextPageUrl(keyword, page);
             } catch (UnsupportedEncodingException e) {
@@ -54,5 +57,9 @@ public class PageRunner {
 
     public void setPageCheckedListener(PageSpider.PageChecked listener) {
         spider.setPageCheckedListener(listener);
+    }
+
+    public boolean isPlatform(SearchPlatform platform) {
+        return spider.getPlatform() == platform;
     }
 }

@@ -1,8 +1,12 @@
 package Ywk.Data;
 
-public class KeywordGenerator {
+import Ywk.Api.ApiInstance;
+import Ywk.Api.ApiStatus;
 
+public class KeywordGenerator implements ApiInstance {
     private static KeywordGenerator instance;
+    private ApiStatus initStatus = ApiStatus.WAITING;
+
     private MixType type = MixType.PREFIX_MAIN_SUFFIX;
     private String[] custom = new String[]{};
     private String[] prefix = new String[]{};
@@ -14,7 +18,6 @@ public class KeywordGenerator {
     private int curMain = -1;
     private int curSuffix = -1;
     private int curRun = 0;
-    private boolean init = false;
 
     private KeywordGenerator() {
     }
@@ -26,10 +29,6 @@ public class KeywordGenerator {
         return instance;
     }
 
-    public boolean isInit() {
-        return init;
-    }
-
     public void setMaxRun(int maxRun) {
         this.maxRun = maxRun;
     }
@@ -38,7 +37,7 @@ public class KeywordGenerator {
         this.curRun = curRun;
     }
 
-    public int calculateChunkNumber() {
+    private int calculateChunkNumber() {
         int total = getTotal();
         if (total > 100000) {
             return 2000;
@@ -51,7 +50,7 @@ public class KeywordGenerator {
         }
     }
 
-    public synchronized String next() {
+    private synchronized String next() {
         if (isFinished() || isMax()) {
             System.out.println("keyword next finished");
             return null;
@@ -147,8 +146,9 @@ public class KeywordGenerator {
         this.prefix = prefix;
         this.main = main;
         this.suffix = suffix;
-        init = true;
+        initStatus = ApiStatus.SUCESS;
     }
+
 
     public void setCurrent(int curPrefix, int curMain, int curSuffix) {
         this.curPrefix = curPrefix;
@@ -254,6 +254,16 @@ public class KeywordGenerator {
         } else {
             return curRun >= maxRun;
         }
+    }
+
+    @Override
+    public ApiStatus inited() {
+        return initStatus;
+    }
+
+    @Override
+    public void initFailed() {
+        initStatus = ApiStatus.FAILED;
     }
 
     public enum MixType {

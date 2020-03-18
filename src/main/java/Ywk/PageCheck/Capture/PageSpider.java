@@ -60,6 +60,8 @@ public class PageSpider {
                     .build();
 
         }
+
+        System.out.println("Search[" + url + "]");
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {

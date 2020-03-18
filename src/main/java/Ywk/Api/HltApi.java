@@ -135,6 +135,8 @@ public class HltApi {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                IdentityWrapper wrapper = IdentityWrapper.getInstance();
+                wrapper.initFailed();
                 controller.vitalError();
             }
 
@@ -143,11 +145,12 @@ public class HltApi {
 //                System.out.println(response.body().string());
 
                 IdentityData identityData = new Gson().fromJson(response.body().string(), IdentityData.class);
+                IdentityWrapper wrapper = IdentityWrapper.getInstance();
                 if (identityData.getStatus() != 200) {
                     response.close();
+                    wrapper.inited();
                     controller.vitalError();
                 } else {
-                    IdentityWrapper wrapper = IdentityWrapper.getInstance();
                     wrapper.initList(identityData.getData());
                     controller.apiInitFinished();
                 }
@@ -172,6 +175,8 @@ public class HltApi {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                KeywordGenerator generator = KeywordGenerator.getInstance();
+                generator.initFailed();
                 controller.vitalError();
             }
 
@@ -180,10 +185,12 @@ public class HltApi {
 //                System.out.println(response.body().string());
 
                 WordData wordData = new Gson().fromJson(response.body().string(), WordData.class);
+                KeywordGenerator generator = KeywordGenerator.getInstance();
+
                 if (wordData.getStatus() != 200) {
                     controller.vitalError();
+                    generator.initFailed();
                 } else {
-                    KeywordGenerator generator = KeywordGenerator.getInstance();
                     generator.setWords(wordData.getData().getPrefix().toArray(new String[]{}),
                             wordData.getData().getMain().toArray(new String[]{}),
                             wordData.getData().getSuffix().toArray(new String[]{}));

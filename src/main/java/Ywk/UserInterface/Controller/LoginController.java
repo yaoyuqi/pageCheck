@@ -1,5 +1,6 @@
 package Ywk.UserInterface.Controller;
 
+import Ywk.Api.ApiStatus;
 import Ywk.Api.HltApi;
 import Ywk.Data.IdentityWrapper;
 import Ywk.Data.KeywordGenerator;
@@ -112,9 +113,19 @@ public class LoginController {
     }
 
     public void apiInitFinished() {
-        if (IdentityWrapper.getInstance().isInit()
-                && KeywordGenerator.getInstance().isInit()
+        if (IdentityWrapper.getInstance().inited() == ApiStatus.FAILED
+                || KeywordGenerator.getInstance().inited() == ApiStatus.FAILED
         ) {
+            try {
+                Platform.runLater(() -> {
+                    dialogStage.close();
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        } else if (IdentityWrapper.getInstance().inited() == ApiStatus.SUCESS
+                && KeywordGenerator.getInstance().inited() == ApiStatus.SUCESS) {
             try {
                 Platform.runLater(() -> {
                     dialogStage.close();
@@ -123,7 +134,6 @@ public class LoginController {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
     }
 

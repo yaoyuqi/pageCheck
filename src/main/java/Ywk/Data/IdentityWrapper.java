@@ -1,15 +1,19 @@
 package Ywk.Data;
 
+import Ywk.Api.ApiInstance;
+import Ywk.Api.ApiStatus;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class IdentityWrapper {
+public class IdentityWrapper implements ApiInstance {
 
     private static IdentityWrapper instance;
     private Map<String, IdentityData.DataBean> map = new HashMap<>();
-    private boolean init = false;
+    private ApiStatus initStatus = ApiStatus.WAITING;
+
 
     private IdentityWrapper() {
     }
@@ -21,17 +25,13 @@ public class IdentityWrapper {
         return instance;
     }
 
-    public boolean isInit() {
-        return init;
-    }
-
     public void initList(List<IdentityData.DataBean> list) {
         for (IdentityData.DataBean item :
                 list) {
             map.put(item.getIdentity(), item);
         }
 
-        init = true;
+        initStatus = ApiStatus.SUCESS;
 
     }
 
@@ -41,5 +41,15 @@ public class IdentityWrapper {
 
     public List<String> identities() {
         return Arrays.asList(map.keySet().toArray(new String[0]));
+    }
+
+    @Override
+    public ApiStatus inited() {
+        return initStatus;
+    }
+
+    @Override
+    public void initFailed() {
+        initStatus = ApiStatus.FAILED;
     }
 }

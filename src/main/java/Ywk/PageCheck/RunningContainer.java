@@ -1,29 +1,43 @@
 package Ywk.PageCheck;
 
 import Ywk.Data.KeywordGenerator;
+import Ywk.Data.SearchPlatform;
 import Ywk.PageCheck.Capture.PageRunner;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * generate keywords then use running to crawl
  */
 public class RunningContainer implements Runnable {
     private KeywordGenerator keyword;
-    private List<PageRunner> runners;
+    private final List<PageRunner> allRunners;
+    private List<PageRunner> availableRunners = new ArrayList<>();
     private volatile boolean finished = false;
     private TaskRunningFinishListener listener;
 
     RunningContainer(KeywordGenerator keyword, List<PageRunner> runners) {
         this.keyword = keyword;
-        this.runners = runners;
+        this.allRunners = runners;
+        availableRunners.addAll(this.allRunners);
     }
 
-    public void setFinished(boolean finished) {
+    void setAvailablePlatforms(List<SearchPlatform> availablePlatforms) {
+        availableRunners.clear();
+        availableRunners.addAll(
+                allRunners.stream()
+                        .filter(pageRunner -> availablePlatforms.stream().anyMatch(pageRunner::isPlatform))
+                        .collect(Collectors.toList())
+        );
+    }
+
+    void setFinished(boolean finished) {
         this.finished = finished;
     }
 
-    public void setTaskFinishedListener(TaskRunningFinishListener listener) {
+    void setTaskFinishedListener(TaskRunningFinishListener listener) {
         this.listener = listener;
     }
 
@@ -38,7 +52,8 @@ public class RunningContainer implements Runnable {
         if (next != null) {
             for (String word : next) {
                 if (word != null && !word.isEmpty()) {
-                    runners.stream().parallel().forEach(pageRunner -> pageRunner.run(word));
+                    availableRunners.stream().parallel()
+                            .forEach(pageRunner -> pageRunner.run(word));
                 }
             }
         } else {
