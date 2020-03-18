@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 public class HltApi {
     private static final String key = "1typhdp9zbo2Lbz9YkdfTLE9Tm4jW7nCSKssakFj";
@@ -178,6 +179,7 @@ public class HltApi {
                 KeywordGenerator generator = KeywordGenerator.getInstance();
                 generator.initFailed();
                 controller.vitalError();
+
             }
 
             @Override
@@ -188,12 +190,56 @@ public class HltApi {
                 KeywordGenerator generator = KeywordGenerator.getInstance();
 
                 if (wordData.getStatus() != 200) {
-                    controller.vitalError();
                     generator.initFailed();
+                    controller.vitalError();
                 } else {
                     generator.setWords(wordData.getData().getPrefix().toArray(new String[]{}),
                             wordData.getData().getMain().toArray(new String[]{}),
                             wordData.getData().getSuffix().toArray(new String[]{}));
+                    controller.apiInitFinished();
+
+                }
+                response.close();
+            }
+
+        });
+    }
+
+    public void config(LoginController controller) throws ApiErrorException {
+        String url = host + "api/desktop/config";
+
+        LoginHeader header = LoginHeader.getInstance();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .addHeader(header.getHeaderMark(), header.getAccessToken())
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                PlatformWrapper wrapper = PlatformWrapper.getInstance();
+                wrapper.initFailed();
+                controller.vitalError();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+//                System.out.println(response.body().string());
+
+                Config config = new Gson().fromJson(response.body().string(), Config.class);
+                PlatformWrapper wrapper = PlatformWrapper.getInstance();
+
+                if (config.getStatus() != 200) {
+                    wrapper.initFailed();
+                    controller.vitalError();
+                } else {
+                    wrapper.init(
+                            config.getData().getPlatform().stream().map(item ->
+                                    new SearchPlatform(item.getId(), item.getName(), item.getUrls(), item.getPatter(), item.isIsMobile()))
+                                    .collect(Collectors.toList()),
+                            config.getData().getPageMax());
                     controller.apiInitFinished();
 
                 }

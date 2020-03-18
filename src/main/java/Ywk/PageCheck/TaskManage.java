@@ -73,11 +73,9 @@ public class TaskManage implements Runnable
 //            generator = new KeywordGenerator(prefix, main, suffix);
         generator = KeywordGenerator.getInstance();
         identities = IdentityWrapper.getInstance().identities();
-        initRunners();
         prepareCheckTool();
-        runningContainer.setTaskFinishedListener(this);
 
-        for (SearchPlatform platform : SearchPlatform.values()) {
+        for (SearchPlatform platform : PlatformWrapper.getInstance().getList()) {
             bingoCnt.put(platform.getId(), 0);
         }
 
@@ -108,10 +106,8 @@ public class TaskManage implements Runnable
     private void initRunners() {
         runners = new ArrayList<>();
 
-        SearchPlatform[] platforms = SearchPlatform.values();
-
         for (SearchPlatform platform :
-                platforms) {
+                PlatformWrapper.getInstance().getList()) {
             runners.add(new PageRunner(new PageSpider(HttpClientWrapper.getClient(), new ContentChecker(identities, writer, platform, this))));
         }
 
@@ -130,6 +126,7 @@ public class TaskManage implements Runnable
     }
 
     private void prepareCheckTool() {
+        initRunners();
 
         updateRunnerConfig();
 
@@ -137,6 +134,7 @@ public class TaskManage implements Runnable
         runners.forEach(absRunner -> {
             absRunner.setIdleHandler(runningContainer);
         });
+        runningContainer.setTaskFinishedListener(this);
 
     }
 
@@ -175,7 +173,9 @@ public class TaskManage implements Runnable
 
 
     public synchronized void start() {
+        updateRunnerConfig();
         this.taskStatus = TaskStatus.RUNNING;
+
         controller.updateTaskStatus();
     }
 

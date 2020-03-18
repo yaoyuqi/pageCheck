@@ -34,6 +34,10 @@ public class PlatformWrapper implements ApiInstance {
         return pageDepthMax;
     }
 
+    public List<SearchPlatform> getList() {
+        return list;
+    }
+
     @Override
     public ApiStatus inited() {
         return apiStatus;

@@ -67,7 +67,7 @@ public class SearchPlatform {
     private String pattern;
     private boolean isMobile;
 
-    SearchPlatform(int id, String name, List<String> url, String pattern, boolean isMobile) {
+    public SearchPlatform(int id, String name, List<String> url, String pattern, boolean isMobile) {
 
         this.id = id;
         this.name = name;
@@ -93,11 +93,12 @@ public class SearchPlatform {
     }
 
     public String nextPageUrl(String key, int page) {
-        if (urls.size() < page) {
+        int realPage = page - 1;
+        if (urls.size() < realPage) {
             return "";
         }
 
-        String url = urls.get(page);
+        String url = urls.get(realPage);
         return url.replace(keyPattern, key);
     }
 

@@ -61,12 +61,12 @@ public class PageSpider {
 
         }
 
-        System.out.println("Search[" + url + "]");
+//        System.out.println("Search[" + url + "]");
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 listener.updateRunningInfo();
-                checker.checkFail(keyword);
+                checker.checkFail(keyword, url);
             }
 
             @Override

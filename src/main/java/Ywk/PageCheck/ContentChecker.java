@@ -87,8 +87,8 @@ public class ContentChecker {
         }
     }
 
-    public void checkFail(String keyword) {
-        System.out.println(keyword + " check in " + platform + " fail");
+    public void checkFail(String keyword, String url) {
+        System.out.println(keyword + " check in [" + url + "] fail");
     }
 
     /**

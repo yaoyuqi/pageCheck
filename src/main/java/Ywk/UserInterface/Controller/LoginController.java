@@ -4,6 +4,7 @@ import Ywk.Api.ApiStatus;
 import Ywk.Api.HltApi;
 import Ywk.Data.IdentityWrapper;
 import Ywk.Data.KeywordGenerator;
+import Ywk.Data.PlatformWrapper;
 import Ywk.MainApp;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -64,6 +65,7 @@ public class LoginController {
                     HltApi api = HltApi.getInstance();
                     api.identity(this);
                     api.words(this);
+                    api.config(this);
                 }
             });
         } catch (Exception e) {
@@ -115,6 +117,7 @@ public class LoginController {
     public void apiInitFinished() {
         if (IdentityWrapper.getInstance().inited() == ApiStatus.FAILED
                 || KeywordGenerator.getInstance().inited() == ApiStatus.FAILED
+                || PlatformWrapper.getInstance().inited() == ApiStatus.FAILED
         ) {
             try {
                 Platform.runLater(() -> {
@@ -125,7 +128,9 @@ public class LoginController {
             }
 
         } else if (IdentityWrapper.getInstance().inited() == ApiStatus.SUCESS
-                && KeywordGenerator.getInstance().inited() == ApiStatus.SUCESS) {
+                && KeywordGenerator.getInstance().inited() == ApiStatus.SUCESS
+                && PlatformWrapper.getInstance().inited() == ApiStatus.SUCESS
+        ) {
             try {
                 Platform.runLater(() -> {
                     dialogStage.close();

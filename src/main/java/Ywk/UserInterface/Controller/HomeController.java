@@ -2,6 +2,7 @@ package Ywk.UserInterface.Controller;
 
 import Ywk.Data.Info;
 import Ywk.Data.KeywordGenerator;
+import Ywk.Data.PlatformWrapper;
 import Ywk.Data.SearchPlatform;
 import Ywk.MainApp;
 import Ywk.PageCheck.TaskManage;
@@ -234,14 +235,11 @@ public class HomeController {
     }
 
     private void initResultTabs() {
-        for (SearchPlatform platform : SearchPlatform.values()) {
+        for (SearchPlatform platform : PlatformWrapper.getInstance().getList()) {
             ObservableList<InfoModel> list = FXCollections.observableArrayList();
             listData.put(platform.getId(), list);
-
-
             TableView<InfoModel> tableView = new TableView<>();
             tableView.setItems(list);
-
 
             TableColumn<InfoModel, String> keywordCell = new TableColumn<>("关键词");
             TableColumn<InfoModel, String> productCell = new TableColumn<>("产品");
@@ -304,7 +302,7 @@ public class HomeController {
         int row = 2;
         bingCntPlaceholder.getColumnConstraints().add(new ColumnConstraints(130));
         bingCntPlaceholder.getColumnConstraints().add(new ColumnConstraints(130));
-        for (SearchPlatform platform : SearchPlatform.values()) {
+        for (SearchPlatform platform : PlatformWrapper.getInstance().getList()) {
             Label label = new Label(platform.getName() + "上屏");
             GridPane.setConstraints(label, 0, row);
             SimpleIntegerProperty property = new SimpleIntegerProperty(0);
@@ -353,7 +351,7 @@ public class HomeController {
             updateTotal();
         };
 
-        for (SearchPlatform platform : SearchPlatform.values()) {
+        for (SearchPlatform platform : PlatformWrapper.getInstance().getList()) {
             CheckBox cb = new CheckBox(platform.getName());
             cb.selectedProperty().addListener(cbChangeListener);
             searchPlatformsPlaceholder.getChildren().add(cb);
@@ -369,7 +367,8 @@ public class HomeController {
             return cb.isSelected();
         }).map(node -> {
             String name = ((CheckBox) node).getText();
-            return Arrays.stream(SearchPlatform.values()).filter(platform -> platform.getName().equals(name)).findAny();
+            return PlatformWrapper.getInstance().getList().stream()
+                    .filter(platform -> platform.getName().equals(name)).findAny();
         })
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -378,9 +377,14 @@ public class HomeController {
     }
 
     private void pageDepthSelectSet() {
-        final ObservableList<Integer> choice = FXCollections.observableArrayList(1, 2, 3);
+        List<Integer> pages = new ArrayList<>(PlatformWrapper.getInstance().getPageDepthMax());
+
+        for (int i = 0; i < PlatformWrapper.getInstance().getPageDepthMax(); i++) {
+            pages.add(i + 1);
+        }
+        final ObservableList<Integer> choice = FXCollections.observableArrayList(pages);
         pageChoiceBox.setItems(choice);
-        pageChoiceBox.setValue(1);
+        pageChoiceBox.setValue(pages.get(0));
         pageChoiceBox.getSelectionModel()
                 .selectedIndexProperty()
                 .addListener((observable, oldValue, newValue) -> {
@@ -530,8 +534,13 @@ public class HomeController {
         totalProperty.setValue(total);
         if (total == 0) {
             startBtn.setDisable(true);
+            resumeBtn.setDisable(true);
         } else if (task.getTaskStatus() != TaskStatus.RUNNING) {
             startBtn.setDisable(false);
+            if (task.getTaskStatus() == TaskStatus.PAUSE) {
+                resumeBtn.setDisable(false);
+
+            }
         }
     }
 
