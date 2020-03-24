@@ -1,5 +1,6 @@
 package Ywk.UserInterface.Controller;
 
+import Ywk.Api.CookiesStore;
 import Ywk.Data.Info;
 import Ywk.Data.KeywordGenerator;
 import Ywk.Data.PlatformWrapper;
@@ -18,6 +19,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -27,16 +29,23 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import okhttp3.Cookie;
+import okhttp3.HttpUrl;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -869,8 +878,18 @@ public class HomeController implements ContentChecker.PageValidate {
     public void openWebview(String url) {
         Platform.runLater(() -> {
             WebView webView = new WebView();
+            WebEngine engine = webView.getEngine();
 
-            webView.getEngine().load(url);
+            engine.getLoadWorker().stateProperty().addListener(((observableValue, state, t1) -> {
+                if (t1 == Worker.State.SUCCEEDED) {
+//                    getCookiesFromWebview(url);
+                }
+            }));
+
+            CookieManager cookieManager = new CookieManager();
+            CookieHandler.setDefault(cookieManager);
+
+            engine.load(url);
             Stage stage = new Stage();
             stage.setTitle("安全验证");
             stage.initModality(Modality.WINDOW_MODAL);
@@ -881,6 +900,8 @@ public class HomeController implements ContentChecker.PageValidate {
 
             stage.setScene(scene);
             stage.showAndWait();
+
+
         });
 
     }
@@ -889,5 +910,48 @@ public class HomeController implements ContentChecker.PageValidate {
     public void validate(String url) {
         task.stopAll();
         openWebview(url);
+    }
+
+
+    private void getCookiesFromWebview(String url) {
+        CookieManager cookieManager = (CookieManager) CookieHandler.getDefault();
+
+        try {
+//            Field f = cookieManager.getClass().getDeclaredField("store");
+//            f.setAccessible(true);
+//            Object cookieStore = f.get(cookieManager);
+//            Field bucketsField = Class.forName("com.sun.webkit.network.CookieStore").getDeclaredField("buckets");
+//            bucketsField.setAccessible(true);
+//            Map buckets = (Map) bucketsField.get(cookieStore);
+//
+//            for (Object o : buckets.entrySet()) {
+//                Map.Entry entry = (Map.Entry) o;
+//                String domain = (String) entry.getKey();
+//                Map cookies = (Map) entry.getValue();
+//                Cookie cookie = Cookie.parse(domain, cookies.values())
+//            }
+
+
+            URI uri = new URI(url);
+            List<Cookie> cookies = cookieManager
+                    .getCookieStore().get(uri).stream().map(httpCookie -> {
+                        System.out.println(httpCookie.toString());
+                        return Cookie.parse(HttpUrl.get(uri), httpCookie.toString());
+                    })
+                    .collect(Collectors.toList());
+
+            CookiesStore.getCookieStore().put(uri.getHost(), cookies);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+//        catch (NoSuchFieldException e) {
+//            e.printStackTrace();
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+
+
     }
 }

@@ -127,9 +127,9 @@ public class LoginController {
                 e.printStackTrace();
             }
 
-        } else if (IdentityWrapper.getInstance().inited() == ApiStatus.SUCESS
-                && KeywordGenerator.getInstance().inited() == ApiStatus.SUCESS
-                && PlatformWrapper.getInstance().inited() == ApiStatus.SUCESS
+        } else if (IdentityWrapper.getInstance().inited() == ApiStatus.SUCCESS
+                && KeywordGenerator.getInstance().inited() == ApiStatus.SUCCESS
+                && PlatformWrapper.getInstance().inited() == ApiStatus.SUCCESS
         ) {
             try {
                 Platform.runLater(() -> {

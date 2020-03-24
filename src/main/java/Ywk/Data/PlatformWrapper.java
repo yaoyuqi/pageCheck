@@ -27,7 +27,7 @@ public class PlatformWrapper implements ApiInstance {
     public void init(List<SearchPlatform> list, int pageDepthMax) {
         this.list = list;
         this.pageDepthMax = pageDepthMax;
-        apiStatus = ApiStatus.SUCESS;
+        apiStatus = ApiStatus.SUCCESS;
     }
 
     public int getPageDepthMax() {

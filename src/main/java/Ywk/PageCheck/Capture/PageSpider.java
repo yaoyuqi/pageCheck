@@ -2,9 +2,13 @@ package Ywk.PageCheck.Capture;
 
 import Ywk.Data.SearchPlatform;
 import Ywk.PageCheck.ContentChecker;
-import okhttp3.*;
+import okhttp3.Dispatcher;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 
 /**
@@ -91,34 +95,56 @@ public class PageSpider {
             request = new Request.Builder()
                     .get()
                     .url(url)
-//                    .addHeader("User-Agent:", "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1")
+                    .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+                    .header("Accept-Language", "en,zh-CN;q=0.9,zh;q=0.8")
+
+//                    .header("Cookie", "BAIDUID=2A64D013895E90B23705652F8854A289:FG=1; PSTM=1570589428; BIDUPSID=94C23CF6E223E5C2AE01270CC928E79C; MSA_WH=375_667; BD_UPN=123253; BDUSS=kdrVEdWZEVOT05WRjM1WnQ5ZHZnM0V2OHF2Nm0zMVhCSk9hanpWWFVtcH5Zb3BlRVFBQUFBJCQAAAAAAAAAAAEAAAAwCXMxz8nIy9XGNDcxAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH~VYl5~1WJeT; H_WISE_SIDS=142080_142058_142113_100806_139964_143377_142209_143860_143879_141876_139057_141747_143161_143423_143448_141899_142780_131247_137746_138165_138883_141941_127969_142871_140066_142908_140593_143059_143491_140350_138425_141009_143469_143276_141930_131423_125695_107316_138595_143093_142803_143477_142427_142911_136753_110085; H_PS_PSSID=30975_1443_31117_21091_30903_30823_31086_22157; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598; delPer=0; BD_CK_SAM=1; PSINO=1; COOKIE_SESSION=4_0_9_9_0_0_0_0_9_0_0_0_0_0_0_0_0_0_1584687340%7C9%238805509_15_1582089706%7C6; H_PS_645EC=312cJsJK2%2BOxKryoApolU78xsFsv2Suf0nr%2B%2BO6wZCoHU%2Fd%2B6LSlmhgo%2FrI")
+                    .header("User-Agent:", "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1")
 //                    .addHeader("User-Agent:", randomUserAgent(true))
                     .build();
         } else {
             request = new Request.Builder()
                     .get()
                     .url(url)
-//                    .addHeader("User-Agent:", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36")
+                    .header("Cookie", "BAIDUID=2A64D013895E90B23705652F8854A289:FG=1; PSTM=1570589428; BIDUPSID=94C23CF6E223E5C2AE01270CC928E79C; MSA_WH=375_667; BD_UPN=123253; BDUSS=kdrVEdWZEVOT05WRjM1WnQ5ZHZnM0V2OHF2Nm0zMVhCSk9hanpWWFVtcH5Zb3BlRVFBQUFBJCQAAAAAAAAAAAEAAAAwCXMxz8nIy9XGNDcxAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH~VYl5~1WJeT; H_WISE_SIDS=142080_142058_142113_100806_139964_143377_142209_143860_143879_141876_139057_141747_143161_143423_143448_141899_142780_131247_137746_138165_138883_141941_127969_142871_140066_142908_140593_143059_143491_140350_138425_141009_143469_143276_141930_131423_125695_107316_138595_143093_142803_143477_142427_142911_136753_110085; H_PS_PSSID=30975_1443_31117_21091_30903_30823_31086_22157; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598; delPer=0; BD_CK_SAM=1; PSINO=1; H_PS_645EC=25c2xT4EdDqVS9weTiheh3jDLv33l9FYqfjdFTLm2UqJ6%2BfOcOju7qYHT24; COOKIE_SESSION=5_0_9_9_0_3_0_1_9_1_2_2_0_0_0_0_0_0_1584687345%7C9%238805509_15_1582089706%7C6")
+//                    .header("Cookie", "BAIDUID=935CCBCC6795725A58C6492405276B46:FG=1; BIDUPSID=08AE00A3E1D3AF68FA6146FA5C584239; BDORZ=B490B5EBF6F3CD402E515D22BCDA1598; PSTM=1584691632; delPer=0; BD_CK_SAM=1; PSINO=6; H_PS_PSSID=30971_1425_31044_21100_30823_26350_30717; BD_UPN=12314353;  BDSVRTM=101;H_PS_645EC=37703IRlbHLUx/vx4tjWQXuYIICzB9xdiHjXFWsfQ9c6UVY1aUl4VW5IXyE")
+                    .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+//                    .header("Accept-Encoding", "gzip, deflate, br")
+                    .header("Accept-Language", "en,zh-CN;q=0.9,zh;q=0.8")
+                    .header("User-Agent:", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36")
 //                    .addHeader("User-Agent:", randomUserAgent(false))
                     .build();
 
         }
 
 //        System.out.println("Search[" + url + "]");
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                listener.updateRunningInfo();
-                checker.checkFail(keyword, url);
-            }
+//        client.newCall(request).enqueue(new Callback() {
+//            @Override
+//            public void onFailure(Call call, IOException e) {
+//                listener.updateRunningInfo();
+//                checker.checkFail(keyword, url);
+//            }
+//
+//            @Override
+//            public void onResponse(Call call, Response response) throws IOException {
+//                checker.check(response.body().string(), keyword, page, url);
+//                listener.updateRunningInfo();
+//                response.close();
+//            }
+//        });
+        try (Response response = client.newCall(request).execute()) {
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                checker.check(response.body().string(), keyword, page, url);
+            System.out.println("Request cookie+++++++++++++++");
+            System.out.println(response.request().headers().get("Cookie"));
+//
+//            System.out.println("Response set-cookie+++++++++++++++");
+//            System.out.println(response.headers().toString());
+            checker.check(response.body().string(), keyword, page, url);
                 listener.updateRunningInfo();
-                response.close();
-            }
-        });
+        } catch (IOException | URISyntaxException e) {
+            listener.updateRunningInfo();
+            checker.checkFail(keyword, url);
+        }
 
     }
 

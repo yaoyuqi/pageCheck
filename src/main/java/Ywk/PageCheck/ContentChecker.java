@@ -3,11 +3,14 @@ package Ywk.PageCheck;
 import Ywk.Data.Info;
 import Ywk.Data.SearchPlatform;
 import Ywk.Data.XMLWriter;
+import Ywk.PageCheck.Capture.AdapterWrapper;
+import Ywk.PageCheck.Capture.BaiduAdapter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -39,15 +42,42 @@ public class ContentChecker {
         return platform;
     }
 
-    public void check(String content, String keyword, int page, String url) {
+    public void check(String content, String keyword, int page, String url) throws URISyntaxException {
         if (content != null
                 && content.contains("安全验证")
         ) {
             System.out.println(keyword + " 出现安全验证");
-            System.out.println(content);
-            validateListener.validate(url);
+//            System.out.println(content);
+//            validateListener.validate(url);
             return;
         }
+
+        BaiduAdapter adapter = AdapterWrapper.getInstance();
+
+        adapter.parse(content, url);
+
+//        if (!baiduEncrypedKey.isEmpty()) {
+//            ConcurrentHashMap<String, List<Cookie>> cookieStore = CookiesStore.getCookieStore();
+//            URI uri = new URI(url);
+//            List<Cookie> list = cookieStore.getOrDefault(uri.getHost(), new ArrayList<>());
+//
+//            Optional<Cookie> hpsCookie = list.stream().filter(item -> item.name().equals("H_PS_645EC")).findAny();
+//
+//            list = list.stream().map(item -> {
+//                if (!item.name().equals("H_PS_645EC")) {
+//                    return item;
+//                }
+//                return new Cookie.Builder()
+//                        .domain("www.baidu.com")
+//                        .name("H_PS_645EC")
+//                        .path("/")
+//                        .value(baiduEncrypedKey)
+//                        .expiresAt(2592000)
+//                        .build();
+//
+//            }).collect(Collectors.toList());
+//            cookieStore.put(uri.getHost(), list);
+//        }
 
         if (content != null
                 && identities.stream().parallel().anyMatch(content::contains)
@@ -69,6 +99,7 @@ public class ContentChecker {
             writeResult(keyword, page, result);
 
         } else {
+//            System.out.println(content);
             System.out.println(keyword + " check in pc no results");
         }
 

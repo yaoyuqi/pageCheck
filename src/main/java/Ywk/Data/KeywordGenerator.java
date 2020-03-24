@@ -146,7 +146,7 @@ public class KeywordGenerator implements ApiInstance {
         this.prefix = prefix;
         this.main = main;
         this.suffix = suffix;
-        initStatus = ApiStatus.SUCESS;
+        initStatus = ApiStatus.SUCCESS;
     }
 
 

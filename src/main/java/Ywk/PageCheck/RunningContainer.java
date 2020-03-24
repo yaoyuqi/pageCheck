@@ -52,8 +52,13 @@ public class RunningContainer implements Runnable {
         if (next != null) {
             for (String word : next) {
                 if (word != null && !word.isEmpty()) {
-                    availableRunners.stream().parallel()
+                    availableRunners
                             .forEach(pageRunner -> pageRunner.run(word));
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
                 }
             }
         } else {

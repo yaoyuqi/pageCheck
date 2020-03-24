@@ -31,7 +31,7 @@ public class IdentityWrapper implements ApiInstance {
             map.put(item.getIdentity(), item);
         }
 
-        initStatus = ApiStatus.SUCESS;
+        initStatus = ApiStatus.SUCCESS;
 
     }
 
