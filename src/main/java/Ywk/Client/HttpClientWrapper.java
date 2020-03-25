@@ -15,6 +15,7 @@ public class HttpClientWrapper {
     static {
         ConcurrentHashMap<String, List<Cookie>> cookies = CookiesStore.getCookieStore();
         client = (new OkHttpClient.Builder())
+//                .readTimeout(30, TimeUnit.SECONDS)
                 .protocols(Collections.singletonList(Protocol.HTTP_1_1))
 //                .cookieJar(new CookieJar() {
 //                    @Override

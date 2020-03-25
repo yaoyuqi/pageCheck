@@ -9,7 +9,6 @@ import okhttp3.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -103,6 +102,8 @@ public class HltApi {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+
                 controller.loginResult(false);
             }
 
@@ -141,6 +142,8 @@ public class HltApi {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+
                 IdentityWrapper wrapper = IdentityWrapper.getInstance();
                 wrapper.initFailed();
                 controller.vitalError();
@@ -157,46 +160,46 @@ public class HltApi {
                     wrapper.inited();
                     controller.vitalError();
                 } else {
-                    //TODO Test
-                    String[] marks = {"Ydvqmc",
-                            "2goenm",
-                            "Ngrqxz",
-                            "K6aykb",
-                            "Tvwbby",
-                            "2jtjhm",
-                            "3aqf9i",
-                            "Eka49r",
-                            "R5y4gn",
-                            "Olmdc5",
-                            "A7vc5e",
-                            "Xm9rge",
-                            "8nr8uq",
-                            "R6jerq",
-                            "Tknu3w",
-                            "Omtcby",
-                            "Npkpdm",
-                            "Ygwd9a",
-                            "Am1nxu",
-                            "U3s4ai",
-                            "Ergell",
-                            "0ylmly",
-                            "Olhkxu",
-                            "Yuvpqa",
-                            "3okzm6",
-                            "Bufjiy",
-                            "Jlgsxc"};
+//                    //TODO Test
+//                    String[] marks = {"Ydvqmc",
+//                            "2goenm",
+//                            "Ngrqxz",
+//                            "K6aykb",
+//                            "Tvwbby",
+//                            "2jtjhm",
+//                            "3aqf9i",
+//                            "Eka49r",
+//                            "R5y4gn",
+//                            "Olmdc5",
+//                            "A7vc5e",
+//                            "Xm9rge",
+//                            "8nr8uq",
+//                            "R6jerq",
+//                            "Tknu3w",
+//                            "Omtcby",
+//                            "Npkpdm",
+//                            "Ygwd9a",
+//                            "Am1nxu",
+//                            "U3s4ai",
+//                            "Ergell",
+//                            "0ylmly",
+//                            "Olhkxu",
+//                            "Yuvpqa",
+//                            "3okzm6",
+//                            "Bufjiy",
+//                            "Jlgsxc"};
+//
+//                    IdentityWrapper identityWrapper = IdentityWrapper.getInstance();
+//
+//                    identityWrapper.initList(Arrays.stream(marks).map(item -> {
+//                        IdentityData.DataBean bean = new IdentityData.DataBean();
+//                        bean.setIdentity(item);
+//                        bean.setName("产品" + item);
+//                        return bean;
+//                    }).collect(Collectors.toList()));
+//
 
-                    IdentityWrapper identityWrapper = IdentityWrapper.getInstance();
-
-                    identityWrapper.initList(Arrays.stream(marks).map(item -> {
-                        IdentityData.DataBean bean = new IdentityData.DataBean();
-                        bean.setIdentity(item);
-                        bean.setName("产品" + item);
-                        return bean;
-                    }).collect(Collectors.toList()));
-
-
-//                    wrapper.initList(identityData.getData());
+                    wrapper.initList(identityData.getData());
                     controller.apiInitFinished();
                 }
 
@@ -213,6 +216,7 @@ public class HltApi {
 
         Request request = new Request.Builder()
                 .url(url)
+
                 .get()
                 .addHeader(header.getHeaderMark(), header.getAccessToken())
                 .build();
@@ -220,6 +224,7 @@ public class HltApi {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
                 KeywordGenerator generator = KeywordGenerator.getInstance();
                 generator.initFailed();
                 controller.vitalError();

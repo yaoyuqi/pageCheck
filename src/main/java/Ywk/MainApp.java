@@ -81,8 +81,8 @@ public class MainApp extends Application {
             Scene scene = new Scene(pane, SCREEN_WIDTH, SCREEN_HEIGHT);
             HomeController controller = loader.getController();
 
-            //Test
-            setTestData();
+            //TODO Test
+//            setTestData();
 
             controller.setApp(this);
             primaryStage.setScene(scene);
