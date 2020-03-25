@@ -64,7 +64,7 @@ public class ApiWriter extends XMLWriter {
         Arrays.fill(apiResult, STATUS_RUNNING);
 
         for (int i = 0; i < chunks.size(); i++) {
-            Result result = new Result(chunks.get(i), i + 1, mark, date);
+            Result result = new Result(chunks.get(i), i + 1, mark);
             api.upload(result, this);
         }
     }

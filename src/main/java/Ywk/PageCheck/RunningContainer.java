@@ -1,8 +1,7 @@
 package Ywk.PageCheck;
 
+import Ywk.Client.SearchPlatform;
 import Ywk.Data.KeywordGenerator;
-import Ywk.Data.SearchPlatform;
-import Ywk.PageCheck.Capture.PageRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +11,8 @@ import java.util.stream.Collectors;
  * generate keywords then use running to crawl
  */
 public class RunningContainer implements Runnable {
-    private KeywordGenerator keyword;
     private final List<PageRunner> allRunners;
+    private KeywordGenerator keyword;
     private List<PageRunner> availableRunners = new ArrayList<>();
     private volatile boolean finished = false;
     private TaskRunningFinishListener listener;

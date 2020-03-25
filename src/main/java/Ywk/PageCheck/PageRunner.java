@@ -1,7 +1,7 @@
-package Ywk.PageCheck.Capture;
+package Ywk.PageCheck;
 
 
-import Ywk.Data.SearchPlatform;
+import Ywk.Client.SearchPlatform;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

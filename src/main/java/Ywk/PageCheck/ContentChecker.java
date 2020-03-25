@@ -1,16 +1,13 @@
 package Ywk.PageCheck;
 
+import Ywk.Client.SearchPlatform;
 import Ywk.Data.Info;
-import Ywk.Data.SearchPlatform;
 import Ywk.Data.XMLWriter;
-import Ywk.PageCheck.Capture.AdapterWrapper;
-import Ywk.PageCheck.Capture.BaiduAdapter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -27,10 +24,6 @@ public class ContentChecker {
 
     private PageValidate validateListener;
 
-    public void setValidateListener(PageValidate validateListener) {
-        this.validateListener = validateListener;
-    }
-
     ContentChecker(List<String> identities, XMLWriter writer, SearchPlatform platform, NewItemFound newItemFound) {
         this.identities = identities;
         this.writer = writer;
@@ -38,11 +31,15 @@ public class ContentChecker {
         this.foundListener = newItemFound;
     }
 
+    public void setValidateListener(PageValidate validateListener) {
+        this.validateListener = validateListener;
+    }
+
     public SearchPlatform getPlatform() {
         return platform;
     }
 
-    public void check(String content, String keyword, int page, String url) throws URISyntaxException {
+    public void check(String content, String keyword, int page) {
         if (content != null
                 && content.contains("安全验证")
         ) {
@@ -51,10 +48,6 @@ public class ContentChecker {
 //            validateListener.validate(url);
             return;
         }
-
-        BaiduAdapter adapter = AdapterWrapper.getInstance();
-
-        adapter.parse(content, url);
 
 //        if (!baiduEncrypedKey.isEmpty()) {
 //            ConcurrentHashMap<String, List<Cookie>> cookieStore = CookiesStore.getCookieStore();

@@ -1,20 +1,16 @@
 package Ywk.Api;
 
 import Ywk.Data.Info;
-import Ywk.Data.SearchPlatform;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Result {
-    private String check_time;
     private String mark;
     private int part;
-    private int total;
     private List<Data> data;
 
-    public Result(List<Info> infoList, int part, String mark, String checkTime) {
-        this.check_time = checkTime;
+    public Result(List<Info> infoList, int part, String mark) {
         this.mark = mark;
         this.part = part;
         this.data = new ArrayList<>();
@@ -26,18 +22,10 @@ public class Result {
             item.setTime(info.getTime());
             item.setWord(info.getKeyword());
             item.setPage(info.getPage());
-            item.setPlatform(info.getPlatform());
+            item.setProduct(info.getIdentity());
+            item.setSearch_engine_id(info.getPlatform().getId());
             data.add(item);
         }
-        this.total = this.data.size();
-    }
-
-    public String getCheck_time() {
-        return check_time;
-    }
-
-    public void setCheck_time(String check_time) {
-        this.check_time = check_time;
     }
 
     public String getMark() {
@@ -56,14 +44,6 @@ public class Result {
         this.part = part;
     }
 
-    public int getTotal() {
-        return total;
-    }
-
-    public void setTotal(int total) {
-        this.total = total;
-    }
-
     public List<Data> getData() {
         return data;
     }
@@ -76,15 +56,24 @@ public class Result {
         private String loc;
         private String word;
         private String time;
-        private SearchPlatform platform;
+        private String product;
+        private int search_engine_id;
         private int page;
 
-        public SearchPlatform getPlatform() {
-            return platform;
+        public String getProduct() {
+            return product;
         }
 
-        public void setPlatform(SearchPlatform platform) {
-            this.platform = platform;
+        public void setProduct(String product) {
+            this.product = product;
+        }
+
+        public int getSearch_engine_id() {
+            return search_engine_id;
+        }
+
+        public void setSearch_engine_id(int search_engine_id) {
+            this.search_engine_id = search_engine_id;
         }
 
         public int getPage() {

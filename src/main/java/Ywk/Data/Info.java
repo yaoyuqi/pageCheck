@@ -1,6 +1,8 @@
 package Ywk.Data;
 
 
+import Ywk.Client.SearchPlatform;
+
 public class Info {
     private String keyword;
     private SearchPlatform platform;

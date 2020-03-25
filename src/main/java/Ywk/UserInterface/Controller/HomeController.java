@@ -1,10 +1,10 @@
 package Ywk.UserInterface.Controller;
 
-import Ywk.Api.CookiesStore;
+import Ywk.Client.CookiesStore;
+import Ywk.Client.PlatformWrapper;
+import Ywk.Client.SearchPlatform;
 import Ywk.Data.Info;
 import Ywk.Data.KeywordGenerator;
-import Ywk.Data.PlatformWrapper;
-import Ywk.Data.SearchPlatform;
 import Ywk.MainApp;
 import Ywk.PageCheck.ContentChecker;
 import Ywk.PageCheck.TaskManage;
@@ -351,6 +351,14 @@ public class HomeController implements ContentChecker.PageValidate {
                 if (model != null) {
                     String url = platform.nextPageUrl(model.getKeyword(), model.getPage());
                     app.getHostServices().showDocument(url);
+
+//                    try {
+//                        Desktop.getDesktop().browse(new URI(url));
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    } catch (URISyntaxException e) {
+//                        e.printStackTrace();
+//                    }
                 }
             });
             return cell;
@@ -472,6 +480,10 @@ public class HomeController implements ContentChecker.PageValidate {
     private void handleNewStart() {
         task.newTask();
 
+        for (Map.Entry<Integer, IntegerProperty> bingo : bingoCntProperties.entrySet()) {
+            bingo.getValue().setValue(task.bingCntRetrieve(bingo.getKey()));
+        }
+
         for (int key : listData.keySet()) {
             listData.get(key).clear();
         }
@@ -480,6 +492,7 @@ public class HomeController implements ContentChecker.PageValidate {
         if (runSpeed == 0) {
             runSpeed = 1;
         }
+
 
         task.setSpeed(runSpeed);
 
@@ -782,7 +795,10 @@ public class HomeController implements ContentChecker.PageValidate {
      * @param info
      */
     public synchronized void addResult(Info info) {
-        listData.get(info.getPlatform().getId()).add(new InfoModel(info));
+        int id = info.getPlatform().getId();
+        listData.get(id).add(new InfoModel(info));
+
+        updateBingoCnt(id, task.bingCntRetrieve(id));
     }
 
     /**

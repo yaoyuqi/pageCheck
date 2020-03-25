@@ -1,9 +1,7 @@
 package Ywk;
 
 import Ywk.Api.HltApi;
-import Ywk.Api.HttpClientWrapper;
-import Ywk.Data.IdentityData;
-import Ywk.Data.IdentityWrapper;
+import Ywk.Client.HttpClientWrapper;
 import Ywk.Data.KeywordGenerator;
 import Ywk.UserInterface.Controller.HomeController;
 import Ywk.UserInterface.Controller.LoginController;
@@ -20,8 +18,6 @@ import javafx.stage.WindowEvent;
 import okhttp3.OkHttpClient;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 public class MainApp extends Application {
 
@@ -100,42 +96,42 @@ public class MainApp extends Application {
     }
 
     private void setTestData() {
-        String[] marks = {"Ydvqmc",
-                "2goenm",
-                "Ngrqxz",
-                "K6aykb",
-                "Tvwbby",
-                "2jtjhm",
-                "3aqf9i",
-                "Eka49r",
-                "R5y4gn",
-                "Olmdc5",
-                "A7vc5e",
-                "Xm9rge",
-                "8nr8uq",
-                "R6jerq",
-                "Tknu3w",
-                "Omtcby",
-                "Npkpdm",
-                "Ygwd9a",
-                "Am1nxu",
-                "U3s4ai",
-                "Ergell",
-                "0ylmly",
-                "Olhkxu",
-                "Yuvpqa",
-                "3okzm6",
-                "Bufjiy",
-                "Jlgsxc"};
-
-        IdentityWrapper identityWrapper = IdentityWrapper.getInstance();
-
-        identityWrapper.initList(Arrays.stream(marks).map(item -> {
-            IdentityData.DataBean bean = new IdentityData.DataBean();
-            bean.setIdentity(item);
-            bean.setName("产品" + item);
-            return bean;
-        }).collect(Collectors.toList()));
+//        String[] marks = {"Ydvqmc",
+//                "2goenm",
+//                "Ngrqxz",
+//                "K6aykb",
+//                "Tvwbby",
+//                "2jtjhm",
+//                "3aqf9i",
+//                "Eka49r",
+//                "R5y4gn",
+//                "Olmdc5",
+//                "A7vc5e",
+//                "Xm9rge",
+//                "8nr8uq",
+//                "R6jerq",
+//                "Tknu3w",
+//                "Omtcby",
+//                "Npkpdm",
+//                "Ygwd9a",
+//                "Am1nxu",
+//                "U3s4ai",
+//                "Ergell",
+//                "0ylmly",
+//                "Olhkxu",
+//                "Yuvpqa",
+//                "3okzm6",
+//                "Bufjiy",
+//                "Jlgsxc"};
+//
+//        IdentityWrapper identityWrapper = IdentityWrapper.getInstance();
+//
+//        identityWrapper.initList(Arrays.stream(marks).map(item -> {
+//            IdentityData.DataBean bean = new IdentityData.DataBean();
+//            bean.setIdentity(item);
+//            bean.setName("产品" + item);
+//            return bean;
+//        }).collect(Collectors.toList()));
 
         String[] keywords = {
                 "抽水机租赁",

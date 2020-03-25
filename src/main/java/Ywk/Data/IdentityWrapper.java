@@ -26,6 +26,7 @@ public class IdentityWrapper implements ApiInstance {
     }
 
     public void initList(List<IdentityData.DataBean> list) {
+        map.clear();
         for (IdentityData.DataBean item :
                 list) {
             map.put(item.getIdentity(), item);

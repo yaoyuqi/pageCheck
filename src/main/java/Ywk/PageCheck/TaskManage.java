@@ -1,10 +1,16 @@
 package Ywk.PageCheck;
 
 
-import Ywk.Api.HttpClientWrapper;
-import Ywk.Data.*;
-import Ywk.PageCheck.Capture.PageRunner;
-import Ywk.PageCheck.Capture.PageSpider;
+import Ywk.Client.HttpClientWrapper;
+import Ywk.Client.Interceptor.EncryInterceptor;
+import Ywk.Client.Interceptor.PageEncrypt;
+import Ywk.Client.PlatformWrapper;
+import Ywk.Client.RequestBuilder.RequestBuilder;
+import Ywk.Client.SearchPlatform;
+import Ywk.Data.ApiWriter;
+import Ywk.Data.IdentityWrapper;
+import Ywk.Data.Info;
+import Ywk.Data.KeywordGenerator;
 import Ywk.UserInterface.Controller.HomeController;
 
 import java.text.SimpleDateFormat;
@@ -60,10 +66,10 @@ public class TaskManage implements Runnable
      */
     private List<PageRunner> runners;
 
-    private Map<Integer, Integer> bingoCnt = new HashMap<>();
-
 
     public TaskManage(HomeController controller) {
+        taskStatus = TaskStatus.NEW;
+        uploadStatus = UploadStatus.WAITING;
         writer = new ApiWriter();
         writer.setHandler(this);
         this.controller = controller;
@@ -80,6 +86,12 @@ public class TaskManage implements Runnable
         }
 
 
+    }
+
+    private Map<Integer, Integer> bingoCnt = new HashMap<>();
+
+    public int bingCntRetrieve(int id) {
+        return bingoCnt.get(id);
     }
 
     public TaskStatus getTaskStatus() {
@@ -106,12 +118,18 @@ public class TaskManage implements Runnable
     private void initRunners() {
         runners = new ArrayList<>();
 
-        for (SearchPlatform platform :
-                PlatformWrapper.getInstance().getList()) {
+        List<SearchPlatform> platforms = PlatformWrapper.getInstance().getList();
+
+        RequestBuilder builders = new RequestBuilder(platforms);
+
+        List<PageEncrypt> encrypts = EncryInterceptor.getInstance().getList();
+
+
+        for (SearchPlatform platform : platforms) {
             ContentChecker checker = new ContentChecker(identities, writer, platform, this);
             checker.setValidateListener(controller);
 
-            runners.add(new PageRunner(new PageSpider(HttpClientWrapper.getClient(), checker)));
+            runners.add(new PageRunner(new PageSpider(HttpClientWrapper.getClient(), checker, builders, encrypts)));
         }
 
         runners.forEach(pageRunner -> {
@@ -191,7 +209,7 @@ public class TaskManage implements Runnable
         taskStatus = TaskStatus.FINISHED;
         //自动上传
         if (autoUpdate) {
-            uploadStatus = UploadStatus.UPLOADING;
+//            uploadStatus = UploadStatus.UPLOADING;
             uploadResult();
         }
     }
@@ -254,6 +272,10 @@ public class TaskManage implements Runnable
         }
 
         ranCnt = 0;
+        for (Map.Entry<Integer, Integer> item :
+                bingoCnt.entrySet()) {
+            item.setValue(0);
+        }
 
         clearData();
 
@@ -306,5 +328,6 @@ public class TaskManage implements Runnable
     @Override
     public void found(Info info) {
         bingoCnt.put(info.getPlatform().getId(), bingoCnt.get(info.getPlatform().getId()) + 1);
+        controller.addResult(info);
     }
 }

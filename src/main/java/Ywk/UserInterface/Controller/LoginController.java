@@ -2,9 +2,9 @@ package Ywk.UserInterface.Controller;
 
 import Ywk.Api.ApiStatus;
 import Ywk.Api.HltApi;
+import Ywk.Client.PlatformWrapper;
 import Ywk.Data.IdentityWrapper;
 import Ywk.Data.KeywordGenerator;
-import Ywk.Data.PlatformWrapper;
 import Ywk.MainApp;
 import javafx.application.Platform;
 import javafx.fxml.FXML;

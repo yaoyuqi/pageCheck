@@ -1,4 +1,4 @@
-package Ywk.Data;
+package Ywk.Client;
 
 import Ywk.Api.ApiInstance;
 import Ywk.Api.ApiStatus;

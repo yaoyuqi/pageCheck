@@ -1,11 +1,16 @@
 package Ywk.Api;
 
+import Ywk.Client.PlatformWrapper;
+import Ywk.Client.SearchPlatform;
 import Ywk.Data.*;
 import Ywk.UserInterface.Controller.LoginController;
 import com.google.gson.Gson;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class HltApi {
@@ -152,7 +157,46 @@ public class HltApi {
                     wrapper.inited();
                     controller.vitalError();
                 } else {
-                    wrapper.initList(identityData.getData());
+                    //TODO Test
+                    String[] marks = {"Ydvqmc",
+                            "2goenm",
+                            "Ngrqxz",
+                            "K6aykb",
+                            "Tvwbby",
+                            "2jtjhm",
+                            "3aqf9i",
+                            "Eka49r",
+                            "R5y4gn",
+                            "Olmdc5",
+                            "A7vc5e",
+                            "Xm9rge",
+                            "8nr8uq",
+                            "R6jerq",
+                            "Tknu3w",
+                            "Omtcby",
+                            "Npkpdm",
+                            "Ygwd9a",
+                            "Am1nxu",
+                            "U3s4ai",
+                            "Ergell",
+                            "0ylmly",
+                            "Olhkxu",
+                            "Yuvpqa",
+                            "3okzm6",
+                            "Bufjiy",
+                            "Jlgsxc"};
+
+                    IdentityWrapper identityWrapper = IdentityWrapper.getInstance();
+
+                    identityWrapper.initList(Arrays.stream(marks).map(item -> {
+                        IdentityData.DataBean bean = new IdentityData.DataBean();
+                        bean.setIdentity(item);
+                        bean.setName("产品" + item);
+                        return bean;
+                    }).collect(Collectors.toList()));
+
+
+//                    wrapper.initList(identityData.getData());
                     controller.apiInitFinished();
                 }
 
@@ -236,8 +280,21 @@ public class HltApi {
                     controller.vitalError();
                 } else {
                     wrapper.init(
-                            config.getData().getPlatform().stream().map(item ->
-                                    new SearchPlatform(item.getId(), item.getName(), item.getUrls(), item.getPatter(), item.isIsMobile()))
+                            config.getData().getPlatform().stream().map(item -> {
+                                        try {
+                                            return new SearchPlatform(
+                                                    item.getId(),
+                                                    item.getName(),
+                                                    item.getUrls(),
+                                                    item.getPatter(),
+                                                    item.isIsMobile());
+                                        } catch (URISyntaxException e) {
+                                            e.printStackTrace();
+                                            return null;
+                                        }
+                                    }
+                            )
+                                    .filter(Objects::nonNull)
                                     .collect(Collectors.toList()),
                             config.getData().getPageMax());
                     controller.apiInitFinished();
@@ -251,7 +308,7 @@ public class HltApi {
 
     public void upload(Result result, ApiWriter handler) {
 
-        String url = host + "api/hltapp/results";
+        String url = host + "api/desktop/results";
         LoginHeader header = LoginHeader.getInstance();
         RequestBody requestBody = FormBody.create(MediaType.parse("application/json; charset=utf-8"),
                 new Gson().toJson(result));
@@ -270,8 +327,20 @@ public class HltApi {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
 //                String responseText = response.body().toString();
-                handler.handleResult(result.getPart(), true);
-                response.close();
+                try {
+                    UploadResult uploadResult = new Gson().fromJson(response.body().toString(), UploadResult.class);
+                    if (uploadResult.getStatus() != 200) {
+                        handler.handleResult(result.getPart(), false);
+                    } else {
+                        handler.handleResult(result.getPart(), true);
+
+                    }
+                } catch (Exception e) {
+                    handler.handleResult(result.getPart(), false);
+                } finally {
+                    response.close();
+                }
+
             }
         });
 
