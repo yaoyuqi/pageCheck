@@ -38,8 +38,8 @@ public class LoginController {
         String user = account.getText();
         String password = passwordField.getText();
 
-//        user = "lymczs";
-//        password = "qwe123";
+        user = "lymczs";
+        password = "qwe123";
         if (user.isEmpty() || password.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText(null);
@@ -140,6 +140,10 @@ public class LoginController {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void newVersionFound() {
+        HomeController.showAlert(Alert.AlertType.ERROR, "发现新版本，请联系客服获取升级版");
     }
 
     public void vitalError() {

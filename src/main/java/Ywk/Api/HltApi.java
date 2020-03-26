@@ -13,6 +13,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class HltApi {
+
+    private static int currentVersion = 2;
     private static final String key = "1typhdp9zbo2Lbz9YkdfTLE9Tm4jW7nCSKssakFj";
     private static final String host = "http://member.91huoke.com/";
     private static HltApi api;
@@ -234,21 +236,30 @@ public class HltApi {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
 //                System.out.println(response.body().string());
-
-                WordData wordData = new Gson().fromJson(response.body().string(), WordData.class);
                 KeywordGenerator generator = KeywordGenerator.getInstance();
 
-                if (wordData.getStatus() != 200) {
+                try {
+                    WordData wordData = new Gson().fromJson(response.body().string(), WordData.class);
+
+                    if (wordData.getStatus() != 200) {
+                        generator.initFailed();
+                        controller.vitalError();
+                    } else {
+                        generator.setWords(wordData.getData().getPrefix().toArray(new String[]{}),
+                                wordData.getData().getMain().toArray(new String[]{}),
+                                wordData.getData().getSuffix().toArray(new String[]{}));
+                        controller.apiInitFinished();
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                     generator.initFailed();
                     controller.vitalError();
-                } else {
-                    generator.setWords(wordData.getData().getPrefix().toArray(new String[]{}),
-                            wordData.getData().getMain().toArray(new String[]{}),
-                            wordData.getData().getSuffix().toArray(new String[]{}));
-                    controller.apiInitFinished();
+                } finally {
+                    response.close();
 
                 }
-                response.close();
+
             }
 
         });
@@ -284,26 +295,34 @@ public class HltApi {
                     wrapper.initFailed();
                     controller.vitalError();
                 } else {
-                    wrapper.init(
-                            config.getData().getPlatform().stream().map(item -> {
-                                        try {
-                                            return new SearchPlatform(
-                                                    item.getId(),
-                                                    item.getName(),
-                                                    item.getUrls(),
-                                                    item.getPatter(),
-                                                    item.isIsMobile());
-                                        } catch (URISyntaxException e) {
-                                            e.printStackTrace();
-                                            return null;
-                                        }
-                                    }
-                            )
-                                    .filter(Objects::nonNull)
-                                    .collect(Collectors.toList()),
-                            config.getData().getPageMax());
-                    controller.apiInitFinished();
+                    if (currentVersion < config.getData().getVersion()) {
+                        wrapper.initFailed();
+                        controller.newVersionFound();
+                        ;
+                    } else {
 
+
+                        wrapper.init(
+                                config.getData().getPlatform().stream().map(item -> {
+                                            try {
+                                                return new SearchPlatform(
+                                                        item.getId(),
+                                                        item.getName(),
+                                                        item.getUrls(),
+                                                        item.getPatter(),
+                                                        item.isIsMobile());
+                                            } catch (URISyntaxException e) {
+                                                e.printStackTrace();
+                                                return null;
+                                            }
+                                        }
+                                )
+                                        .filter(Objects::nonNull)
+                                        .collect(Collectors.toList()),
+                                config.getData().getPageMax());
+                        controller.apiInitFinished();
+
+                    }
                 }
                 response.close();
             }
@@ -331,9 +350,10 @@ public class HltApi {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-//                String responseText = response.body().toString();
+//
                 try {
-                    UploadResult uploadResult = new Gson().fromJson(response.body().toString(), UploadResult.class);
+                    String responseText = response.body().string();
+                    UploadResult uploadResult = new Gson().fromJson(responseText, UploadResult.class);
                     if (uploadResult.getStatus() != 200) {
                         handler.handleResult(result.getPart(), false);
                     } else {

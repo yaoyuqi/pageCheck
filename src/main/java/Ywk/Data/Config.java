@@ -45,6 +45,8 @@ public class Config {
          */
 
         private int pageMax;
+        private int version;
+        private boolean force;
         private List<PlatformBean> platform;
 
         public int getPageMax() {
@@ -53,6 +55,22 @@ public class Config {
 
         public void setPageMax(int pageMax) {
             this.pageMax = pageMax;
+        }
+
+        public int getVersion() {
+            return version;
+        }
+
+        public void setVersion(int version) {
+            this.version = version;
+        }
+
+        public boolean isForce() {
+            return force;
+        }
+
+        public void setForce(boolean force) {
+            this.force = force;
         }
 
         public List<PlatformBean> getPlatform() {
