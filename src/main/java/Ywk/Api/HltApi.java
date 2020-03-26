@@ -239,7 +239,8 @@ public class HltApi {
                 KeywordGenerator generator = KeywordGenerator.getInstance();
 
                 try {
-                    WordData wordData = new Gson().fromJson(response.body().string(), WordData.class);
+                    String content = response.body().string();
+                    WordData wordData = new Gson().fromJson(content, WordData.class);
 
                     if (wordData.getStatus() != 200) {
                         generator.initFailed();
@@ -251,7 +252,7 @@ public class HltApi {
                         controller.apiInitFinished();
 
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     generator.initFailed();
                     controller.vitalError();

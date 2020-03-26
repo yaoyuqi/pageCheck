@@ -147,6 +147,10 @@ public class LoginController {
     }
 
     public void vitalError() {
-        HomeController.showAlert(Alert.AlertType.ERROR, "初始化失败，请重启软件");
+        Platform.runLater(() -> {
+            dialogStage.close();
+            HomeController.showAlert(Alert.AlertType.ERROR, "初始化失败，请重启软件");
+
+        });
     }
 }
