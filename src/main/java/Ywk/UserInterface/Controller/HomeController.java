@@ -38,14 +38,9 @@ import javafx.util.Callback;
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.*;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -349,16 +344,25 @@ public class HomeController implements ContentChecker.PageValidate {
                 TableCell<InfoModel, String> tableCell = (TableCell<InfoModel, String>) mouseEvent.getSource();
                 InfoModel model = list.get(tableCell.getIndex());
                 if (model != null) {
-                    String url = platform.nextPageUrl(model.getKeyword(), model.getPage());
-                    app.getHostServices().showDocument(url);
+                    try {
+                        String keyword = URLEncoder.encode(model.getKeyword(), StandardCharsets.UTF_8.toString());
+                        String url = platform.nextPageUrl(keyword, model.getPage());
+                        app.getHostServices().showDocument(url);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
 
-//                    try {
-//                        Desktop.getDesktop().browse(new URI(url));
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    } catch (URISyntaxException e) {
-//                        e.printStackTrace();
+//                    Desktop desktop = Desktop.getDesktop();
+//                    if (desktop.isSupported(Desktop.Action.BROWSE)) {
+//                        try {
+//                            desktop.browse(new URI(url));
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        } catch (URISyntaxException e) {
+//                            e.printStackTrace();
+//                        }
 //                    }
+//
                 }
             });
             return cell;
