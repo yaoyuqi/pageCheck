@@ -67,6 +67,7 @@ public class TaskManage implements Runnable
     private List<PageRunner> runners;
 
 
+
     public TaskManage(HomeController controller) {
         taskStatus = TaskStatus.NEW;
         uploadStatus = UploadStatus.WAITING;
@@ -126,9 +127,14 @@ public class TaskManage implements Runnable
 
 
         for (SearchPlatform platform : platforms) {
-            ContentChecker checker = new ContentChecker(identities, writer, platform, this);
-            checker.setValidateListener(controller);
+            Checker checker;
+            if (platform.getId() != 4) {
+                checker = new ContentChecker(identities, writer, platform, this);
 
+            } else {
+                checker = new TouTiaoCheck(identities, writer, platform, this);
+            }
+            checker.setValidateListener(controller);
             runners.add(new PageRunner(new PageSpider(HttpClientWrapper.getClient(), checker, builders, encrypts)));
         }
 

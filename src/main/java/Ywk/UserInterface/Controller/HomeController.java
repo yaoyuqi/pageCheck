@@ -346,7 +346,7 @@ public class HomeController implements ContentChecker.PageValidate {
                 if (model != null) {
                     try {
                         String keyword = URLEncoder.encode(model.getKeyword(), StandardCharsets.UTF_8.toString());
-                        String url = platform.nextPageUrl(keyword, model.getPage());
+                        String url = platform.nextPageUrlBrowse(keyword, model.getPage());
                         app.getHostServices().showDocument(url);
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();

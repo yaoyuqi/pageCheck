@@ -9,17 +9,19 @@ public class SearchPlatform {
     private int id;
     private String name;
     private List<String> urls;
+    private List<String> browseUrls;
     private String pattern;
     private boolean isMobile;
     private String host;
 
-    public SearchPlatform(int id, String name, List<String> url, String pattern, boolean isMobile) throws URISyntaxException {
+    public SearchPlatform(int id, String name, List<String> url, List<String> browses, String pattern, boolean isMobile) throws URISyntaxException {
 
         this.id = id;
         this.name = name;
         this.urls = url;
         this.pattern = pattern;
         this.isMobile = isMobile;
+        this.browseUrls = browses;
         URI uri = new URI(urls.get(0));
 
         this.host = uri.getHost();
@@ -49,6 +51,16 @@ public class SearchPlatform {
         }
 
         String url = urls.get(realPage);
+        return url.replace(keyPattern, key);
+    }
+
+    public String nextPageUrlBrowse(String key, int page) {
+        int realPage = page - 1;
+        if (browseUrls.size() < realPage) {
+            return "";
+        }
+
+        String url = browseUrls.get(realPage);
         return url.replace(keyPattern, key);
     }
 

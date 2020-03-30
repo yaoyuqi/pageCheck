@@ -48,7 +48,7 @@ public class BaiduInterceptor implements PageEncrypt {
 ////        adapter.parse(content);
 //    }
 
-    public void parse(String content) {
+    public synchronized void parse(String content) {
         Pattern pattern = Pattern.compile("bds\\.comm\\.encTn\\s*=\\s*'(\\S+)'");
 
         Matcher matcher = pattern.matcher(content);
@@ -69,7 +69,7 @@ public class BaiduInterceptor implements PageEncrypt {
 
     }
 
-    public Request process(Request origin) {
+    public synchronized Request process(Request origin) {
 
         String cookie = origin.header("Cookie");
 

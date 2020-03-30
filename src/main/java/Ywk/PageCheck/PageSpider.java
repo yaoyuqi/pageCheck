@@ -16,14 +16,14 @@ import java.util.List;
 public class PageSpider {
 
     private OkHttpClient client;
-    private ContentChecker checker;
+    private Checker checker;
     private PageChecked listener;
     private RequestBuilder builder;
     private List<PageEncrypt> encrypts;
 
 
     public PageSpider(OkHttpClient client,
-                      ContentChecker checker,
+                      Checker checker,
                       RequestBuilder builder,
                       List<PageEncrypt> encrypts
     ) {

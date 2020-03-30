@@ -95,6 +95,7 @@ public class Config {
             private String patter;
             private boolean isMobile;
             private List<String> urls;
+            private List<String> browseUrls;
 
             public int getId() {
                 return id;
@@ -134,6 +135,14 @@ public class Config {
 
             public void setUrls(List<String> urls) {
                 this.urls = urls;
+            }
+
+            public List<String> getBrowseUrls() {
+                return browseUrls;
+            }
+
+            public void setBrowseUrls(List<String> browseUrls) {
+                this.browseUrls = browseUrls;
             }
         }
     }

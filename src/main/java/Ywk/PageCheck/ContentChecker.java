@@ -14,7 +14,7 @@ import java.util.*;
 /**
  * parse the content, find the matched results and write them to writer
  */
-public class ContentChecker {
+public class ContentChecker implements Checker {
     private List<String> identities;
 
     private XMLWriter writer;
@@ -24,6 +24,10 @@ public class ContentChecker {
 
     private PageValidate validateListener;
 
+    public List<String> getIdentities() {
+        return identities;
+    }
+
     ContentChecker(List<String> identities, XMLWriter writer, SearchPlatform platform, NewItemFound newItemFound) {
         this.identities = identities;
         this.writer = writer;
@@ -31,14 +35,17 @@ public class ContentChecker {
         this.foundListener = newItemFound;
     }
 
+    @Override
     public void setValidateListener(PageValidate validateListener) {
         this.validateListener = validateListener;
     }
 
+    @Override
     public SearchPlatform getPlatform() {
         return platform;
     }
 
+    @Override
     public void check(String content, String keyword, int page) {
         if (content != null
                 && content.contains("安全验证")
@@ -99,7 +106,7 @@ public class ContentChecker {
     }
 
 
-    private void writeResult(String keyword, int page, Map<String, List<String>> result) {
+    void writeResult(String keyword, int page, Map<String, List<String>> result) {
         for (String identity : result.keySet()) {
             SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             System.out.println(keyword + " check in pc ok");
@@ -116,7 +123,7 @@ public class ContentChecker {
         }
     }
 
-    private void checkMatched(Map<String, List<String>> result, String match, String index) {
+    void checkMatched(Map<String, List<String>> result, String match, String index) {
         if (!result.containsKey(match)) {
             List<String> list = new ArrayList<>();
             list.add(index);
@@ -126,6 +133,7 @@ public class ContentChecker {
         }
     }
 
+    @Override
     public void checkFail(String keyword, String url) {
         System.out.println(keyword + " check in [" + url + "] fail");
     }

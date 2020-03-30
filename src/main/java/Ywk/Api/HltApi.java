@@ -301,7 +301,6 @@ public class HltApi {
                     if (currentVersion < config.getData().getVersion()) {
                         wrapper.initFailed();
                         controller.newVersionFound();
-                        ;
                     } else {
 
 
@@ -312,6 +311,7 @@ public class HltApi {
                                                         item.getId(),
                                                         item.getName(),
                                                         item.getUrls(),
+                                                        item.getBrowseUrls(),
                                                         item.getPatter(),
                                                         item.isIsMobile());
                                             } catch (URISyntaxException e) {

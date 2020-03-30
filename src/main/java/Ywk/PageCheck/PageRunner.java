@@ -13,6 +13,9 @@ public class PageRunner {
 
     private int checkDepth = 1;
 
+    private static final int SPEED_RATE = 100;
+
+
     public PageRunner(PageSpider spider) {
         this.spider = spider;
     }
@@ -52,7 +55,7 @@ public class PageRunner {
     }
 
     public void setSpeed(int speed) {
-        spider.setSpeed(speed);
+        spider.setSpeed(speed * SPEED_RATE);
     }
 
     public void setPageCheckedListener(PageSpider.PageChecked listener) {
