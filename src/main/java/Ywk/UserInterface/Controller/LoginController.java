@@ -61,6 +61,7 @@ public class LoginController {
                     alert.setContentText("登录失败");
                     alert.setHeaderText(null);
                     alert.show();
+                    dialogStage.close();
                 } else {
                     HltApi api = HltApi.getInstance();
                     api.identity(this);

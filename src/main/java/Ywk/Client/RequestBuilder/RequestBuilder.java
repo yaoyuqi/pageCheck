@@ -13,7 +13,9 @@ public class RequestBuilder {
 
     private List<AbstractBuilder> builders = Arrays.asList(
             new BaiduBuilder(),
-            new ShenmaBuilder()
+            new BaiduMBuilder(),
+            new ShenmaBuilder(),
+            new ToutiaoBuilder()
     );
 
 

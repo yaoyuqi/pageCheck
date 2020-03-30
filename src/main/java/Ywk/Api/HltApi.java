@@ -45,7 +45,9 @@ public class HltApi {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 try {
-                    TokenData loginOut = new Gson().fromJson(response.body().string(), TokenData.class);
+                    String content = response.body().string();
+
+                    TokenData loginOut = new Gson().fromJson(content, TokenData.class);
                     if (loginOut.getAccess_token() == null || loginOut.getAccess_token().isEmpty()) {
                         controller.loginResult(false);
                     } else {
