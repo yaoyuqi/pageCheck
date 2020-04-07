@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class HltApi {
 
-    private static int currentVersion = 2;
+    private static int currentVersion = 3;
     private static final String key = "1typhdp9zbo2Lbz9YkdfTLE9Tm4jW7nCSKssakFj";
     private static final String host = "http://member.91huoke.com/";
     private static HltApi api;
