@@ -187,6 +187,8 @@ public class HomeController implements ContentChecker.PageValidate {
 
     private List<String> customList = new LinkedList<>();
 
+    private final static int MAX_SHOW = 1000;
+
 
     public static void showAlert(Alert.AlertType type, String message) {
         if (!Platform.isFxApplicationThread()) {
@@ -800,7 +802,13 @@ public class HomeController implements ContentChecker.PageValidate {
      */
     public synchronized void addResult(Info info) {
         int id = info.getPlatform().getId();
-        listData.get(id).add(new InfoModel(info));
+        ObservableList<InfoModel> list = listData.get(id);
+
+        list.add(0, new InfoModel(info));
+
+        if (list.size() > MAX_SHOW) {
+            list.remove(MAX_SHOW - 1, list.size() - 1);
+        }
 
         updateBingoCnt(id, task.bingCntRetrieve(id));
     }
