@@ -56,7 +56,7 @@ public class MainApp extends Application {
         LoginController loginController = loader.getController();
         loginController.setApp(this);
 
-        Scene scene = new Scene(root, 600, 400);
+        Scene scene = new Scene(root, 400, 300);
         primaryStage.setTitle("全网推广跑词工具");
         primaryStage.setScene(scene);
         primaryStage.show();
