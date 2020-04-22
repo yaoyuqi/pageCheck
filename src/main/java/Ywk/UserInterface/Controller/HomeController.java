@@ -630,15 +630,27 @@ public class HomeController implements ContentChecker.PageValidate {
         } else if (task.getTaskStatus() == TaskStatus.RUNNING) {
             updateRunningStatus();
         } else if (task.getTaskStatus() == TaskStatus.PAUSE) {
-            updatePauseStatus();
+            if (task.getUploadStatus() == UploadStatus.UPLOADING) {
+                updateUploadingStatus();
+            } else if (task.getUploadStatus() == UploadStatus.FAIL
+                    || task.getUploadStatus() == UploadStatus.SUCCESS) {
+                updateUploadFinishedStatus();
+                uploadBtn.setDisable(task.getUploadStatus() == UploadStatus.SUCCESS);
+                resumeBtn.setDisable(task.getTaskStatus() == TaskStatus.FINISHED); //继续按钮
+            } else {
+                updatePauseStatus();
+            }
         } else if (task.getTaskStatus() == TaskStatus.FINISHED) {
-            updateFinishedStatus();
-        } else if (task.getUploadStatus() == UploadStatus.UPLOADING) {
-            updateUploadingStatus();
-        } else if (task.getUploadStatus() == UploadStatus.FAIL
-                || task.getUploadStatus() == UploadStatus.SUCCESS) {
-            updateUploadFinishedStatus();
-            resumeBtn.setDisable(task.getTaskStatus() == TaskStatus.FINISHED); //继续按钮
+            if (task.getUploadStatus() == UploadStatus.UPLOADING) {
+                updateUploadingStatus();
+            } else if (task.getUploadStatus() == UploadStatus.FAIL
+                    || task.getUploadStatus() == UploadStatus.SUCCESS) {
+                updateUploadFinishedStatus();
+                resumeBtn.setDisable(task.getTaskStatus() == TaskStatus.FINISHED); //继续按钮
+            } else {
+                updateFinishedStatus();
+            }
+
         }
     }
 
@@ -646,6 +658,7 @@ public class HomeController implements ContentChecker.PageValidate {
         startBtn.setDisable(false);//开始按钮 可用
         stopBtn.setDisable(true); //结束按钮 不可用
         resumeBtn.setDisable(true); //继续按钮 不可用
+        uploadBtn.setDisable(true); //上传按钮  不可用
 
 
         //平台勾选 可用
@@ -657,7 +670,6 @@ public class HomeController implements ContentChecker.PageValidate {
 
         autoUploadCb.setDisable(false); //自动上传 可用
         pageChoiceBox.setDisable(false); //检索深度 可用
-        uploadBtn.setDisable(false); //上传按钮 可用
 
         maxTf.setDisable(false);
         chooseCustomRb.setDisable(false);
@@ -676,7 +688,10 @@ public class HomeController implements ContentChecker.PageValidate {
     private void updateUploadFinishedStatus() {
 
         startBtn.setDisable(false);//开始按钮 可用
+        resumeBtn.setDisable(false); //继续按钮 可用
         stopBtn.setDisable(true); //结束按钮 不可用
+        uploadBtn.setDisable(false); //上传按钮 可用
+
 
         //平台勾选 可用
         searchPlatformsPlaceholder.getChildren().forEach(action -> {
@@ -686,7 +701,6 @@ public class HomeController implements ContentChecker.PageValidate {
 
         autoUploadCb.setDisable(false); //自动上传 可用
         pageChoiceBox.setDisable(false); //检索深度 可用
-        uploadBtn.setDisable(false); //上传按钮 可用
 
         maxTf.setDisable(false);
         chooseCustomRb.setDisable(false);
@@ -702,6 +716,8 @@ public class HomeController implements ContentChecker.PageValidate {
         startBtn.setDisable(true); //开始按钮 不可用
         stopBtn.setDisable(false); //结束按钮 可用
         resumeBtn.setDisable(true); //继续按钮 不可用
+        uploadBtn.setDisable(true); //上传按钮  不可用
+
         //平台勾选 不可用
         searchPlatformsPlaceholder.getChildren().forEach(action -> {
             CheckBox cb = (CheckBox) action;
@@ -710,7 +726,6 @@ public class HomeController implements ContentChecker.PageValidate {
 
         autoUploadCb.setDisable(true); //自动上传 不可用
         pageChoiceBox.setDisable(true); //检索深度不可用
-        uploadBtn.setDisable(true); //上传按钮 不可用
         maxTf.setDisable(true);
         chooseCustomRb.setDisable(true);
         chooseMainRb.setDisable(true);
@@ -724,6 +739,7 @@ public class HomeController implements ContentChecker.PageValidate {
         startBtn.setDisable(false); //开始按钮 可用
         stopBtn.setDisable(true);  //结束按钮 不可用
         resumeBtn.setDisable(false);  //继续按钮 可用
+        uploadBtn.setDisable(false); //上传按钮 可用
 
         //平台勾选 可用
         searchPlatformsPlaceholder.getChildren().forEach(action -> {
@@ -733,7 +749,6 @@ public class HomeController implements ContentChecker.PageValidate {
 
         autoUploadCb.setDisable(false); //自动上传 可用
         pageChoiceBox.setDisable(false); //检索深度 可用
-        uploadBtn.setDisable(false); //上传按钮 可用
 
         maxTf.setDisable(false);
         chooseCustomRb.setDisable(false);
@@ -771,9 +786,11 @@ public class HomeController implements ContentChecker.PageValidate {
 
     private void updateUploadingStatus() {
         //全部不可用
-        startBtn.setDisable(true); //开始按钮 可用
+        startBtn.setDisable(true); //开始按钮 不可用
         stopBtn.setDisable(true);  //结束按钮 不可用
-        resumeBtn.setDisable(true);  //继续按钮 可用
+        resumeBtn.setDisable(true);  //继续按钮 不可用
+        uploadBtn.setDisable(true); //上传按钮 不可用
+
 
         //平台勾选 可用
         searchPlatformsPlaceholder.getChildren().forEach(action -> {
@@ -781,9 +798,8 @@ public class HomeController implements ContentChecker.PageValidate {
             cb.setDisable(false);
         });
 
-        autoUploadCb.setDisable(true); //自动上传 可用
-        pageChoiceBox.setDisable(true); //检索深度 可用
-        uploadBtn.setDisable(true); //上传按钮 可用
+        autoUploadCb.setDisable(true); //自动上传 不可用
+        pageChoiceBox.setDisable(true); //检索深度 不可用
 
         maxTf.setDisable(true);
         chooseCustomRb.setDisable(true);

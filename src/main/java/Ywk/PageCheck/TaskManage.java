@@ -203,6 +203,7 @@ public class TaskManage implements Runnable
     public synchronized void start() {
         updateRunnerConfig();
         this.taskStatus = TaskStatus.RUNNING;
+        this.uploadStatus = UploadStatus.WAITING;
 
         controller.updateTaskStatus();
     }
@@ -247,6 +248,7 @@ public class TaskManage implements Runnable
     public void uploadSuccess() {
         uploadStatus = UploadStatus.SUCCESS;
         controller.uploadSuccess();
+        controller.updateTaskStatus();
     }
 
 
@@ -262,6 +264,7 @@ public class TaskManage implements Runnable
     public void newTask() {
         prepareForNew();
         taskStatus = TaskStatus.NEW;
+        uploadStatus = UploadStatus.WAITING;
     }
 
     /**
