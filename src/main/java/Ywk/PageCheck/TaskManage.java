@@ -272,7 +272,7 @@ public class TaskManage implements Runnable
      */
     private void prepareForNew() {
         if (generator != null) {
-            generator.setCurrent(-1, -1, -1);
+            generator.setCurrent(-1, -1, -1, -1);
             generator.setCurRun(0);
         }
 

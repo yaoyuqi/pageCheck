@@ -173,6 +173,19 @@ public class HomeController implements ContentChecker.PageValidate {
     @FXML
     private RadioButton chooseMainSuffixRb;
 
+
+    @FXML
+    private RadioButton chooseHeaderMainRb;
+
+    @FXML
+    private RadioButton choosePrefixHeaderMainRb;
+
+    @FXML
+    private RadioButton chooseHeaderMainSuffixRb;
+
+    @FXML
+    private RadioButton choosePrefixHeaderMainSuffixRb;
+
     @FXML
     private RadioButton chooseCustomRb;
 
@@ -425,6 +438,10 @@ public class HomeController implements ContentChecker.PageValidate {
         choosePrefixMainSuffixRb.setUserData(KeywordGenerator.MixType.PREFIX_MAIN_SUFFIX);
         chooseMainSuffixRb.setUserData(KeywordGenerator.MixType.MAIN_SUFFIX);
         chooseCustomRb.setUserData(KeywordGenerator.MixType.CUSTOM);
+        chooseHeaderMainRb.setUserData(KeywordGenerator.MixType.HEAD_MAIN);
+        chooseHeaderMainSuffixRb.setUserData(KeywordGenerator.MixType.HEAD_MAIN_SUFFIX);
+        choosePrefixHeaderMainRb.setUserData(KeywordGenerator.MixType.PREFIX_HEAD_MAIN);
+        choosePrefixHeaderMainSuffixRb.setUserData(KeywordGenerator.MixType.PREFIX_HEAD_MAIN_SUFFIX);
 
         final ToggleGroup group = new ToggleGroup();
 
@@ -434,6 +451,10 @@ public class HomeController implements ContentChecker.PageValidate {
         choosePrefixMainSuffixRb.setToggleGroup(group);
         chooseMainSuffixRb.setToggleGroup(group);
         chooseCustomRb.setToggleGroup(group);
+        chooseHeaderMainRb.setToggleGroup(group);
+        chooseHeaderMainSuffixRb.setToggleGroup(group);
+        choosePrefixHeaderMainRb.setToggleGroup(group);
+        choosePrefixHeaderMainSuffixRb.setToggleGroup(group);
 
         choosePrefixMainSuffixRb.setSelected(true);
 

@@ -104,6 +104,14 @@
                                 <RadioButton fx:id="choosePrefixMainSuffixRb" mnemonicParsing="false"
                                              text="[地区词] + [主词] + [尾词]"/>
                                 <RadioButton fx:id="chooseMainSuffixRb" mnemonicParsing="false" text="[主词] + [尾词]"/>
+                                <RadioButton fx:id="chooseHeaderMainRb" mnemonicParsing="false" text="[词头] + [主词]"/>
+                                <RadioButton fx:id="choosePrefixHeaderMainRb" mnemonicParsing="false"
+                                             text="[地区] + [词头] + [主词]"/>
+                                <RadioButton fx:id="chooseHeaderMainSuffixRb" mnemonicParsing="false"
+                                             text="[词头] + [主词] + [尾词]"/>
+                                <RadioButton fx:id="choosePrefixHeaderMainSuffixRb" mnemonicParsing="false"
+                                             text="[地区] + [词头] + [主词] + [尾词]"/>
+
                                 <RadioButton fx:id="chooseCustomRb" mnemonicParsing="false" text="[自定义]"/>
                                 <Button fx:id="selectTxtBtn" mnemonicParsing="false" onAction="#handleCustomKeywords"
                                         text="选择文件(一行一条)" visible="false"/>

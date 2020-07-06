@@ -42,6 +42,7 @@ public class WordData {
         private List<String> prefix;
         private List<String> main;
         private List<String> suffix;
+        private List<String> head;
 
         public List<String> getPrefix() {
             return prefix;
@@ -65,6 +66,14 @@ public class WordData {
 
         public void setSuffix(List<String> suffix) {
             this.suffix = suffix;
+        }
+
+        public List<String> getHead() {
+            return head;
+        }
+
+        public void setHead(List<String> head) {
+            this.head = head;
         }
     }
 }

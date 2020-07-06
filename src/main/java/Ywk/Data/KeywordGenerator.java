@@ -12,12 +12,14 @@ public class KeywordGenerator implements ApiInstance {
     private String[] prefix = new String[]{};
     private String[] main = new String[]{};
     private String[] suffix = new String[]{};
+    private String[] head = new String[]{};
     private int maxRun = 0;
 
     private int curPrefix = -1;
     private int curMain = -1;
     private int curSuffix = -1;
     private int curRun = 0;
+    private int curHead = -1;
 
     private KeywordGenerator() {
     }
@@ -142,18 +144,20 @@ public class KeywordGenerator implements ApiInstance {
     }
 
 
-    public void setWords(String[] prefix, String[] main, String[] suffix) {
+    public void setWords(String[] prefix, String[] main, String[] suffix, String[] head) {
         this.prefix = prefix;
         this.main = main;
         this.suffix = suffix;
+        this.head = head;
         initStatus = ApiStatus.SUCCESS;
     }
 
 
-    public void setCurrent(int curPrefix, int curMain, int curSuffix) {
+    public void setCurrent(int curPrefix, int curMain, int curSuffix, int curHead) {
         this.curPrefix = curPrefix;
         this.curMain = curMain;
         this.curSuffix = curSuffix;
+        this.curHead = curHead;
     }
 
     private boolean isFinished() {
@@ -271,7 +275,11 @@ public class KeywordGenerator implements ApiInstance {
         PREFIX_MAIN,
         MAIN,
         MAIN_SUFFIX,
-        CUSTOM
+        CUSTOM,
+        HEAD_MAIN,
+        PREFIX_HEAD_MAIN,
+        HEAD_MAIN_SUFFIX,
+        PREFIX_HEAD_MAIN_SUFFIX
     }
 
 }

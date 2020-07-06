@@ -21,8 +21,8 @@ import java.io.IOException;
 
 public class MainApp extends Application {
 
-    private static final int SCREEN_WIDTH = 800;
-    private static final int SCREEN_HEIGHT = 600;
+    private static final int SCREEN_WIDTH = 1200;
+    private static final int SCREEN_HEIGHT = 800;
 
     private Stage primaryStage;
 
@@ -168,7 +168,7 @@ public class MainApp extends Application {
 
         KeywordGenerator generator = KeywordGenerator.getInstance();
 
-        generator.setWords(new String[]{""}, keywords, new String[]{""});
+        generator.setWords(new String[]{""}, keywords, new String[]{""}, new String[]{""});
 
 
     }

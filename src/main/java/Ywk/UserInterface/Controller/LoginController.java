@@ -38,8 +38,8 @@ public class LoginController {
         String user = account.getText();
         String password = passwordField.getText();
 
-//        user = "lymczs";
-//        password = "qwe123";
+        user = "lymczs";
+        password = "qwe123";
         if (user.isEmpty() || password.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText(null);

@@ -250,7 +250,9 @@ public class HltApi {
                     } else {
                         generator.setWords(wordData.getData().getPrefix().toArray(new String[]{}),
                                 wordData.getData().getMain().toArray(new String[]{}),
-                                wordData.getData().getSuffix().toArray(new String[]{}));
+                                wordData.getData().getSuffix().toArray(new String[]{}),
+                                new String[]{});
+                        //TODO
                         controller.apiInitFinished();
 
                     }
