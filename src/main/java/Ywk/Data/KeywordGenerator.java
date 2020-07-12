@@ -129,6 +129,130 @@ public class KeywordGenerator implements ApiInstance {
                     out += suffix[curSuffix];
                 }
                 break;
+            case HEAD_MAIN:
+                curMain++;
+                if (curMain == main.length) {
+                    curMain = -1;
+                    curHead++;
+                }
+                if (curHead != -1 && curHead < head.length) {
+                    out += head[curHead];
+                }
+                if (curMain != -1 && curMain < main.length) {
+                    out += main[curMain];
+                }
+                break;
+            case HEAD_MAIN_SUFFIX:
+
+                /*
+                    跑词顺序调整
+                    1。 先跑主词
+                    2。HEAD+主词
+                    3。 HEAD+主词 一轮+ 后缀
+                 */
+
+
+                curMain++;
+                if (curMain == main.length) {
+                    curMain = 0;
+                    curHead++;
+                }
+
+                if (curHead == head.length) {
+                    curHead = -1;
+                    curSuffix++;
+                }
+
+
+                if (curHead != -1 && curHead < head.length) {
+                    out += head[curHead];
+                }
+
+                if (curMain != -1 && curMain < main.length) {
+                    out += main[curMain];
+                }
+
+                if (curSuffix != -1 && curSuffix < suffix.length) {
+                    out += suffix[curSuffix];
+                }
+                break;
+
+            case PREFIX_HEAD_MAIN:
+
+                /*
+                    跑词顺序调整
+                    1。 先跑主词
+                    2。prefix+主词
+                    3。 prefix+head 一轮+ 后缀
+                 */
+
+
+                curMain++;
+                if (curMain == main.length) {
+                    curMain = 0;
+                    curPrefix++;
+                }
+
+                if (curPrefix == prefix.length) {
+                    curPrefix = -1;
+                    curHead++;
+                }
+
+                if (curPrefix != -1 && curPrefix < prefix.length) {
+                    out += prefix[curPrefix];
+                }
+
+                if (curHead != -1 && curHead < head.length) {
+                    out += head[curHead];
+                }
+
+                if (curMain != -1 && curMain < main.length) {
+                    out += main[curMain];
+                }
+                break;
+            case PREFIX_HEAD_MAIN_SUFFIX:
+
+                /*
+                    跑词顺序调整
+                    1。 先跑主词
+                    2。prefix+主词
+                    3. prefix + head + 主
+                    3。 prefix+head 一轮+ 后缀
+                 */
+
+
+                curMain++;
+                if (curMain == main.length) {
+                    curMain = 0;
+                    curPrefix++;
+                }
+
+                if (curPrefix == prefix.length) {
+                    curPrefix = -1;
+                    curHead++;
+                }
+
+                if (curHead == head.length) {
+                    curHead = -1;
+                    curSuffix++;
+                }
+
+                if (curPrefix != -1 && curPrefix < prefix.length) {
+                    out += prefix[curPrefix];
+                }
+
+                if (curHead != -1 && curHead < head.length) {
+                    out += head[curHead];
+                }
+
+                if (curMain != -1 && curMain < main.length) {
+                    out += main[curMain];
+                }
+
+                if (curSuffix != -1 && curSuffix < suffix.length) {
+                    out += suffix[curSuffix];
+                }
+                break;
             case CUSTOM:
                 if (curSuffix < custom.length) {
                     out = custom[curRun];
@@ -173,6 +297,22 @@ public class KeywordGenerator implements ApiInstance {
                         && curSuffix == suffix.length - 1;
             case MAIN_SUFFIX:
                 return curMain == main.length - 1
+                        && curSuffix == suffix.length - 1;
+            case HEAD_MAIN:
+                return curHead == head.length - 1
+                        && curMain == main.length - 1;
+            case HEAD_MAIN_SUFFIX:
+                return curHead == head.length - 1
+                        && curMain == main.length - 1
+                        && curSuffix == suffix.length - 1;
+            case PREFIX_HEAD_MAIN:
+                return curPrefix == prefix.length - 1
+                        && curHead == head.length - 1
+                        && curMain == main.length - 1;
+            case PREFIX_HEAD_MAIN_SUFFIX:
+                return curPrefix == prefix.length - 1
+                        && curHead == head.length - 1
+                        && curMain == main.length - 1
                         && curSuffix == suffix.length - 1;
             case CUSTOM:
                 return curRun == custom.length;
@@ -244,6 +384,18 @@ public class KeywordGenerator implements ApiInstance {
                 break;
             case PREFIX_MAIN:
                 total = (prefix.length + 1) * (main.length + 1) - 1;
+                break;
+            case HEAD_MAIN:
+                total = (head.length + 1) * (main.length + 1) - 1;
+                break;
+            case HEAD_MAIN_SUFFIX:
+                total = (head.length + 1) * (main.length + 1) * (suffix.length + 1) - 1;
+                break;
+            case PREFIX_HEAD_MAIN:
+                total = (prefix.length + 1) * (head.length + 1) * (main.length + 1) - 1;
+                break;
+            case PREFIX_HEAD_MAIN_SUFFIX:
+                total = (prefix.length + 1) * (head.length + 1) * (main.length + 1) * (suffix.length + 1) - 1;
                 break;
             case CUSTOM:
                 total = custom.length;

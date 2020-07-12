@@ -489,6 +489,34 @@ public class HomeController implements ContentChecker.PageValidate {
 
         });
 
+        chooseHeaderMainRb.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                task.setKeywordType(KeywordGenerator.MixType.HEAD_MAIN);
+                updateTotal();
+            }
+        });
+
+        chooseHeaderMainSuffixRb.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                task.setKeywordType(KeywordGenerator.MixType.HEAD_MAIN_SUFFIX);
+                updateTotal();
+            }
+        });
+
+        choosePrefixHeaderMainSuffixRb.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                task.setKeywordType(KeywordGenerator.MixType.PREFIX_HEAD_MAIN_SUFFIX);
+                updateTotal();
+            }
+        });
+
+        choosePrefixHeaderMainRb.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                task.setKeywordType(KeywordGenerator.MixType.PREFIX_HEAD_MAIN);
+                updateTotal();
+            }
+        });
+
 
         chooseCustomRb.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -500,6 +528,7 @@ public class HomeController implements ContentChecker.PageValidate {
                 updateTotal();
             }
         });
+
 
     }
 
@@ -699,17 +728,25 @@ public class HomeController implements ContentChecker.PageValidate {
         pageChoiceBox.setDisable(false); //检索深度 可用
 
         maxTf.setDisable(false);
-        chooseCustomRb.setDisable(false);
-        chooseMainRb.setDisable(false);
-        chooseMainSuffixRb.setDisable(false);
-        choosePrefixMainSuffixRb.setDisable(false);
-        choosePrefixMainRb.setDisable(false);
+        changeChooseKeywordsChoice(false);
 
         for (int key : listData.keySet()) {
             listData.get(key).clear();
         }
 
         task.newTask();
+    }
+
+    private void changeChooseKeywordsChoice(boolean status) {
+        chooseCustomRb.setDisable(status);
+        chooseMainRb.setDisable(status);
+        chooseMainSuffixRb.setDisable(status);
+        choosePrefixMainSuffixRb.setDisable(status);
+        choosePrefixMainRb.setDisable(status);
+        chooseHeaderMainRb.setDisable(status);
+        chooseHeaderMainSuffixRb.setDisable(status);
+        choosePrefixHeaderMainRb.setDisable(status);
+        choosePrefixHeaderMainSuffixRb.setDisable(status);
     }
 
     private void updateUploadFinishedStatus() {
@@ -730,11 +767,8 @@ public class HomeController implements ContentChecker.PageValidate {
         pageChoiceBox.setDisable(false); //检索深度 可用
 
         maxTf.setDisable(false);
-        chooseCustomRb.setDisable(false);
-        chooseMainRb.setDisable(false);
-        chooseMainSuffixRb.setDisable(false);
-        choosePrefixMainSuffixRb.setDisable(false);
-        choosePrefixMainRb.setDisable(false);
+        changeChooseKeywordsChoice(false);
+
         selectTxtBtn.setDisable(false);
 
     }
@@ -754,11 +788,8 @@ public class HomeController implements ContentChecker.PageValidate {
         autoUploadCb.setDisable(true); //自动上传 不可用
         pageChoiceBox.setDisable(true); //检索深度不可用
         maxTf.setDisable(true);
-        chooseCustomRb.setDisable(true);
-        chooseMainRb.setDisable(true);
-        chooseMainSuffixRb.setDisable(true);
-        choosePrefixMainSuffixRb.setDisable(true);
-        choosePrefixMainRb.setDisable(true);
+        changeChooseKeywordsChoice(true);
+
         selectTxtBtn.setDisable(true);
     }
 
@@ -778,11 +809,8 @@ public class HomeController implements ContentChecker.PageValidate {
         pageChoiceBox.setDisable(false); //检索深度 可用
 
         maxTf.setDisable(false);
-        chooseCustomRb.setDisable(false);
-        chooseMainRb.setDisable(false);
-        chooseMainSuffixRb.setDisable(false);
-        choosePrefixMainSuffixRb.setDisable(false);
-        choosePrefixMainRb.setDisable(false);
+        changeChooseKeywordsChoice(false);
+
         selectTxtBtn.setDisable(false);
     }
 
@@ -802,11 +830,8 @@ public class HomeController implements ContentChecker.PageValidate {
         uploadBtn.setDisable(false); //上传按钮 可用
 
         maxTf.setDisable(false);
-        chooseCustomRb.setDisable(false);
-        chooseMainRb.setDisable(false);
-        chooseMainSuffixRb.setDisable(false);
-        choosePrefixMainSuffixRb.setDisable(false);
-        choosePrefixMainRb.setDisable(false);
+        changeChooseKeywordsChoice(false);
+
         selectTxtBtn.setDisable(false);
 
     }
@@ -829,11 +854,8 @@ public class HomeController implements ContentChecker.PageValidate {
         pageChoiceBox.setDisable(true); //检索深度 不可用
 
         maxTf.setDisable(true);
-        chooseCustomRb.setDisable(true);
-        chooseMainRb.setDisable(true);
-        chooseMainSuffixRb.setDisable(true);
-        choosePrefixMainSuffixRb.setDisable(true);
-        choosePrefixMainRb.setDisable(true);
+        changeChooseKeywordsChoice(true);
+
         selectTxtBtn.setDisable(true);
 
     }

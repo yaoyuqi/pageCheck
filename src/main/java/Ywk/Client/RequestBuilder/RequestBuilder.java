@@ -15,7 +15,11 @@ public class RequestBuilder {
             new BaiduBuilder(),
             new BaiduMBuilder(),
             new ShenmaBuilder(),
-            new ToutiaoBuilder()
+            new ToutiaoBuilder(),
+            new SogouBuilder(),
+            new SogouMBuilder(),
+            new S360Builder(),
+            new S360MBuilder()
     );
 
 

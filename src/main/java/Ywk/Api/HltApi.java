@@ -1,6 +1,7 @@
 package Ywk.Api;
 
 import Ywk.Client.PlatformWrapper;
+import Ywk.Client.Proxy.ProxyPool;
 import Ywk.Client.SearchPlatform;
 import Ywk.Data.*;
 import Ywk.UserInterface.Controller.LoginController;
@@ -251,8 +252,7 @@ public class HltApi {
                         generator.setWords(wordData.getData().getPrefix().toArray(new String[]{}),
                                 wordData.getData().getMain().toArray(new String[]{}),
                                 wordData.getData().getSuffix().toArray(new String[]{}),
-                                new String[]{});
-                        //TODO
+                                wordData.getData().getHead().toArray(new String[]{}));
                         controller.apiInitFinished();
 
                     }
@@ -268,6 +268,65 @@ public class HltApi {
             }
 
         });
+    }
+
+    public void proxy() {
+        String url = host + "api/desktop/proxy";
+
+        LoginHeader header = LoginHeader.getInstance();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .addHeader(header.getHeaderMark(), header.getAccessToken())
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+
+            String content = response.body().string();
+            ProxyData proxyData = new Gson().fromJson(content, ProxyData.class);
+            if (proxyData.getStatus() != 200) {
+//                        generator.initFailed();
+            } else {
+                ProxyPool pool = ProxyPool.getInstance();
+                pool.freshProxy(proxyData.getData().getProxy());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+////        client.newCall(request).enqueue(new Callback() {
+////            @Override
+////            public void onFailure(Call call, IOException e) {
+////                e.printStackTrace();
+////                KeywordGenerator generator = KeywordGenerator.getInstance();
+////                generator.initFailed();
+////            }
+////
+////            @Override
+////            public void onResponse(Call call, Response response) throws IOException {
+//////                System.out.println(response.body().string());
+//////                KeywordGenerator generator = KeywordGenerator.getInstance();
+////                try {
+////                    String content = response.body().string();
+////                    ProxyData proxyData = new Gson().fromJson(content, ProxyData.class);
+////                    if (proxyData.getStatus() != 200) {
+//////                        generator.initFailed();
+////                    } else {
+////                        ProxyPool pool = ProxyPool.getInstance();
+////                        pool.freshProxy(proxyData.getData().getProxy());
+////                    }
+////                } catch (Exception e) {
+////                    e.printStackTrace();
+////                } finally {
+////                    response.close();
+////
+////                }
+////
+////            }
+//
+//        });
     }
 
     public void config(LoginController controller) throws ApiErrorException {

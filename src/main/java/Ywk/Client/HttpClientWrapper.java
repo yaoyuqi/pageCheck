@@ -1,6 +1,7 @@
 package Ywk.Client;
 
 import Ywk.Client.Interceptor.EncryInterceptor;
+import Ywk.Client.Proxy.MyProxySelector;
 import okhttp3.Cookie;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
@@ -16,6 +17,7 @@ public class HttpClientWrapper {
         ConcurrentHashMap<String, List<Cookie>> cookies = CookiesStore.getCookieStore();
         client = (new OkHttpClient.Builder())
 //                .readTimeout(30, TimeUnit.SECONDS)
+                .proxySelector(new MyProxySelector())
                 .protocols(Collections.singletonList(Protocol.HTTP_1_1))
 //                .cookieJar(new CookieJar() {
 //                    @Override

@@ -4,200 +4,128 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0"
-            xmlns="http://javafx.com/javafx/11.0.1" fx:controller="Ywk.UserInterface.Controller.HomeController">
+            xmlns="http://javafx.com/javafx/10.0.2-internal"
+            fx:controller="Ywk.UserInterface.Controller.HomeController">
     <children>
         <HBox maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" AnchorPane.bottomAnchor="0.0"
               AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="600.0" AnchorPane.topAnchor="0.0">
             <children>
-                <VBox prefHeight="600.0" prefWidth="200.0">
-                    <children>
-                        <GridPane fx:id="bingCntPlaceholder">
-                            <!--<columnConstraints>-->
-                            <!--<ColumnConstraints hgrow="SOMETIMES" maxWidth="120.0" minWidth="10.0" prefWidth="66.0"/>-->
-                            <!--<ColumnConstraints hgrow="SOMETIMES" maxWidth="115.0" minWidth="10.0"-->
-                            <!--prefWidth="114.0"/>-->
-                            <!--</columnConstraints>-->
-                            <!--<rowConstraints>-->
-                            <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-                            <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-                            <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-                            <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-                            <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-                            <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-                            <!--</rowConstraints>-->
-                            <VBox.margin>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
-                            </VBox.margin>
-                            <children>
-                                <Label text="总数" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                                <Label fx:id="totalLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                                <Label text="已检索" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                                <Label fx:id="checkedLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                                <!--<Label text="百度PC上屏" GridPane.columnIndex="0" GridPane.rowIndex="2"/>-->
-                                <!--<Label fx:id="showedPcLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>-->
-                                <!--<Label text="百度手机上屏" GridPane.columnIndex="0" GridPane.rowIndex="3"/>-->
-                                <!--<Label fx:id="showedMobileLabel" text="0" GridPane.columnIndex="1"-->
-                                <!--GridPane.rowIndex="3"/>-->
-                                <!--<Label text="神马上屏" GridPane.rowIndex="4"/>-->
-                                <!--<Label fx:id="shenmaLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="4"/>-->
-                                <!--<Label text="头条上屏" GridPane.rowIndex="5"/>-->
-                                <!--<Label fx:id="toutiaoLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="5"/>-->
-                            </children>
-                        </GridPane>
-                        <HBox alignment="CENTER_LEFT" spacing="5.0">
-                            <children>
-                                <Label text="上限"/>
-                                <TextField fx:id="maxTf" prefWidth="70.0" text="0"/>
-                            </children>
-                            <VBox.margin>
-                                <Insets bottom="10.0" left="10.0" right="10.0"/>
-                            </VBox.margin>
-                        </HBox>
+                <ScrollPane prefHeight="200.0" prefWidth="200.0">
+                    <VBox prefHeight="600.0" prefWidth="200.0">
+                        <children>
+                            <GridPane fx:id="bingCntPlaceholder">
+                                <VBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                </VBox.margin>
+                                <children>
+                                    <Label text="总数" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                    <Label fx:id="totalLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                                    <Label text="已检索" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                                    <Label fx:id="checkedLabel" text="0" GridPane.columnIndex="1"
+                                           GridPane.rowIndex="1"/>
+                                </children>
+                            </GridPane>
+                            <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                <children>
+                                    <Label text="上限"/>
+                                    <TextField fx:id="maxTf" prefWidth="70.0" text="0"/>
+                                </children>
+                                <VBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0"/>
+                                </VBox.margin>
+                            </HBox>
 
-                        <VBox spacing="5.0" fx:id="searchPlatformsPlaceholder">
-                            <children>
+                            <VBox spacing="5.0" fx:id="searchPlatformsPlaceholder">
+                                <children>
 
-                            </children>
-                            <VBox.margin>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
-                            </VBox.margin>
-                        </VBox>
-                        <!--<GridPane>-->
-                        <!--<columnConstraints>-->
-                        <!--<ColumnConstraints hgrow="SOMETIMES" maxWidth="86.0" minWidth="10.0" prefWidth="66.0"/>-->
-                        <!--<ColumnConstraints hgrow="SOMETIMES" maxWidth="115.0" minWidth="10.0"-->
-                        <!--prefWidth="114.0"/>-->
-                        <!--</columnConstraints>-->
-                        <!--<rowConstraints>-->
-                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-                        <!--</rowConstraints>-->
-                        <!--<VBox.margin>-->
-                        <!--<Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>-->
-                        <!--</VBox.margin>-->
-                        <!--<children>-->
-                        <!--<CheckBox fx:id="checkMobileCb" mnemonicParsing="false" text="百度移动端"-->
-                        <!--GridPane.columnIndex="0" GridPane.rowIndex="0"/>-->
-                        <!--<CheckBox fx:id="checkPcCb" mnemonicParsing="false" selected="true" text="百度PC端"-->
-                        <!--GridPane.columnIndex="1" GridPane.rowIndex="0"/>-->
-                        <!--<CheckBox fx:id="checkSMCb" mnemonicParsing="false" text="神马搜索" GridPane.columnIndex="0"-->
-                        <!--GridPane.rowIndex="1"/>-->
-                        <!--<CheckBox fx:id="checkTTCb" mnemonicParsing="false" text="头条搜索" GridPane.columnIndex="1"-->
-                        <!--GridPane.rowIndex="1"/>-->
-                        <!--</children>-->
-                        <!--</GridPane>-->
-                        <HBox alignment="CENTER_LEFT" spacing="5.0">
-                            <children>
-                                <Label text="检索深度"/>
-                                <ChoiceBox fx:id="pageChoiceBox" prefWidth="50.0"/>
-                                <Label text="页"/>
-                            </children>
-                            <VBox.margin>
-                                <Insets left="10.0" right="10.0" top="10.0"/>
-                            </VBox.margin>
-                        </HBox>
-                        <VBox spacing="5.0">
-                            <children>
+                                </children>
+                                <VBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                </VBox.margin>
+                            </VBox>
+                            <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                <children>
+                                    <Label text="检索深度"/>
+                                    <ChoiceBox fx:id="pageChoiceBox" prefWidth="50.0"/>
+                                    <Label text="页"/>
+                                </children>
+                                <VBox.margin>
+                                    <Insets left="10.0" right="10.0" top="10.0"/>
+                                </VBox.margin>
+                            </HBox>
+                            <VBox spacing="5.0">
+                                <children>
 
-                                <RadioButton fx:id="chooseMainRb" mnemonicParsing="false" text="[主词]"/>
-                                <RadioButton fx:id="choosePrefixMainRb" mnemonicParsing="false" text="[地区词] + [主词]"/>
-                                <RadioButton fx:id="choosePrefixMainSuffixRb" mnemonicParsing="false"
-                                             text="[地区词] + [主词] + [尾词]"/>
-                                <RadioButton fx:id="chooseMainSuffixRb" mnemonicParsing="false" text="[主词] + [尾词]"/>
-                                <RadioButton fx:id="chooseHeaderMainRb" mnemonicParsing="false" text="[词头] + [主词]"/>
-                                <RadioButton fx:id="choosePrefixHeaderMainRb" mnemonicParsing="false"
-                                             text="[地区] + [词头] + [主词]"/>
-                                <RadioButton fx:id="chooseHeaderMainSuffixRb" mnemonicParsing="false"
-                                             text="[词头] + [主词] + [尾词]"/>
-                                <RadioButton fx:id="choosePrefixHeaderMainSuffixRb" mnemonicParsing="false"
-                                             text="[地区] + [词头] + [主词] + [尾词]"/>
+                                    <RadioButton fx:id="chooseMainRb" mnemonicParsing="false" text="[主词]"/>
+                                    <RadioButton fx:id="choosePrefixMainRb" mnemonicParsing="false"
+                                                 text="[地区词] + [主词]"/>
+                                    <RadioButton fx:id="choosePrefixMainSuffixRb" mnemonicParsing="false"
+                                                 text="[地区词] + [主词] + [尾词]"/>
+                                    <RadioButton fx:id="chooseMainSuffixRb" mnemonicParsing="false" text="[主词] + [尾词]"/>
+                                    <RadioButton fx:id="chooseHeaderMainRb" mnemonicParsing="false" text="[词头] + [主词]"/>
+                                    <RadioButton fx:id="choosePrefixHeaderMainRb" mnemonicParsing="false"
+                                                 text="[地区] + [词头] + [主词]"/>
+                                    <RadioButton fx:id="chooseHeaderMainSuffixRb" mnemonicParsing="false"
+                                                 text="[词头] + [主词] + [尾词]"/>
+                                    <RadioButton fx:id="choosePrefixHeaderMainSuffixRb" mnemonicParsing="false"
+                                                 text="[地区] + [词头] + [主词] + [尾词]"/>
 
-                                <RadioButton fx:id="chooseCustomRb" mnemonicParsing="false" text="[自定义]"/>
-                                <Button fx:id="selectTxtBtn" mnemonicParsing="false" onAction="#handleCustomKeywords"
-                                        text="选择文件(一行一条)" visible="false"/>
-                            </children>
-                            <VBox.margin>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
-                            </VBox.margin>
-                        </VBox>
+                                    <RadioButton fx:id="chooseCustomRb" mnemonicParsing="false" text="[自定义]"/>
+                                    <Button fx:id="selectTxtBtn" mnemonicParsing="false"
+                                            onAction="#handleCustomKeywords"
+                                            text="选择文件(一行一条)" visible="false"/>
+                                </children>
+                                <VBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                </VBox.margin>
+                            </VBox>
 
-                        <HBox spacing="5.0">
-                            <children>
-                                <Label text="加速"/>
-                                <Slider fx:id="speedSlider"/>
-                            </children>
-                            <padding>
-                                <Insets left="10.0"/>
-                            </padding>
-                        </HBox>
-                        <CheckBox fx:id="autoUploadCb" mnemonicParsing="false" text="完成后自动上传结果">
-                            <VBox.margin>
-                                <Insets bottom="10.0" left="10.0" top="10.0"/>
-                            </VBox.margin>
-                        </CheckBox>
-                        <HBox spacing="10.0">
-                            <children>
-                                <Button fx:id="startBtn" mnemonicParsing="false" onAction="#handleNewStart" text="开始"/>
-                                <Button fx:id="resumeBtn" disable="true" mnemonicParsing="false"
-                                        onAction="#handleResume" text="继续"/>
-                                <Button fx:id="stopBtn" disable="true" mnemonicParsing="false" onAction="#handleStop"
-                                        text="停止"/>
-                            </children>
-                            <VBox.margin>
-                                <Insets/>
-                            </VBox.margin>
-                            <padding>
-                                <Insets left="10.0" top="10.0"/>
-                            </padding>
-                        </HBox>
-                        <Button fx:id="uploadBtn" mnemonicParsing="false" onAction="#handleUpload" text="上传结果">
-                            <VBox.margin>
-                                <Insets bottom="10.0" left="10.0" top="10.0"/>
-                            </VBox.margin>
-                        </Button>
-
-                        <!--<GridPane>-->
-                        <!--<columnConstraints>-->
-                        <!--<ColumnConstraints hgrow="SOMETIMES" maxWidth="86.0" minWidth="10.0" prefWidth="66.0"/>-->
-                        <!--<ColumnConstraints hgrow="SOMETIMES" maxWidth="115.0" minWidth="10.0"-->
-                        <!--prefWidth="114.0"/>-->
-                        <!--</columnConstraints>-->
-                        <!--<rowConstraints>-->
-                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-                        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-                        <!--</rowConstraints>-->
-                        <!--<VBox.margin>-->
-                        <!--<Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>-->
-                        <!--</VBox.margin>-->
-                        <!--&lt;!&ndash;<children>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<Label text="已运行" GridPane.columnIndex="0" GridPane.rowIndex="0"/>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<Label fx:id="runnedLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="0"/>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<Label text="剩余时间" GridPane.columnIndex="0" GridPane.rowIndex="1"/>&ndash;&gt;-->
-                        <!--&lt;!&ndash;<Label fx:id="estimateLabel" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>&ndash;&gt;-->
-                        <!--&lt;!&ndash;</children>&ndash;&gt;-->
-                        <!--</GridPane>-->
-                        <!--<ProgressBar fx:id="progressBar" prefWidth="200.0" progress="0.0">-->
-                        <!--<VBox.margin>-->
-                        <!--<Insets left="10.0" right="10.0" top="10.0"/>-->
-                        <!--</VBox.margin>-->
-                        <!--</ProgressBar>-->
-                        <!--<ListView fx:id="infoLv" prefHeight="200.0" prefWidth="200.0">-->
-                        <!--<VBox.margin>-->
-                        <!--<Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>-->
-                        <!--</VBox.margin>-->
-                        <!--</ListView>-->
-
-
-                    </children>
-                </VBox>
+                            <HBox spacing="5.0">
+                                <children>
+                                    <Label text="加速"/>
+                                    <Slider fx:id="speedSlider"/>
+                                </children>
+                                <padding>
+                                    <Insets left="10.0"/>
+                                </padding>
+                            </HBox>
+                            <CheckBox fx:id="autoUploadCb" mnemonicParsing="false" text="完成后自动上传结果">
+                                <VBox.margin>
+                                    <Insets bottom="10.0" left="10.0" top="10.0"/>
+                                </VBox.margin>
+                            </CheckBox>
+                            <HBox spacing="10.0">
+                                <children>
+                                    <Button fx:id="startBtn" mnemonicParsing="false" onAction="#handleNewStart"
+                                            text="开始"/>
+                                    <Button fx:id="resumeBtn" disable="true" mnemonicParsing="false"
+                                            onAction="#handleResume" text="继续"/>
+                                    <Button fx:id="stopBtn" disable="true" mnemonicParsing="false"
+                                            onAction="#handleStop"
+                                            text="停止"/>
+                                </children>
+                                <VBox.margin>
+                                    <Insets/>
+                                </VBox.margin>
+                                <padding>
+                                    <Insets left="10.0" top="10.0"/>
+                                </padding>
+                            </HBox>
+                            <Button fx:id="uploadBtn" mnemonicParsing="false" onAction="#handleUpload" text="上传结果">
+                                <VBox.margin>
+                                    <Insets bottom="10.0" left="10.0" top="10.0"/>
+                                </VBox.margin>
+                            </Button>
+                        </children>
+                    </VBox>
+                </ScrollPane>
             </children>
         </HBox>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0"
                     AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
                     SplitPane.resizableWithParent="false">
             <children>
-                <TabPane fx:id="tabPlaceholder"
-                         prefHeight="600.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE"
+                <TabPane fx:id="tabPlaceholder" prefHeight="600.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE"
                          AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                          AnchorPane.topAnchor="0.0">
                     <!--<tabs>-->

@@ -13,7 +13,7 @@ public class PageRunner {
 
     private int checkDepth = 1;
 
-    private static final int SPEED_RATE = 100;
+    private static final int SPEED_RATE = 16;
 
 
     public PageRunner(PageSpider spider) {

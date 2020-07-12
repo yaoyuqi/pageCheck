@@ -83,8 +83,12 @@ public class PageSpider {
 //                    .build();
 //
 //        }
-
-        String urlNew = url + "&rsv_spt=1&rsv_iqid=0xd3486227000e553c&issp=1&f=3&rsv_bp=1&rsv_idx=2&ie=utf-8&tn=baiduhome_pg&rsv_enter=1&rsv_dl=ts_0&rsv_sug3=4&rsv_sug1=2&rsv_sug7=100&rsv_sug2=1&rsv_btype=i&prefixsug=dsf&rsp=0&inputT=1930&rsv_sug4=2608&rsv_jmp=fail";
+        String urlNew;
+        if (url.contains("baidu")) {
+            urlNew = url + "&rsv_spt=1&rsv_iqid=0xd3486227000e553c&issp=1&f=3&rsv_bp=1&rsv_idx=2&ie=utf-8&tn=baiduhome_pg&rsv_enter=1&rsv_dl=ts_0&rsv_sug3=4&rsv_sug1=2&rsv_sug7=100&rsv_sug2=1&rsv_btype=i&prefixsug=dsf&rsp=0&inputT=1930&rsv_sug4=2608&rsv_jmp=fail";
+        } else {
+            urlNew = url;
+        }
 
         System.out.println("Search[" + urlNew + "]");
 //        client.newCall(request).enqueue(new Callback() {

@@ -5,6 +5,7 @@ import Ywk.Client.HttpClientWrapper;
 import Ywk.Client.Interceptor.EncryInterceptor;
 import Ywk.Client.Interceptor.PageEncrypt;
 import Ywk.Client.PlatformWrapper;
+import Ywk.Client.Proxy.ProxyFetchTask;
 import Ywk.Client.RequestBuilder.RequestBuilder;
 import Ywk.Client.SearchPlatform;
 import Ywk.Data.ApiWriter;
@@ -66,6 +67,7 @@ public class TaskManage implements Runnable
      */
     private List<PageRunner> runners;
 
+    private Timer timer;
 
 
     public TaskManage(HomeController controller) {
@@ -202,10 +204,16 @@ public class TaskManage implements Runnable
 
     public synchronized void start() {
         updateRunnerConfig();
+        updateProxy();
         this.taskStatus = TaskStatus.RUNNING;
         this.uploadStatus = UploadStatus.WAITING;
 
         controller.updateTaskStatus();
+    }
+
+    public void updateProxy() {
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new ProxyFetchTask(), 0, 120000);
     }
 
     /**
@@ -256,6 +264,7 @@ public class TaskManage implements Runnable
      * 停止任务
      */
     public void stopAll() {
+        timer.cancel();
         taskStatus = TaskStatus.PAUSE;
         runners.forEach(PageRunner::stop);
 
