@@ -28,7 +28,7 @@
                             <HBox alignment="CENTER_LEFT" spacing="5.0">
                                 <children>
                                     <Label text="上限"/>
-                                    <TextField fx:id="maxTf" prefWidth="70.0" text="0"/>
+                                    <TextField fx:id="maxTf" prefWidth="70.0" text="200000"/>
                                 </children>
                                 <VBox.margin>
                                     <Insets bottom="10.0" left="10.0" right="10.0"/>
