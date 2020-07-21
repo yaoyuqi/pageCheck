@@ -263,21 +263,21 @@ public class HomeController implements ContentChecker.PageValidate {
             tableView.setItems(list);
 
             TableColumn<InfoModel, String> keywordCell = new TableColumn<>("关键词");
-            TableColumn<InfoModel, String> productCell = new TableColumn<>("产品");
+//            TableColumn<InfoModel, String> productCell = new TableColumn<>("产品");
             TableColumn<InfoModel, String> pageCell = new TableColumn<>("页数");
             TableColumn<InfoModel, String> locCell = new TableColumn<>("位置");
             TableColumn<InfoModel, String> checkTimeCell = new TableColumn<>("查询时间");
             TableColumn<InfoModel, String> browseCell = new TableColumn<>("查看页面");
 
             keywordCell.setSortable(false);
-            productCell.setSortable(false);
+//            productCell.setSortable(false);
             pageCell.setSortable(false);
             browseCell.setSortable(false);
             checkTimeCell.setSortable(false);
             locCell.setSortable(false);
             checkTimeCell.setMinWidth(80);
             keywordCell.setMinWidth(150);
-            productCell.setMinWidth(80);
+//            productCell.setMinWidth(80);
 
             Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> keywordCallback =
                     (param) -> param.getValue().keywordProperty();
@@ -297,14 +297,15 @@ public class HomeController implements ContentChecker.PageValidate {
 
 
             keywordCell.setCellValueFactory(keywordCallback);
-            productCell.setCellValueFactory(productCallback);
+//            productCell.setCellValueFactory(productCallback);
             pageCell.setCellValueFactory(pageCallback);
             locCell.setCellValueFactory(locCallback);
             checkTimeCell.setCellValueFactory(timeCallback);
             browseCell.setCellValueFactory(cellData -> new SimpleStringProperty("点击查看"));
             browseCell.setCellFactory(urlClickOpenCallback(list, platform));
 
-            tableView.getColumns().setAll(keywordCell, productCell, pageCell, locCell, checkTimeCell, browseCell);
+//            tableView.getColumns().setAll(keywordCell, productCell, pageCell, locCell, checkTimeCell, browseCell);
+            tableView.getColumns().setAll(keywordCell, pageCell, locCell, checkTimeCell, browseCell);
             Tab tab = new Tab();
             tab.setText(platform.getName());
             tabPlaceholder.getTabs().add(tab);
