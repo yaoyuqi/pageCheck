@@ -456,8 +456,8 @@ public class HomeController implements ContentChecker.PageValidate {
         choosePrefixHeaderMainRb.setToggleGroup(group);
         choosePrefixHeaderMainSuffixRb.setToggleGroup(group);
 
-        choosePrefixMainSuffixRb.setSelected(true);
-
+//        choosePrefixMainSuffixRb.setSelected(true);
+        chooseHeaderMainSuffixRb.setSelected(true);
         chooseMainRb.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 task.setKeywordType(KeywordGenerator.MixType.MAIN);
