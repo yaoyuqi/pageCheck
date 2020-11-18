@@ -57,7 +57,7 @@ public class MainApp extends Application {
         loginController.setApp(this);
 
         Scene scene = new Scene(root, 400, 300);
-        primaryStage.setTitle("全网推广跑词工具");
+        primaryStage.setTitle("百姓查询");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
