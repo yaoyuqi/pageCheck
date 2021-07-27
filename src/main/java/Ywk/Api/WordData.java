@@ -43,6 +43,8 @@ public class WordData {
         private List<String> main;
         private List<String> suffix;
         private List<String> head;
+        private List<String> news_title;
+        private List<String> question_title;
 
         public List<String> getPrefix() {
             return prefix;
@@ -74,6 +76,22 @@ public class WordData {
 
         public void setHead(List<String> head) {
             this.head = head;
+        }
+
+        public List<String> getNews_title() {
+            return news_title;
+        }
+
+        public void setNews_title(List<String> news_title) {
+            this.news_title = news_title;
+        }
+
+        public List<String> getQuestion_title() {
+            return question_title;
+        }
+
+        public void setQuestion_title(List<String> question_title) {
+            this.question_title = question_title;
         }
     }
 }

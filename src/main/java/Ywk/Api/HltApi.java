@@ -4,6 +4,7 @@ import Ywk.Client.PlatformWrapper;
 import Ywk.Client.Proxy.ProxyPool;
 import Ywk.Client.SearchPlatform;
 import Ywk.Data.*;
+import Ywk.Data.Keyword.KeywordGenerator;
 import Ywk.UserInterface.Controller.LoginController;
 import com.google.gson.Gson;
 import okhttp3.*;
@@ -249,10 +250,17 @@ public class HltApi {
                         generator.initFailed();
                         controller.vitalError();
                     } else {
-                        generator.setWords(wordData.getData().getPrefix().toArray(new String[]{}),
-                                wordData.getData().getMain().toArray(new String[]{}),
-                                wordData.getData().getSuffix().toArray(new String[]{}),
-                                wordData.getData().getHead().toArray(new String[]{}));
+                        generator.setWord(KeywordGenerator.WordType.Prefix, wordData.getData().getPrefix().toArray(new String[]{}));
+                        generator.setWord(KeywordGenerator.WordType.Main, wordData.getData().getMain().toArray(new String[]{}));
+                        generator.setWord(KeywordGenerator.WordType.Suffix, wordData.getData().getSuffix().toArray(new String[]{}));
+                        generator.setWord(KeywordGenerator.WordType.Head, wordData.getData().getHead().toArray(new String[]{}));
+                        generator.setWord(KeywordGenerator.WordType.Title, wordData.getData().getNews_title().toArray(new String[]{}));
+                        generator.setWord(KeywordGenerator.WordType.QuestionTitle, wordData.getData().getQuestion_title().toArray(new String[]{}));
+                        generator.setInitSuccess();
+//                        generator.setWords(wordData.getData().getPrefix().toArray(new String[]{}),
+//                                wordData.getData().getMain().toArray(new String[]{}),
+//                                wordData.getData().getSuffix().toArray(new String[]{}),
+//                                wordData.getData().getHead().toArray(new String[]{}));
                         controller.apiInitFinished();
 
                     }

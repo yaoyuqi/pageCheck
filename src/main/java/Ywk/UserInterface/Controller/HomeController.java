@@ -4,7 +4,7 @@ import Ywk.Client.CookiesStore;
 import Ywk.Client.PlatformWrapper;
 import Ywk.Client.SearchPlatform;
 import Ywk.Data.Info;
-import Ywk.Data.KeywordGenerator;
+import Ywk.Data.Keyword.KeywordGenerator;
 import Ywk.MainApp;
 import Ywk.PageCheck.ContentChecker;
 import Ywk.PageCheck.TaskManage;
@@ -16,7 +16,6 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
@@ -279,28 +278,11 @@ public class HomeController implements ContentChecker.PageValidate {
             keywordCell.setMinWidth(150);
             productCell.setMinWidth(80);
 
-            Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> keywordCallback =
-                    (param) -> param.getValue().keywordProperty();
-
-            Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> pageCallback =
-                    (param) -> param.getValue().pageProperty();
-
-            Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> locCallback =
-                    (param) -> param.getValue().locProperty();
-
-
-            Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> timeCallback =
-                    (param) -> param.getValue().timeProperty();
-
-            Callback<TableColumn.CellDataFeatures<InfoModel, String>, ObservableValue<String>> productCallback =
-                    (param) -> param.getValue().productProperty();
-
-
-            keywordCell.setCellValueFactory(keywordCallback);
-            productCell.setCellValueFactory(productCallback);
-            pageCell.setCellValueFactory(pageCallback);
-            locCell.setCellValueFactory(locCallback);
-            checkTimeCell.setCellValueFactory(timeCallback);
+            keywordCell.setCellValueFactory(param -> param.getValue().keywordProperty());
+            productCell.setCellValueFactory(param -> param.getValue().productProperty());
+            pageCell.setCellValueFactory(param -> param.getValue().pageProperty());
+            locCell.setCellValueFactory(param -> param.getValue().locProperty());
+            checkTimeCell.setCellValueFactory(param -> param.getValue().timeProperty());
             browseCell.setCellValueFactory(cellData -> new SimpleStringProperty("点击查看"));
             browseCell.setCellFactory(urlClickOpenCallback(list, platform));
 

@@ -11,7 +11,7 @@ import Ywk.Client.SearchPlatform;
 import Ywk.Data.ApiWriter;
 import Ywk.Data.IdentityWrapper;
 import Ywk.Data.Info;
-import Ywk.Data.KeywordGenerator;
+import Ywk.Data.Keyword.KeywordGenerator;
 import Ywk.UserInterface.Controller.HomeController;
 
 import java.text.SimpleDateFormat;
@@ -81,6 +81,7 @@ public class TaskManage implements Runnable
 //            String[] suffix = {"怎么样", "如何"};
 //            generator = new KeywordGenerator(prefix, main, suffix);
         generator = KeywordGenerator.getInstance();
+        generator.initGenerators();
         identities = IdentityWrapper.getInstance().identities();
         prepareCheckTool();
 
@@ -281,8 +282,8 @@ public class TaskManage implements Runnable
      */
     private void prepareForNew() {
         if (generator != null) {
-            generator.setCurrent(-1, -1, -1, -1);
-            generator.setCurRun(0);
+//            generator.setCurrent(-1, -1, -1, -1);
+            generator.resetGenerators();
         }
 
         if (runningContainer != null) {
@@ -323,11 +324,12 @@ public class TaskManage implements Runnable
 
 
     public void setCustomKeywords(List<String> e) {
-        generator.setCustom(e.toArray(new String[]{}));
+        generator.setWord(KeywordGenerator.WordType.Custom, e.toArray(new String[]{}));
     }
 
     public void setKeywordType(KeywordGenerator.MixType type) {
         generator.setType(type);
+//        generator.initGenerators();
     }
 
     public void setKeywordMax(int max) {

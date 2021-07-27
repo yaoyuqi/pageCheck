@@ -1,7 +1,7 @@
 package Ywk.PageCheck;
 
 import Ywk.Client.SearchPlatform;
-import Ywk.Data.KeywordGenerator;
+import Ywk.Data.Keyword.KeywordGenerator;
 
 import java.util.ArrayList;
 import java.util.List;

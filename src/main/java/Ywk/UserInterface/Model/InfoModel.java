@@ -20,6 +20,10 @@ public class InfoModel {
         this.info = info;
     }
 
+    public Info getInfo() {
+        return info;
+    }
+
     public String getUrl() {
         return info.getPlatform().nextPageUrl(getKeyword(), info.getPage());
     }

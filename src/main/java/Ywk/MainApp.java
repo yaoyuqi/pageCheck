@@ -2,7 +2,7 @@ package Ywk;
 
 import Ywk.Api.HltApi;
 import Ywk.Client.HttpClientWrapper;
-import Ywk.Data.KeywordGenerator;
+import Ywk.Data.Keyword.KeywordGenerator;
 import Ywk.UserInterface.Controller.HomeController;
 import Ywk.UserInterface.Controller.LoginController;
 import javafx.application.Application;
@@ -16,10 +16,14 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import okhttp3.OkHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class MainApp extends Application {
+    private static final Logger logger = LoggerFactory.getLogger(MainApp.class);
 
     private static final int SCREEN_WIDTH = 1200;
     private static final int SCREEN_HEIGHT = 800;
@@ -36,6 +40,7 @@ public class MainApp extends Application {
     }
 
     public void start(Stage primaryStage) throws Exception {
+        logger.info("app start");
         client = HttpClientWrapper.getClient();
 
         HltApi.getInstance(client);
@@ -43,7 +48,7 @@ public class MainApp extends Application {
         this.primaryStage = primaryStage;
 
 
-        primaryStage.getIcons().add(new Image(MainApp.class.getResourceAsStream("/icons/logo128.png")));
+        primaryStage.getIcons().add(new Image(Objects.requireNonNull(MainApp.class.getResourceAsStream("/icons/logo128.png"))));
 
         primaryStage.setOnCloseRequest((WindowEvent event) -> {
             Platform.exit();
@@ -61,6 +66,7 @@ public class MainApp extends Application {
         primaryStage.setTitle("91数据中台");
         primaryStage.setScene(scene);
         primaryStage.show();
+        logger.info("start scene finished");
     }
 
     public void gotoMain() {
@@ -168,7 +174,7 @@ public class MainApp extends Application {
 
         KeywordGenerator generator = KeywordGenerator.getInstance();
 
-        generator.setWords(new String[]{""}, keywords, new String[]{""}, new String[]{""});
+//        generator.setWords(new String[]{""}, keywords, new String[]{""}, new String[]{""});
 
 
     }

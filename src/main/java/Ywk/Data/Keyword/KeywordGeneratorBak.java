@@ -1,10 +1,10 @@
-package Ywk.Data;
+package Ywk.Data.Keyword;
 
 import Ywk.Api.ApiInstance;
 import Ywk.Api.ApiStatus;
 
-public class KeywordGenerator implements ApiInstance {
-    private static KeywordGenerator instance;
+public class KeywordGeneratorBak implements ApiInstance {
+    private static KeywordGeneratorBak instance;
     private ApiStatus initStatus = ApiStatus.WAITING;
 
     private MixType type = MixType.PREFIX_MAIN_SUFFIX;
@@ -21,12 +21,12 @@ public class KeywordGenerator implements ApiInstance {
     private int curRun = 0;
     private int curHead = -1;
 
-    private KeywordGenerator() {
+    private KeywordGeneratorBak() {
     }
 
-    public static KeywordGenerator getInstance() {
+    public static KeywordGeneratorBak getInstance() {
         if (instance == null) {
-            instance = new KeywordGenerator();
+            instance = new KeywordGeneratorBak();
         }
         return instance;
     }
