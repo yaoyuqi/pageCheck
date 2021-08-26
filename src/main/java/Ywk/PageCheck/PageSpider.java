@@ -5,6 +5,9 @@ import Ywk.Client.Interceptor.PageEncrypt;
 import Ywk.Client.RequestBuilder.RequestBuilder;
 import Ywk.Client.SearchPlatform;
 import okhttp3.*;
+import okhttp3.internal.http.RealResponseBody;
+import okio.GzipSource;
+import okio.Okio;
 
 import java.io.IOException;
 import java.util.List;
@@ -117,9 +120,11 @@ public class PageSpider {
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                    String content = response.body().string();
-
-                    encrypts.stream().filter(pageEncrypt -> pageEncrypt.canHandle(response.request().url().uri()))
+                    var tResponse = unzip(response);
+                    String content = tResponse.body().string();
+//                    System.out.println("contentType is " + tResponse.header("Content-Type"));
+//                    System.out.println(content);
+                    encrypts.stream().filter(pageEncrypt -> pageEncrypt.canHandle(tResponse.request().url().uri()))
                             .forEach(pageEncrypt -> pageEncrypt.parse(content));
 
                     checker.check(content, keyword, page);
@@ -144,6 +149,19 @@ public class PageSpider {
         }
 
 
+    }
+
+    private Response unzip(final Response response) {
+        var contentEncoding = response.headers().get("Content-Encoding");
+        if (contentEncoding != null && contentEncoding.equals("gzip")) {
+            var contentLength = response.body().contentLength();
+            var responseBody = new GzipSource(response.body().source());
+            var strippedHeaders = response.headers().newBuilder().build();
+            return response.newBuilder().headers(strippedHeaders)
+                    .body(new RealResponseBody(response.body().contentType().toString(), contentLength, Okio.buffer(responseBody)))
+                    .build();
+        }
+        return response;
     }
 
     public SearchPlatform getPlatform() {

@@ -40,6 +40,9 @@ public class LoginController {
 
         user = "lymczs";
         password = "qwe123";
+
+//        user = "xyzljx01";
+//        password = "zljx666666";
         if (user.isEmpty() || password.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText(null);

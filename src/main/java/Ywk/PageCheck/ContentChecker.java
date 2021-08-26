@@ -78,10 +78,11 @@ public class ContentChecker implements Checker {
 //            }).collect(Collectors.toList());
 //            cookieStore.put(uri.getHost(), list);
 //        }
-
+//        System.out.println(content);
         if (content != null
                 && identities.stream().parallel().anyMatch(content::contains)
         ) {
+
             Document doc = Jsoup.parse(content);
             Elements elements = doc.select(platform.getPattern());
             Map<String, List<String>> result = new HashMap<>();
