@@ -120,16 +120,20 @@ public class PageSpider {
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                    var tResponse = unzip(response);
-                    String content = tResponse.body().string();
+                    try {
+                        var tResponse = unzip(response);
+                        String content = tResponse.body().string();
 //                    System.out.println("contentType is " + tResponse.header("Content-Type"));
 //                    System.out.println(content);
-                    encrypts.stream().filter(pageEncrypt -> pageEncrypt.canHandle(tResponse.request().url().uri()))
-                            .forEach(pageEncrypt -> pageEncrypt.parse(content));
+                        encrypts.stream().filter(pageEncrypt -> pageEncrypt.canHandle(tResponse.request().url().uri()))
+                                .forEach(pageEncrypt -> pageEncrypt.parse(content));
 
-                    checker.check(content, keyword, page);
-                    listener.updateRunningInfo();
-                    response.close();
+                        checker.check(content, keyword, page);
+                        listener.updateRunningInfo();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                 }
             });
 //            try (Response response = client.newCall(request).execute()) {

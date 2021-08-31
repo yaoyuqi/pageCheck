@@ -38,8 +38,8 @@ public class LoginController {
         String user = account.getText();
         String password = passwordField.getText();
 
-        user = "lymczs";
-        password = "qwe123";
+//        user = "lymczs";
+//        password = "qwe123";
 
 //        user = "xyzljx01";
 //        password = "zljx666666";
