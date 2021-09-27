@@ -81,8 +81,8 @@ public class MainApp extends Application {
             Rectangle2D bounds = screen.getVisualBounds();
             primaryStage.setX((bounds.getMaxX() - SCREEN_WIDTH) / 2);
             primaryStage.setY((bounds.getMaxY() - SCREEN_HEIGHT) / 2);
-//            primaryStage.setWidth(bounds.getWidth());
-//            primaryStage.setHeight(bounds.getHeight());
+            //            primaryStage.setWidth(bounds.getWidth());
+            // primaryStage.setHeight(bounds.getHeight());
 
             Scene scene = new Scene(pane, SCREEN_WIDTH, SCREEN_HEIGHT);
             HomeController controller = loader.getController();
