@@ -18,7 +18,7 @@ public class S360MBuilder extends AbstractBuilder {
 //                    .header("Accept-Encoding", "gzip, deflate, br")
                 .header("Accept-Language", "en,zh-CN;q=0.9,zh;q=0.8")
 //                .header("User-Agent:", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36")
-                .header("User-Agent:", UserAgents.randomUserAgent(true))
+                .header("User-Agent", UserAgents.randomUserAgent(true))
                 .build();
 
 
